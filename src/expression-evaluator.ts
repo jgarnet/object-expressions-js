@@ -1,5 +1,7 @@
 import ConditionEvaluator from "./types/condition-evaluator";
 
+const OPERATORS = ['AND', 'OR', 'NOT'];
+
 class ExpressionEvaluator {
 
     /**
@@ -149,18 +151,16 @@ class ExpressionEvaluator {
             }
             // check for operators
             if (parenCount === 0 && !inString) {
-                if (this.isOperator('OR', expression, i)) {
-                    this.addOperator('OR', buffer);
-                    buffer = '';
-                    i += 1;
-                } else if (this.isOperator('AND', expression, i)) {
-                    this.addOperator('AND', buffer);
-                    buffer = '';
-                    i += 2;
-                } else if (this.isOperator('NOT', expression, i)) {
-                    this.addOperator('NOT', buffer);
-                    buffer = '';
-                    i += 2;
+                for (const operator of OPERATORS) {
+                    if (this.isOperator(operator, expression, i)) {
+                        // add the operator to the current tokens
+                        this.addOperator(operator, buffer);
+                        // clear the current buffer
+                        buffer = '';
+                        // move the buffer index forward past the operator
+                        i += operator.length - 1;
+                        break;
+                    }
                 }
             }
         }
