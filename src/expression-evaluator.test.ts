@@ -8,7 +8,7 @@ const conditionEvaluator: ConditionEvaluator = {
         const parts = token.split(" ");
         switch (parts[1]) {
             case '=':
-                return object[parts[0]] == parts[2];
+                return object[parts[0]] == parts[2].replace(/\\"/g, '"');
             case '>':
                 return object[parts[0]] > parts[2];
             case '<':
@@ -86,5 +86,17 @@ describe('ExpressionEvaluator Tests', () => {
             { a: 1, b: 2, c: 3, d: 4 },
             true
         );
+    });
+    it('should account for quotes and whitespace', () => {
+        testAssertion(`
+            a = 1
+        `, { a: 1 }, true);
+        testAssertion(`
+            a = "testing\nmultiple\nlines"
+        `, { a: 'testing\nmultiple\nlines' }, true);
+        testAssertion(`
+            a = testing\nmultiple\nlines
+        `, { a: 'testing\nmultiple\nlines' }, false);
+        testAssertion('a = "Testing_\\"nested\\"_quotes"', { a: 'Testing_"nested"_quotes'}, true);
     });
 });

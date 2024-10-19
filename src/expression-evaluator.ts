@@ -72,6 +72,7 @@ class ExpressionEvaluator {
     private parse(expression: string) {
         let buffer = '';
         let parenCount = 0;
+        let inQuote = false;
         for (let i = 0; i < expression.length; i++) {
             const char = expression[i];
             // check for child expressions
@@ -84,49 +85,66 @@ class ExpressionEvaluator {
                 parenCount--;
                 if (parenCount === 0) {
                     // end expression
-                    this.tokens.push(buffer);
+                    this.addToken(buffer);
                     this.childExpressions.add(buffer);
                     buffer = '';
                 } else {
                     buffer += char;
                 }
+            } else if (char === '"') {
+                if (!inQuote) {
+                    inQuote = true;
+                } else if (expression[i - 1] === '\\') {
+                    buffer += char;
+                } else {
+                    inQuote = false;
+                }
+            } else if (/\s/.test(char)) {
+                if (inQuote) {
+                    buffer += char;
+                } else {
+                    buffer += ' ';
+                }
             } else {
                 buffer += char;
             }
             // check for operators
-            // todo: refactor to ignore whitespace for each token
             if (parenCount === 0) {
                 if (i + 5 < expression.length && expression.slice(i + 1, i + 5) === ' OR ') {
                     if (buffer.length > 0) {
-                        this.tokens.push(buffer);
+                        this.addToken(buffer);
                     }
-                    this.tokens.push('OR');
+                    this.addToken('OR');
                     buffer = '';
                     i += 4;
                 } else if (i + 6 < expression.length && expression.slice(i + 1, i + 6) === ' AND ') {
                     if (buffer.length > 0) {
-                        this.tokens.push(buffer);
+                        this.addToken(buffer);
                     }
-                    this.tokens.push('AND');
+                    this.addToken('AND');
                     buffer = '';
                     i += 5;
                 } else if (i + 6 < expression.length && expression.slice(i + 1, i + 6) === ' NOT ') {
                     if (buffer.length > 0) {
-                        this.tokens.push(buffer);
+                        this.addToken(buffer);
                     }
-                    this.tokens.push('NOT');
+                    this.addToken('NOT');
                     buffer = '';
                     i += 5;
                 } else if (i + 4 < expression.length && expression.slice(i, i + 4) === 'NOT ') {
-                    this.tokens.push('NOT');
+                    this.addToken('NOT');
                     buffer = '';
                     i += 3;
                 }
             }
         }
         if (buffer.length > 0) {
-            this.tokens.push(buffer);
+            this.addToken(buffer);
         }
+    }
+
+    private addToken(token: string): void {
+        this.tokens.push(token.trim());
     }
 }
 
