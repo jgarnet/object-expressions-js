@@ -72,7 +72,7 @@ class ExpressionEvaluator {
     private parse(expression: string) {
         let buffer = '';
         let parenCount = 0;
-        let inQuote = false;
+        let inString = false;
         for (let i = 0; i < expression.length; i++) {
             const char = expression[i];
             if (char === '(') {
@@ -94,17 +94,15 @@ class ExpressionEvaluator {
                 }
             } else if (char === '"') {
                 // keep track of quotes for strings with whitespace
-                if (!inQuote) {
-                    inQuote = true;
-                } else if (expression[i - 1] === '\\') {
-                    // allow child quotes if escaped
-                    buffer += char;
+                if (!inString) {
+                    inString = true;
                 } else {
                     // close current string
-                    inQuote = false;
+                    inString = false;
                 }
+                buffer += char;
             } else if (/\s/.test(char)) {
-                if (inQuote) {
+                if (inString) {
                     // allow whitespace to be preserved inside a string
                     buffer += char;
                 } else {
@@ -116,7 +114,7 @@ class ExpressionEvaluator {
                 buffer += char;
             }
             // check for operators
-            if (parenCount === 0) {
+            if (parenCount === 0 && !inString) {
                 if (i + 5 < expression.length && expression.slice(i + 1, i + 5) === ' OR ') {
                     if (buffer.length > 0) {
                         this.addToken(buffer);

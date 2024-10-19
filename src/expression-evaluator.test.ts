@@ -6,16 +6,23 @@ import {describe, expect, it} from "@jest/globals";
 const conditionEvaluator: ConditionEvaluator = {
     evaluate: (token, object) => {
         const parts = token.split(" ");
-        switch (parts[1]) {
+        const field = parts[0];
+        const operator = parts[1];
+        let conditionValue = parts.slice(2).join(' ');
+        // unwrap string values -- this would need to be managed for each ConditionEvaluator based on syntax rules
+        if (conditionValue[0] === '"' && conditionValue[conditionValue.length - 1] === '"') {
+            conditionValue = conditionValue.slice(1, conditionValue.length - 1);
+        }
+        const value = object[field];
+        switch (operator) {
             case '=':
-                return object[parts[0]] == parts[2].replace(/\\"/g, '"');
+                return value == conditionValue.replace(/\\"/g, '"');
             case '>':
-                return object[parts[0]] > parts[2];
+                return value > conditionValue;
             case '<':
-                return object[parts[0]] < parts[2];
+                return value < conditionValue;
             case 'IN':
-                const subParts = parts[2].split(',');
-                const value = object[parts[0]];
+                const subParts = conditionValue.split(',');
                 return subParts.indexOf(value) !== -1;
         }
         return false;
@@ -72,8 +79,8 @@ describe('ExpressionEvaluator Tests', () => {
             false
         );
         testAssertion(
-            '((status = Delivered AND type = Online) OR (status = Picked_Up AND type = In_Store)) AND (cost > 25)',
-            { status: 'Picked_Up', type: 'In_Store', cost: 50, deliveryType: 'ship', deliveryFee: 5 },
+            '((status = Delivered AND type = Online) OR (status = Picked Up AND type = In Store)) AND (cost > 25)',
+            { status: 'Picked Up', type: 'In Store', cost: 50, deliveryType: 'ship', deliveryFee: 5 },
             true
         );
         testAssertion(
@@ -97,6 +104,12 @@ describe('ExpressionEvaluator Tests', () => {
         testAssertion(`
             a = testing\nmultiple\nlines
         `, { a: 'testing\nmultiple\nlines' }, false);
-        testAssertion('a = "Testing_\\"nested\\"_quotes"', { a: 'Testing_"nested"_quotes'}, true);
+        testAssertion('a = "Testing \\"nested\\" quotes"', { a: 'Testing "nested" quotes'}, true);
+    });
+    it('should not parse tokens inside strings as operators', () => {
+        testAssertion('a = "NOT test"', { a: 'NOT test' }, true);
+        testAssertion('a = "a = 1 AND a > 0"', { a: 'a = 1 AND a > 0' }, true);
+        testAssertion('a = "a = 1 AND a > 0" AND b = 5', { a: 'a = 1 AND a > 0', b: 5 }, true);
+        testAssertion('(a = "a = 1 AND a > 0" AND (b = 5))', { a: 'a = 1 AND a > 0', b: 5 }, true);
     });
 });
