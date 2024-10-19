@@ -2,9 +2,26 @@ import ConditionEvaluator from "./types/condition-evaluator";
 
 class ExpressionEvaluator {
 
+    /**
+     * Stores all tokens (condition strings, operators, and child expression strings) for the expression being evaluated.
+     * @private
+     */
     private readonly tokens: string[];
+    /**
+     * Evaluates a condition string against an object.
+     * @private
+     */
     private conditionEvaluator: ConditionEvaluator;
+    /**
+     * Caches the outcome for all condition strings and child expressions to avoid duplicate computations.
+     * @private
+     */
     private cache: Map<string, boolean>;
+    /**
+     * Stores all child expressions contained within the expression being evaluated.
+     * Used during evaluation to recursively evaluate child expressions.
+     * @private
+     */
     private childExpressions: Set<string>;
 
     constructor(conditionEvaluator: ConditionEvaluator, cache?: Map<string, boolean>) {
@@ -14,6 +31,11 @@ class ExpressionEvaluator {
         this.childExpressions = new Set();
     }
 
+    /**
+     * Parses and evaluates an expression against an object to determine if all conditions apply.
+     * @param expression The expression being evaluated.
+     * @param object The object being evaluated.
+     */
     evaluate(expression: string, object: any): boolean {
         if (!expression || expression.trim() === '') {
             throw new Error('Expression cannot be empty.');
@@ -55,6 +77,12 @@ class ExpressionEvaluator {
         return result;
     }
 
+    /**
+     * Evaluates a token to determine whether the condition(s) apply to the supplied object.
+     * @param token A single condition or a child expression.
+     * @param object The object being evaluated.
+     * @private
+     */
     private evaluateToken(token: string, object: any): boolean {
         if (this.cache.has(token)) {
             return this.cache.get(token) as boolean;
@@ -69,6 +97,11 @@ class ExpressionEvaluator {
         return result;
     }
 
+    /**
+     * Parses the expression string to identify all child expressions, operators, and conditions.
+     * @param expression The expression string being parsed.
+     * @private
+     */
     private parse(expression: string) {
         let buffer = '';
         let parenCount = 0;
@@ -86,7 +119,7 @@ class ExpressionEvaluator {
                 if (parenCount === 0) {
                     // end child expression
                     this.addToken(buffer);
-                    this.childExpressions.add(buffer);
+                    this.childExpressions.add(buffer.trim());
                     buffer = '';
                 } else {
                     // continue appending characters to child expression
@@ -104,6 +137,7 @@ class ExpressionEvaluator {
             } else if (/\s/.test(char)) {
                 if (inString) {
                     // allow whitespace to be preserved inside a string
+                    // todo: determine if preserveWhitespace option should be added to toggle this part
                     buffer += char;
                 } else {
                     // if not inside a string, replace all whitespace with spaces
@@ -115,33 +149,18 @@ class ExpressionEvaluator {
             }
             // check for operators
             if (parenCount === 0 && !inString) {
-                if (i + 5 < expression.length && expression.slice(i + 1, i + 5) === ' OR ') {
-                    if (buffer.length > 0) {
-                        this.addToken(buffer);
-                    }
-                    this.addToken('OR');
+                if (this.isOperator('OR', expression, i)) {
+                    this.addOperator('OR', buffer);
                     buffer = '';
-                    i += 4;
-                } else if (i + 6 < expression.length && expression.slice(i + 1, i + 6) === ' AND ') {
-                    if (buffer.length > 0) {
-                        this.addToken(buffer);
-                    }
-                    this.addToken('AND');
+                    i += 1;
+                } else if (this.isOperator('AND', expression, i)) {
+                    this.addOperator('AND', buffer);
                     buffer = '';
-                    i += 5;
-                } else if (i + 6 < expression.length && expression.slice(i + 1, i + 6) === ' NOT ') {
-                    if (buffer.length > 0) {
-                        this.addToken(buffer);
-                    }
-                    this.addToken('NOT');
+                    i += 2;
+                } else if (this.isOperator('NOT', expression, i)) {
+                    this.addOperator('NOT', buffer);
                     buffer = '';
-                    i += 5;
-                } else if (i + 4 < expression.length && expression.slice(i, i + 4) === 'NOT ') {
-                    // account for edge-case where expression is composed of one negated condition
-                    // i.e. expression = `NOT ${CONDITION}`
-                    this.addToken('NOT');
-                    buffer = '';
-                    i += 3;
+                    i += 2;
                 }
             }
         }
@@ -151,8 +170,48 @@ class ExpressionEvaluator {
         }
     }
 
+    /**
+     * Checks if the current character in the parsing buffer is the start of an operator.
+     * @param operator The operator being checked.
+     * @param expression The expression string being parsed.
+     * @param index The index of the current position / character in the expression string.
+     * @private
+     */
+    private isOperator(operator: string, expression: string, index: number): boolean {
+        const char = expression[index];
+        return (
+            // the current character is the first character of the operator being checked
+            char === operator[0] &&
+            // the current operator fits in the bounds of the token
+            index + operator.length < expression.length &&
+            // the current character *is* the start of the operator
+            expression.slice(index, index + operator.length) === operator
+        );
+    }
+
+    /**
+     * Adds an operator to the collection of tokens contained in the expression string.
+     * If a buffer is already populated, it will be added to the token collection as well.
+     * @param operator The operator being added.
+     * @param buffer The current buffer that has been parsed up until this point in the expression string.
+     * @private
+     */
+    private addOperator(operator: string, buffer: string): void {
+        buffer = buffer.slice(0, buffer.length - 1);
+        this.addToken(buffer);
+        this.addToken(operator);
+    }
+
+    /**
+     * Adds a token which represents a condition string, an operator, or a child expression contained within the expression string.
+     * @param token The value being added to the token collection.
+     * @private
+     */
     private addToken(token: string): void {
-        this.tokens.push(token.trim());
+        const trimmed = token.trim();
+        if (trimmed.length > 0) {
+            this.tokens.push(trimmed);
+        }
     }
 }
 

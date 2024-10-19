@@ -105,6 +105,50 @@ describe('ExpressionEvaluator Tests', () => {
             a = testing\nmultiple\nlines
         `, { a: 'testing\nmultiple\nlines' }, false);
         testAssertion('a = "Testing \\"nested\\" quotes"', { a: 'Testing "nested" quotes'}, true);
+        testAssertion(
+            `
+            (a = 1 OR b > 2)
+            AND
+            (b < 5 OR c > 5)
+            `,
+            { a: 5, b: 7, c: 9 },
+            true
+        );
+        testAssertion(
+            `
+            (
+            (a = 1 OR b > 2)
+            AND
+            (b < 5 OR c > 5) AND (d = 11)
+            )
+            `,
+            { a: 5, b: 7, c: 9, d: 11 },
+            true
+        );
+        testAssertion(
+            `
+            (
+            (a = 1
+            OR
+            b > 2)
+            AND
+            (b < 5
+            OR c > 5)
+            AND (d = 11)
+            )
+            `,
+            { a: 5, b: 7, c: 9, d: 11 },
+            true
+        );
+        testAssertion(
+            `
+            firstName = John AND
+            profession = "Health Care"
+            AND age = 23
+            `,
+            { firstName: 'John', lastName: 'Doe', age: 23, profession: 'Health Care' },
+            true
+        );
     });
     it('should not parse tokens inside strings as operators', () => {
         testAssertion('a = "NOT test"', { a: 'NOT test' }, true);
