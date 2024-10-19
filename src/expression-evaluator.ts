@@ -75,8 +75,8 @@ class ExpressionEvaluator {
         let inQuote = false;
         for (let i = 0; i < expression.length; i++) {
             const char = expression[i];
-            // check for child expressions
             if (char === '(') {
+                // check for new child expressions
                 parenCount++;
                 if (parenCount > 1) {
                     buffer += char;
@@ -84,28 +84,35 @@ class ExpressionEvaluator {
             } else if (char === ')') {
                 parenCount--;
                 if (parenCount === 0) {
-                    // end expression
+                    // end child expression
                     this.addToken(buffer);
                     this.childExpressions.add(buffer);
                     buffer = '';
                 } else {
+                    // continue appending characters to child expression
                     buffer += char;
                 }
             } else if (char === '"') {
+                // keep track of quotes for strings with whitespace
                 if (!inQuote) {
                     inQuote = true;
                 } else if (expression[i - 1] === '\\') {
+                    // allow child quotes if escaped
                     buffer += char;
                 } else {
+                    // close current string
                     inQuote = false;
                 }
             } else if (/\s/.test(char)) {
                 if (inQuote) {
+                    // allow whitespace to be preserved inside a string
                     buffer += char;
                 } else {
+                    // if not inside a string, replace all whitespace with spaces
                     buffer += ' ';
                 }
             } else {
+                // normal use case -- not inside child expression, string, etc. -- simply append to buffer
                 buffer += char;
             }
             // check for operators
@@ -132,12 +139,15 @@ class ExpressionEvaluator {
                     buffer = '';
                     i += 5;
                 } else if (i + 4 < expression.length && expression.slice(i, i + 4) === 'NOT ') {
+                    // account for edge-case where expression is composed of one negated condition
+                    // i.e. expression = `NOT ${CONDITION}`
                     this.addToken('NOT');
                     buffer = '';
                     i += 3;
                 }
             }
         }
+        // if a buffer remains, add it as a token
         if (buffer.length > 0) {
             this.addToken(buffer);
         }
