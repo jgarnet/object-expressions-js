@@ -149,6 +149,16 @@ describe('ExpressionEvaluator Tests', () => {
             { firstName: 'John', lastName: 'Doe', age: 23, profession: 'Health Care' },
             true
         );
+        testAssertion(
+            `
+            firstName = John AND
+            profession = "Health
+Care"
+            AND age = 23
+            `,
+            { firstName: 'John', lastName: 'Doe', age: 23, profession: 'Health\nCare' },
+            true
+        );
     });
     it('should not parse tokens inside strings as operators', () => {
         testAssertion('a = "NOT test"', { a: 'NOT test' }, true);
