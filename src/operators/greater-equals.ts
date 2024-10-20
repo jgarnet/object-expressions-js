@@ -1,12 +1,10 @@
 import Operator from "../types/operator";
 import ExpressionContext from "../types/expression-context";
-const some = require("lodash/some");
 
-const _in: Operator = {
+const greaterEquals: Operator = {
     evaluate<T>(value: any, conditionValue: string, tokens: string[], context: ExpressionContext<T>): boolean {
-        const values = conditionValue.split(',').map(val => val.trim());
-        return some(values, (val: any) => val == value);
+        return value >= conditionValue;
     }
 };
 
-export default _in;
+export default greaterEquals;

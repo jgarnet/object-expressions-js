@@ -2,65 +2,30 @@ import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
 import operators from "./operators/operators";
 import Operator from "./types/operator";
-import Operators from "./operators/operators";
 const get = require("lodash/get");
-const has = require("lodash/has");
-const isEmpty = require("lodash/isEmpty");
-const isNil = require("lodash/isNil");
-const some = require("lodash/some");
 
 class BaseConditionEvaluator implements ConditionEvaluator {
     evaluate<T>(token: string, context: ExpressionContext<T>): boolean {
         const object = context.object;
         const _operators = (context.operators ?? operators) as Map<string, Operator>;
-        const [operandA, operator, operandB] = this.getOperandsAndOperator(token);
+        const tokens = this.getOperandsAndOperator(token, _operators);
+        const [operandA, operator, operandB] = tokens;
         const value = get(object, operandA.trim());
-        let target = operandB.trim();
-        if (target[0] === '"' && target[target.length - 1] === '"') {
-            target = target.slice(1, target.length - 1).replace(/\\"/g, '"');
+        let conditionValue = operandB.trim();
+        // unwrap string values if defined in condition value
+        if (conditionValue[0] === '"' && conditionValue[conditionValue.length - 1] === '"') {
+            conditionValue = conditionValue
+                .slice(1, conditionValue.length - 1)
+                .replace(/\\"/g, '"');
         }
         if (_operators.has(operator)) {
             const _operator = _operators.get(operator) as Operator;
-            return _operator.evaluate(value, target, context);
+            return _operator.evaluate(value, conditionValue, tokens, context);
         }
-        // switch (operator.toUpperCase()) {
-        //     case '=':
-        //         return value == target;
-        //     case '>':
-        //         return value > target;
-        //     case '<':
-        //         return value < target;
-        //     case '>=':
-        //         return value >= target;
-        //     case '<=':
-        //         return value <= target;
-        //     case 'LIKE':
-        //         return new RegExp(target).test(`${value}`);
-        //     case 'IN':
-        //         const values = target.split(',').map(val => val.trim());
-        //         return some(values, (val: any) => val == value);
-        //     case 'HAS':
-        //         if (operandA === '$') {
-        //             return has(object, target);
-        //         }
-        //         return has(value, target);
-        //     case 'IS':
-        //         switch (target.toUpperCase()) {
-        //             case 'EMPTY':
-        //                 return isEmpty(value);
-        //             case "NULL":
-        //                 return isNil(value);
-        //             case "TRUE":
-        //                 return value === true;
-        //             case "FALSE":
-        //                 return value === false;
-        //         }
-        //         return false;
-        // }
         return false;
     }
 
-    private getOperandsAndOperator(token: string): string[] {
+    private getOperandsAndOperator(token: string, operators: Map<string, Operator>): string[] {
         let operandA = '';
         let operator = '';
         let operandB = '';
@@ -72,8 +37,8 @@ class BaseConditionEvaluator implements ConditionEvaluator {
                 inString = !inString;
             }
             if (!inString) {
-                const addOperator = (...operators: string[]): boolean => {
-                    for (const operatorStr of operators) {
+                const addOperator = (): boolean => {
+                    for (const operatorStr of operators.keys()) {
                         if (this.isOperator(operatorStr, token, i)) {
                             operandA = buffer;
                             buffer = '';
@@ -84,18 +49,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
                     }
                     return false;
                 };
-                const isOperator = addOperator(
-                    'LIKE',
-                    'IN',
-                    'IS',
-                    'HAS',
-                    '>=',
-                    '<=',
-                    '>',
-                    '<',
-                    '='
-                );
-                if (isOperator) {
+                if (addOperator()) {
                     continue;
                 }
             }
