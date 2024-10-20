@@ -1,7 +1,7 @@
 import {describe, expect, it} from "@jest/globals";
-import BaseConditionEvaluator from "./base-condition-evaluator";
-import ExpressionContext from "./types/expression-context";
-import operators from "./operators/operators";
+import BaseConditionEvaluator from "../base-condition-evaluator";
+import ExpressionContext from "../types/expression-context";
+import operators from "../operators/operators";
 
 const evaluator = new BaseConditionEvaluator();
 
