@@ -93,7 +93,8 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
             const newContext = {
                 expression: token,
                 object,
-                cache: context.cache
+                cache: context.cache,
+                operators: context.operators
             };
             result = new BaseExpressionEvaluator(this.conditionEvaluator, this.expressionParser).evaluate(newContext);
         } else {
