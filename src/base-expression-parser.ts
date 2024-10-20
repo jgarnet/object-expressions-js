@@ -80,14 +80,14 @@ class BaseExpressionParser implements ExpressionParser {
      * @private
      */
     private isOperator(operator: string, expression: string, index: number): boolean {
-        const char = expression[index];
+        const char = expression[index].toUpperCase();
         return (
             // the current character is the first character of the operator being checked
             char === operator[0] &&
             // the current operator fits in the bounds of the token
             index + operator.length < expression.length &&
             // the current character *is* the start of the operator
-            expression.slice(index, index + operator.length) === operator
+            expression.slice(index, index + operator.length).toUpperCase() === operator
         );
     }
 

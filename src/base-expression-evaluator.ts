@@ -3,6 +3,7 @@ import ExpressionContext from "./types/expression-context";
 import BaseExpressionParser from "./base-expression-parser";
 import ExpressionParser from "./types/expression-parser";
 import ExpressionEvaluator from "./types/expression-evaluator";
+import BaseConditionEvaluator from "./base-condition-evaluator";
 
 class BaseExpressionEvaluator implements ExpressionEvaluator {
     /**
@@ -16,8 +17,8 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
      */
     private expressionParser: ExpressionParser;
 
-    constructor(conditionEvaluator: ConditionEvaluator, expressionParser?: ExpressionParser) {
-        this.conditionEvaluator = conditionEvaluator;
+    constructor(conditionEvaluator?: ConditionEvaluator, expressionParser?: ExpressionParser) {
+        this.conditionEvaluator = conditionEvaluator ?? new BaseConditionEvaluator();
         this.expressionParser = expressionParser ?? new BaseExpressionParser();
     }
 

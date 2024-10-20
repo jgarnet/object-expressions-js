@@ -1,36 +1,9 @@
-import ConditionEvaluator from "./types/condition-evaluator";
 import BaseExpressionEvaluator from "./base-expression-evaluator";
 import {describe, expect, it} from "@jest/globals";
 
-// simplified condition evaluator
-const conditionEvaluator: ConditionEvaluator = {
-    evaluate: (token, object) => {
-        const parts = token.split(" ");
-        const field = parts[0];
-        const operator = parts[1];
-        let conditionValue = parts.slice(2).join(' ');
-        // unwrap string values -- this would need to be managed for each ConditionEvaluator based on syntax rules
-        if (conditionValue[0] === '"' && conditionValue[conditionValue.length - 1] === '"') {
-            conditionValue = conditionValue.slice(1, conditionValue.length - 1);
-        }
-        const value = object[field];
-        switch (operator) {
-            case '=':
-                return value == conditionValue.replace(/\\"/g, '"');
-            case '>':
-                return value > conditionValue;
-            case '<':
-                return value < conditionValue;
-            case 'IN':
-                const subParts = conditionValue.split(',');
-                return subParts.indexOf(value) !== -1;
-        }
-        return false;
-    }
-};
-
 const testAssertion = (expression: string, object: any, outcome: boolean) => {
-    const evaluator = new BaseExpressionEvaluator(conditionEvaluator);
+    // const evaluator = new BaseExpressionEvaluator(conditionEvaluator);
+    const evaluator = new BaseExpressionEvaluator();
     expect(evaluator.evaluate({ expression, object })).toEqual(outcome);
 };
 
