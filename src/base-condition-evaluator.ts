@@ -27,7 +27,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
             case 'LIKE':
                 return new RegExp(target).test(`${value}`);
             case 'IN':
-                const values = operandB.split(',').map(val => val.trim());
+                const values = target.split(',').map(val => val.trim());
                 return some(values, (val: any) => val == value);
             case 'HAS':
                 if (operandA === '$') {

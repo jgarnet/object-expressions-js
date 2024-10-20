@@ -9,6 +9,14 @@ describe('BaseConditionEvaluator tests', () => {
         expect(evaluator.evaluate('field = 1', { field: 1 })).toEqual(true);
         expect(evaluator.evaluate('field = 2', { field: 1 })).toEqual(false);
         // strings
+        expect(evaluator.evaluate('field = value', { field: "value" })).toEqual(true);
+        expect(evaluator.evaluate('field = "value"', { field: "value" })).toEqual(true);
+        expect(evaluator.evaluate('field = "value 2"', { field: "value 2" })).toEqual(true);
+        expect(evaluator.evaluate('field = "value \\"2\\""', { field: "value \"2\"" })).toEqual(true);
+        expect(evaluator.evaluate('field = value', { field: "value 2" })).toEqual(false);
+        expect(evaluator.evaluate('field = "value"', { field: "value 2" })).toEqual(false);
+        expect(evaluator.evaluate('field = "value 2"', { field: "value 3" })).toEqual(false);
+        expect(evaluator.evaluate('field = "value \\"2\\""', { field: "value \"3\"" })).toEqual(false);
     });
     it('should evaluate IS', () => {
         // boolean
