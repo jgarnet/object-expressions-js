@@ -31,7 +31,7 @@ const conditionEvaluator: ConditionEvaluator = {
 
 const testAssertion = (expression: string, object: any, outcome: boolean) => {
     const evaluator = new ExpressionEvaluator(conditionEvaluator);
-    expect(evaluator.evaluate(expression, object)).toEqual(outcome);
+    expect(evaluator.evaluate({ expression, object })).toEqual(outcome);
 };
 
 describe('ExpressionEvaluator Tests', () => {

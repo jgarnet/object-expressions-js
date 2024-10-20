@@ -1,54 +1,42 @@
 import ConditionEvaluator from "./types/condition-evaluator";
+import ExpressionContext from "./types/expression-context";
 
 const OPERATORS = ['AND', 'OR', 'NOT'];
 
 class ExpressionEvaluator {
-
-    /**
-     * Stores all tokens (condition strings, operators, and child expression strings) for the expression being evaluated.
-     * @private
-     */
-    private readonly tokens: string[];
     /**
      * Evaluates a condition string against an object.
      * @private
      */
     private conditionEvaluator: ConditionEvaluator;
-    /**
-     * Caches the outcome for all condition strings and child expressions to avoid duplicate computations.
-     * @private
-     */
-    private cache: Map<string, boolean>;
-    /**
-     * Stores all child expressions contained within the expression being evaluated.
-     * Used during evaluation to recursively evaluate child expressions.
-     * @private
-     */
-    private childExpressions: Set<string>;
 
-    constructor(conditionEvaluator: ConditionEvaluator, cache?: Map<string, boolean>) {
+    constructor(conditionEvaluator: ConditionEvaluator) {
         this.conditionEvaluator = conditionEvaluator;
-        this.cache = cache ?? new Map();
-        this.tokens = [];
-        this.childExpressions = new Set();
     }
 
     /**
      * Parses and evaluates an expression against an object to determine if all conditions apply.
-     * @param expression The expression being evaluated.
-     * @param object The object being evaluated.
+     * @param context The {@link ExpressionContext}.
      */
-    evaluate(expression: string, object: any): boolean {
+    evaluate<T>(context: ExpressionContext<T>): boolean {
+        // initialize state
+        const expression = context.expression;
         if (!expression || expression.trim() === '') {
             throw new Error('Expression cannot be empty.');
         }
-        this.parse(expression);
+        context.tokens = [];
+        context.childExpressions = new Set<string>();
+        context.cache = context.cache ?? new Map<string, boolean>();
+        // parse tokens
+        this.parse(context);
+        // evaluate tokens and return result
+        const tokens = context.tokens;
         let isNegate = false;
         let isAnd = false;
         let isOr = false;
         let result = false;
-        for (let i = 0; i < this.tokens.length; i++) {
-            const token = this.tokens[i];
+        for (let i = 0; i < tokens.length; i++) {
+            const token = tokens[i];
             if (token === 'NOT') {
                 isNegate = true;
             } else if (token === 'AND') {
@@ -56,7 +44,7 @@ class ExpressionEvaluator {
             } else if (token === 'OR') {
                 isOr = true;
             } else {
-                let current = this.evaluateToken(token, object);
+                let current = this.evaluateToken(token, context);
                 if (isNegate) {
                     current = !current;
                     isNegate = false;
@@ -82,29 +70,39 @@ class ExpressionEvaluator {
     /**
      * Evaluates a token to determine whether the condition(s) apply to the supplied object.
      * @param token A single condition or a child expression.
-     * @param object The object being evaluated.
+     * @param context The {@link ExpressionContext}.
      * @private
      */
-    private evaluateToken(token: string, object: any): boolean {
-        if (this.cache.has(token)) {
-            return this.cache.get(token) as boolean;
+    private evaluateToken<T>(token: string, context: ExpressionContext<T>): boolean {
+        const object = context.object;
+        const cache = context.cache as Map<string, boolean>;
+        const childExpressions = context.childExpressions as Set<string>;
+        if (cache.has(token)) {
+            return cache.get(token) as boolean;
         }
         let result;
-        if (this.childExpressions.has(token)) {
-            result = new ExpressionEvaluator(this.conditionEvaluator, this.cache).evaluate(token, object);
+        if (childExpressions.has(token)) {
+            const newContext = {
+                expression: token,
+                object,
+                cache: context.cache
+            };
+            result = new ExpressionEvaluator(this.conditionEvaluator).evaluate(newContext);
         } else {
             result = this.conditionEvaluator.evaluate(token, object);
         }
-        this.cache.set(token, result);
+        cache.set(token, result);
         return result;
     }
 
     /**
      * Parses the expression string to identify all child expressions, operators, and conditions.
-     * @param expression The expression string being parsed.
+     * @param context The {@link ExpressionContext}.
      * @private
      */
-    private parse(expression: string) {
+    private parse<T>(context: ExpressionContext<T>) {
+        const expression = context.expression;
+        const childExpressions = context.childExpressions as Set<string>;
         let buffer = '';
         let parenCount = 0;
         let inString = false;
@@ -120,8 +118,8 @@ class ExpressionEvaluator {
                 parenCount--;
                 if (parenCount === 0) {
                     // end child expression
-                    this.addToken(buffer);
-                    this.childExpressions.add(buffer.trim());
+                    this.addToken(buffer, context);
+                    childExpressions.add(buffer.trim());
                     buffer = '';
                 } else {
                     // continue appending characters to child expression
@@ -154,7 +152,7 @@ class ExpressionEvaluator {
                 for (const operator of OPERATORS) {
                     if (this.isOperator(operator, expression, i)) {
                         // add the operator to the current tokens
-                        this.addOperator(operator, buffer);
+                        this.addOperator(operator, buffer, context);
                         // clear the current buffer
                         buffer = '';
                         // move the buffer index forward past the operator
@@ -166,7 +164,7 @@ class ExpressionEvaluator {
         }
         // if a buffer remains, add it as a token
         if (buffer.length > 0) {
-            this.addToken(buffer);
+            this.addToken(buffer, context);
         }
     }
 
@@ -194,23 +192,26 @@ class ExpressionEvaluator {
      * If a buffer is already populated, it will be added to the token collection as well.
      * @param operator The operator being added.
      * @param buffer The current buffer that has been parsed up until this point in the expression string.
+     * @param context The {@link ExpressionContext}.
      * @private
      */
-    private addOperator(operator: string, buffer: string): void {
+    private addOperator<T>(operator: string, buffer: string, context: ExpressionContext<T>): void {
         buffer = buffer.slice(0, buffer.length - 1);
-        this.addToken(buffer);
-        this.addToken(operator);
+        this.addToken(buffer, context);
+        this.addToken(operator, context);
     }
 
     /**
      * Adds a token which represents a condition string, an operator, or a child expression contained within the expression string.
      * @param token The value being added to the token collection.
+     * @param context The {@link ExpressionContext}.
      * @private
      */
-    private addToken(token: string): void {
+    private addToken<T>(token: string, context: ExpressionContext<T>): void {
+        const tokens = context.tokens as string[];
         const trimmed = token.trim();
         if (trimmed.length > 0) {
-            this.tokens.push(trimmed);
+            tokens.push(trimmed);
         }
     }
 }
