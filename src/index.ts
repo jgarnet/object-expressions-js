@@ -5,6 +5,8 @@ import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
 import ExpressionEvaluator from "./types/expression-evaluator";
 import ExpressionParser from "./types/expression-parser";
+import Operator from "./types/operator";
+import operators from "./operators/operators";
 
 export {
     BaseConditionEvaluator,
@@ -13,5 +15,7 @@ export {
     ConditionEvaluator,
     ExpressionContext,
     ExpressionEvaluator,
-    ExpressionParser
+    ExpressionParser,
+    Operator,
+    operators
 };
