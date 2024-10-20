@@ -42,17 +42,17 @@ describe('BaseExpressionEvaluator Tests', () => {
             true
         );
         testAssertion(
-            '((status = Delivered AND type = Online) OR (status = Picked Up AND type = In Store)) AND cost > 25',
+            '((status = Delivered AND type = Online) OR (status = "Picked Up" AND type = "In Store")) AND cost > 25',
             { status: 'Delivered', type: 'Online', cost: 50, deliveryType: 'ship', deliveryFee: 5 },
             true
         );
         testAssertion(
-            '((status = Delivered AND type = Online) OR (status = Picked Up AND type = In Store)) AND cost > 25',
+            '((status = Delivered AND type = Online) OR (status = "Picked Up" AND type = "In Store")) AND cost > 25',
             { status: 'Ordered', type: 'Online', cost: 50, deliveryType: 'ship', deliveryFee: 5 },
             false
         );
         testAssertion(
-            '((status = Delivered AND type = Online) OR (status = Picked Up AND type = In Store)) AND (cost > 25)',
+            '((status = Delivered AND type = Online) OR (status = "Picked Up" AND type = "In Store")) AND (cost > 25)',
             { status: 'Picked Up', type: 'In Store', cost: 50, deliveryType: 'ship', deliveryFee: 5 },
             true
         );

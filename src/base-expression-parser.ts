@@ -1,7 +1,8 @@
 import ExpressionParser from "./types/expression-parser";
 import ExpressionContext from "./types/expression-context";
 
-const OPERATORS = ['AND', 'OR', 'NOT'];
+const LOGICAL_OPERATORS = ['AND', 'OR', 'NOT'];
+const FUNCTIONS = ['LEN'];
 
 class BaseExpressionParser implements ExpressionParser {
     parse<T>(context: ExpressionContext<T>): void {
@@ -10,23 +11,34 @@ class BaseExpressionParser implements ExpressionParser {
         let buffer = '';
         let parenCount = 0;
         let inString = false;
+        let funcCount = 0;
         for (let i = 0; i < expression.length; i++) {
             const char = expression[i];
             if (char === '(') {
-                // check for new child expressions
-                parenCount++;
-                if (parenCount > 1) {
+                if (parenCount === 0 && this.isFunction(buffer, context)) {
+                    funcCount++;
                     buffer += char;
+                } else {
+                    // check for new child expressions
+                    parenCount++;
+                    if (parenCount > 1) {
+                        buffer += char;
+                    }
                 }
             } else if (char === ')') {
-                parenCount--;
-                if (parenCount === 0) {
-                    // end child expression
-                    this.addToken(buffer, context);
-                    childExpressions.add(buffer.trim());
-                    buffer = '';
+                if (funcCount === 0) {
+                    parenCount--;
+                    if (parenCount === 0) {
+                        // end child expression
+                        this.addToken(buffer, context);
+                        childExpressions.add(buffer.trim());
+                        buffer = '';
+                    } else {
+                        // continue appending characters to child expression
+                        buffer += char;
+                    }
                 } else {
-                    // continue appending characters to child expression
+                    funcCount--;
                     buffer += char;
                 }
             } else if (char === '"') {
@@ -52,8 +64,8 @@ class BaseExpressionParser implements ExpressionParser {
                 buffer += char;
             }
             // check for operators
-            if (parenCount === 0 && !inString) {
-                for (const operator of OPERATORS) {
+            if (parenCount === 0 && funcCount === 0 && !inString) {
+                for (const operator of LOGICAL_OPERATORS) {
                     if (this.isOperator(operator, expression, i)) {
                         // add the operator to the current tokens
                         this.addOperator(operator, buffer, context);
@@ -81,13 +93,23 @@ class BaseExpressionParser implements ExpressionParser {
      */
     private isOperator(operator: string, expression: string, index: number): boolean {
         const char = expression[index].toUpperCase();
-        return (
+        // if there is a non-whitespace preceding character, this is not a logical operator
+        if (index > 0 && !/\s/.test(expression[index - 1])) {
+            return false;
+        }
+        const matches = (
             // the current character is the first character of the operator being checked
             char === operator[0] &&
             // the current operator fits in the bounds of the token
             index + operator.length < expression.length &&
             // the current character *is* the start of the operator
             expression.slice(index, index + operator.length).toUpperCase() === operator
+        );
+        return matches && (
+            // no characters after
+            index + operator.length + 1 < expression.length ||
+            // or whitespace after
+            /\s/.test(expression[index + operator.length + 1])
         );
     }
 
@@ -117,6 +139,17 @@ class BaseExpressionParser implements ExpressionParser {
         if (trimmed.length > 0) {
             tokens.push(trimmed);
         }
+    }
+
+    private isFunction<T>(token: string, context: ExpressionContext<T>): boolean {
+        // todo: move functions & operators to context & use Set.has()
+        token = token.trim().toUpperCase();
+        for (const func of FUNCTIONS) {
+            if (token.slice(0, token.length) === func) {
+                return true;
+            }
+        }
+        return false;
     }
 }
 

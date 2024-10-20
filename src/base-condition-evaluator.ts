@@ -46,7 +46,6 @@ class BaseConditionEvaluator implements ConditionEvaluator {
                         return value === false;
                 }
                 return false;
-            // todo: IS_DATE, length operations?
         }
         return false;
     }
@@ -79,7 +78,6 @@ class BaseConditionEvaluator implements ConditionEvaluator {
                     'LIKE',
                     'IN',
                     'IS',
-                    'IS_DATE',
                     'HAS',
                     '>=',
                     '<=',
@@ -99,13 +97,23 @@ class BaseConditionEvaluator implements ConditionEvaluator {
 
     private isOperator(operator: string, token: string, index: number): boolean {
         const char = token[index].toUpperCase();
-        return (
+        // if there is a non-whitespace preceding character, this is not an operator
+        if (index > 0 && !/\s/.test(token[index - 1])) {
+            return false;
+        }
+        const matches = (
             // the current character is the first character of the operator being checked
             char === operator[0] &&
             // the current operator fits in the bounds of the token
             index + operator.length - 1 < token.length &&
             // the current character *is* the start of the operator
             token.slice(index, index + operator.length).toUpperCase() === operator
+        );
+        return matches && (
+            // no characters after
+            index + operator.length + 1 < token.length ||
+            // or whitespace after
+            /\s/.test(token[index + operator.length + 1])
         );
     }
 }
