@@ -1,5 +1,5 @@
 import ConditionEvaluator from "./types/condition-evaluator";
-import ExpressionEvaluator from "./expression-evaluator";
+import BaseExpressionEvaluator from "./base-expression-evaluator";
 import {describe, expect, it} from "@jest/globals";
 
 // simplified condition evaluator
@@ -30,11 +30,11 @@ const conditionEvaluator: ConditionEvaluator = {
 };
 
 const testAssertion = (expression: string, object: any, outcome: boolean) => {
-    const evaluator = new ExpressionEvaluator(conditionEvaluator);
+    const evaluator = new BaseExpressionEvaluator(conditionEvaluator);
     expect(evaluator.evaluate({ expression, object })).toEqual(outcome);
 };
 
-describe('ExpressionEvaluator Tests', () => {
+describe('BaseExpressionEvaluator Tests', () => {
     it('should evaluate simple expressions', () => {
         testAssertion('field = 5', { field: 5 }, true);
         testAssertion('(field = 5)', { field: 5 }, true);
