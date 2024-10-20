@@ -1,3 +1,5 @@
+import Operator from "./operator";
+
 /**
  * Stores data relevant for evaluating expressions.
  */
@@ -24,6 +26,7 @@ type ExpressionContext<T> = {
      * Stores all tokens (condition strings, operators, and child expression strings) for the expression being evaluated.
      */
     tokens?: string[];
+    operators?: Map<string, Operator>;
 };
 
 export default ExpressionContext;

@@ -97,7 +97,7 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
             };
             result = new BaseExpressionEvaluator(this.conditionEvaluator, this.expressionParser).evaluate(newContext);
         } else {
-            result = this.conditionEvaluator.evaluate(token, object);
+            result = this.conditionEvaluator.evaluate(token, context);
         }
         cache.set(token, result);
         return result;

@@ -1,5 +1,7 @@
+import ExpressionContext from "./expression-context";
+
 type ConditionEvaluator = {
-    evaluate(token: string, object: any): boolean;
+    evaluate<T>(token: string, context: ExpressionContext<T>): boolean;
 };
 
 export default ConditionEvaluator;

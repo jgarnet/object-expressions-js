@@ -1,4 +1,8 @@
 import ConditionEvaluator from "./types/condition-evaluator";
+import ExpressionContext from "./types/expression-context";
+import operators from "./operators/operators";
+import Operator from "./types/operator";
+import Operators from "./operators/operators";
 const get = require("lodash/get");
 const has = require("lodash/has");
 const isEmpty = require("lodash/isEmpty");
@@ -6,47 +10,53 @@ const isNil = require("lodash/isNil");
 const some = require("lodash/some");
 
 class BaseConditionEvaluator implements ConditionEvaluator {
-    evaluate(token: string, object: any): boolean {
+    evaluate<T>(token: string, context: ExpressionContext<T>): boolean {
+        const object = context.object;
+        const _operators = (context.operators ?? operators) as Map<string, Operator>;
         const [operandA, operator, operandB] = this.getOperandsAndOperator(token);
         const value = get(object, operandA.trim());
         let target = operandB.trim();
         if (target[0] === '"' && target[target.length - 1] === '"') {
             target = target.slice(1, target.length - 1).replace(/\\"/g, '"');
         }
-        switch (operator.toUpperCase()) {
-            case '=':
-                return value == target;
-            case '>':
-                return value > target;
-            case '<':
-                return value < target;
-            case '>=':
-                return value >= target;
-            case '<=':
-                return value <= target;
-            case 'LIKE':
-                return new RegExp(target).test(`${value}`);
-            case 'IN':
-                const values = target.split(',').map(val => val.trim());
-                return some(values, (val: any) => val == value);
-            case 'HAS':
-                if (operandA === '$') {
-                    return has(object, target);
-                }
-                return has(value, target);
-            case 'IS':
-                switch (target.toUpperCase()) {
-                    case 'EMPTY':
-                        return isEmpty(value);
-                    case "NULL":
-                        return isNil(value);
-                    case "TRUE":
-                        return value === true;
-                    case "FALSE":
-                        return value === false;
-                }
-                return false;
+        if (_operators.has(operator)) {
+            const _operator = _operators.get(operator) as Operator;
+            return _operator.evaluate(value, target, context);
         }
+        // switch (operator.toUpperCase()) {
+        //     case '=':
+        //         return value == target;
+        //     case '>':
+        //         return value > target;
+        //     case '<':
+        //         return value < target;
+        //     case '>=':
+        //         return value >= target;
+        //     case '<=':
+        //         return value <= target;
+        //     case 'LIKE':
+        //         return new RegExp(target).test(`${value}`);
+        //     case 'IN':
+        //         const values = target.split(',').map(val => val.trim());
+        //         return some(values, (val: any) => val == value);
+        //     case 'HAS':
+        //         if (operandA === '$') {
+        //             return has(object, target);
+        //         }
+        //         return has(value, target);
+        //     case 'IS':
+        //         switch (target.toUpperCase()) {
+        //             case 'EMPTY':
+        //                 return isEmpty(value);
+        //             case "NULL":
+        //                 return isNil(value);
+        //             case "TRUE":
+        //                 return value === true;
+        //             case "FALSE":
+        //                 return value === false;
+        //         }
+        //         return false;
+        // }
         return false;
     }
 
