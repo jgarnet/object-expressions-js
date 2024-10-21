@@ -131,7 +131,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
             buffer += char;
         }
         if (buffer.trim().length > 0) {
-            args.push(buffer);
+            args.push(buffer.trim());
         }
         return args;
     }
