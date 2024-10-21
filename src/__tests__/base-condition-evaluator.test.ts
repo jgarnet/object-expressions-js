@@ -39,4 +39,7 @@ describe('BaseConditionEvaluator tests', () => {
         testAssertion('field IS false', { field: false }, true);
         testAssertion('field IS true', { field: false }, false);
     });
+    it('should evaluate functions', () => {
+        testAssertion('LEN(field) = 4', { field: 'test' }, true);
+    });
 });

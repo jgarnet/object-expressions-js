@@ -1,4 +1,5 @@
 import Operator from "./operator";
+import ExpressionFunction from "./expression-function";
 
 /**
  * Stores data relevant for evaluating expressions.
@@ -27,6 +28,7 @@ type ExpressionContext<T> = {
      */
     tokens?: string[];
     operators?: Map<string, Operator>;
+    functions?: Map<string, ExpressionFunction>;
 };
 
 export default ExpressionContext;

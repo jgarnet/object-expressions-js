@@ -1,13 +1,15 @@
 import ExpressionParser from "./types/expression-parser";
 import ExpressionContext from "./types/expression-context";
+import functions from "./functions/functions";
+import ExpressionFunction from "./types/expression-function";
 
 const LOGICAL_OPERATORS = ['AND', 'OR', 'NOT'];
-const FUNCTIONS = ['LEN'];
 
 class BaseExpressionParser implements ExpressionParser {
     parse<T>(context: ExpressionContext<T>): void {
         const expression = context.expression;
         const childExpressions = context.childExpressions as Set<string>;
+        const _functions = (context.functions ?? functions) as Map<string, ExpressionFunction>;
         let buffer = '';
         let parenCount = 0;
         let inString = false;
@@ -15,7 +17,7 @@ class BaseExpressionParser implements ExpressionParser {
         for (let i = 0; i < expression.length; i++) {
             const char = expression[i];
             if (char === '(') {
-                if (parenCount === 0 && this.isFunction(buffer, context)) {
+                if (parenCount === 0 && this.isFunction(buffer, _functions)) {
                     funcCount++;
                     buffer += char;
                 } else {
@@ -141,15 +143,9 @@ class BaseExpressionParser implements ExpressionParser {
         }
     }
 
-    private isFunction<T>(token: string, context: ExpressionContext<T>): boolean {
-        // todo: move functions & operators to context & use Set.has()
+    private isFunction<T>(token: string, functions: Map<string, ExpressionFunction>): boolean {
         token = token.trim().toUpperCase();
-        for (const func of FUNCTIONS) {
-            if (token.slice(0, token.length) === func) {
-                return true;
-            }
-        }
-        return false;
+        return functions.has(token.slice(0, token.length));
     }
 }
 
