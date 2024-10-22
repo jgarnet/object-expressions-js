@@ -17,7 +17,7 @@ class BaseExpressionParser implements ExpressionParser {
         for (let i = 0; i < expression.length; i++) {
             const char = expression[i];
             if (char === '(') {
-                if (parenCount === 0 && this.isFunction(buffer, _functions)) {
+                if (parenCount === 0 && this.isFunction(buffer, funcCount, _functions)) {
                     funcCount++;
                     buffer += char;
                 } else {
@@ -47,7 +47,7 @@ class BaseExpressionParser implements ExpressionParser {
                 // keep track of quotes for strings with whitespace
                 if (!inString) {
                     inString = true;
-                } else {
+                } else if (expression[i - 1] !== '\\') {
                     // close current string
                     inString = false;
                 }
@@ -57,8 +57,8 @@ class BaseExpressionParser implements ExpressionParser {
                     // allow whitespace to be preserved inside a string
                     // todo: determine if preserveWhitespace option should be added to toggle this part
                     buffer += char;
-                } else {
-                    // if not inside a string, replace all whitespace with spaces
+                } else if (i > 0 && !/\s/.test(expression[i - 1])) {
+                    // if not inside a string, only allow one space between tokens
                     buffer += ' ';
                 }
             } else {
@@ -79,6 +79,15 @@ class BaseExpressionParser implements ExpressionParser {
                     }
                 }
             }
+        }
+        if (funcCount > 0 || funcCount < 0) {
+            throw new Error('SyntaxError: unclosed function');
+        }
+        if (parenCount > 0 || parenCount < 0) {
+            throw new Error('SyntaxError: unclosed group');
+        }
+        if (inString) {
+            throw new Error('SyntaxError: unclosed string');
         }
         // if a buffer remains, add it as a token
         if (buffer.length > 0) {
@@ -143,9 +152,20 @@ class BaseExpressionParser implements ExpressionParser {
         }
     }
 
-    private isFunction<T>(token: string, functions: Map<string, ExpressionFunction>): boolean {
+    private isFunction<T>(token: string, funcCount: number, functions: Map<string, ExpressionFunction>): boolean {
         token = token.trim().toUpperCase();
-        return functions.has(token.slice(0, token.length));
+        if (funcCount === 0) {
+            return functions.has(token);
+        }
+        const lastComma = token.lastIndexOf(',');
+        if (lastComma !== -1) {
+            const lastQuote = token.lastIndexOf('"');
+            if (lastQuote === -1 || lastComma > lastQuote) {
+                return functions.has(token.slice(lastComma + 1).trim());
+            }
+        }
+        const lastParen = token.lastIndexOf('(');
+        return functions.has(token.slice(lastParen + 1).trim());
     }
 }
 
