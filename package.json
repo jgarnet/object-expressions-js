@@ -15,7 +15,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "evaluate": "node dist/evaluate.js"
   },
   "devDependencies": {
     "@types/jest": "^29.5.13",
