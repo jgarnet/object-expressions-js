@@ -2,6 +2,7 @@ import {describe, expect, it} from "@jest/globals";
 import BaseConditionEvaluator from "../base-condition-evaluator";
 import ExpressionContext from "../types/expression-context";
 import operators from "../operators/operators";
+import functions from "../functions/functions";
 
 const evaluator = new BaseConditionEvaluator();
 
@@ -9,7 +10,8 @@ const testAssertion = (token: string, object: any, result: boolean) => {
     const ctx: ExpressionContext<any> = {
         expression: '',
         object,
-        operators
+        operators,
+        functions
     };
     expect(evaluator.evaluate(token, ctx)).toEqual(result);
 };
@@ -41,5 +43,8 @@ describe('BaseConditionEvaluator tests', () => {
     });
     it('should evaluate functions', () => {
         testAssertion('LEN(field) = 4', { field: 'test' }, true);
+    });
+    it('should evaluate symbols regardless of whitespace', () => {
+        testAssertion('field=5', { field: 5 }, true);
     });
 });

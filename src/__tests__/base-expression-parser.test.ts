@@ -1,16 +1,32 @@
 import {describe, expect, it} from "@jest/globals";
 import BaseExpressionParser from "../base-expression-parser";
 import ExpressionContext from "../types/expression-context";
+import operators from "../operators/operators";
+import functions from "../functions/functions";
 
 const parser = new BaseExpressionParser();
 
 const testError = (expression: string, expectedError: Error) => {
-    const ctx: ExpressionContext<any> = { expression, object: null, tokens: [], childExpressions: new Set() };
+    const ctx: ExpressionContext<any> = {
+        expression,
+        object: null,
+        tokens: [],
+        childExpressions: new Set(),
+        operators: operators,
+        functions: functions
+    };
     expect(() => parser.parse(ctx)).toThrowError(expectedError);
 };
 
 const testAssertion = (expression: string, expectedValue: string[]) => {
-    const ctx: ExpressionContext<any> = { expression, object: null, tokens: [], childExpressions: new Set() };
+    const ctx: ExpressionContext<any> = {
+        expression,
+        object: null,
+        tokens: [],
+        childExpressions: new Set(),
+        operators: operators,
+        functions: functions
+    };
     parser.parse(ctx);
     expect(ctx.tokens).toEqual(expectedValue);
 };
@@ -34,6 +50,7 @@ describe('BaseExpressionParser tests', () => {
     it('should parse tokens regardless of whitespace', () => {
         testAssertion(`A    =     1 AND B
         = 5`, ['A = 1', 'AND', 'B = 5']);
+        testAssertion('A>2 AND B=5', ['A>2', 'AND', 'B=5']);
     });
     it('should preserve whitespace within quotes', () => {
         testAssertion('A = "    test   " AND     B =     5', ['A = "    test   "', 'AND', 'B = 5']);

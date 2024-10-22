@@ -1,21 +1,20 @@
 import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
-import operators from "./operators/operators";
 import Operator from "./types/operator";
 import ExpressionFunction from "./types/expression-function";
-import functions from "./functions/functions";
+
 const get = require("lodash/get");
 
 class BaseConditionEvaluator implements ConditionEvaluator {
     evaluate<T>(token: string, context: ExpressionContext<T>): boolean {
         const object = context.object;
-        const _operators = (context.operators ?? operators) as Map<string, Operator>;
-        const _functions = (context.functions ?? functions) as Map<string, ExpressionFunction>;
-        const tokens = this.getOperandsAndOperator(token, _operators);
+        const operators = context.operators as Map<string, Operator>;
+        const functions = context.functions as Map<string, ExpressionFunction>;
+        const tokens = this.getOperandsAndOperator(token, operators);
         const [operandA, operator, operandB] = tokens;
         let value;
-        if (this.isFunction(operandA, _functions)) {
-            value = this.evaluateFunction(operandA, _functions, context);
+        if (this.isFunction(operandA, functions)) {
+            value = this.evaluateFunction(operandA, functions, context);
         } else {
             value = get(object, operandA.trim());
         }
@@ -26,8 +25,8 @@ class BaseConditionEvaluator implements ConditionEvaluator {
                 .slice(1, conditionValue.length - 1)
                 .replace(/\\"/g, '"');
         }
-        if (_operators.has(operator)) {
-            const _operator = _operators.get(operator) as Operator;
+        if (operators.has(operator)) {
+            const _operator = operators.get(operator) as Operator;
             return _operator.evaluate(value, conditionValue, tokens, context);
         }
         return false;
@@ -46,8 +45,8 @@ class BaseConditionEvaluator implements ConditionEvaluator {
             }
             if (!inString) {
                 const addOperator = (): boolean => {
-                    for (const operatorStr of operators.keys()) {
-                        if (this.isOperator(operatorStr, token, i)) {
+                    for (const [operatorStr, _operator] of operators) {
+                        if (this.isOperator(operatorStr, _operator, token, i)) {
                             operandA = buffer;
                             buffer = '';
                             operator = operatorStr;
@@ -67,25 +66,26 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         return [operandA, operator, operandB];
     }
 
-    private isOperator(operator: string, token: string, index: number): boolean {
+    private isOperator(operatorStr: string, operator: Operator, token: string, index: number): boolean {
         const char = token[index].toUpperCase();
-        // if there is a non-whitespace preceding character, this is not an operator
-        if (index > 0 && !/\s/.test(token[index - 1])) {
+        // for non-symbol operators, if there is a non-whitespace preceding character, it is not an operator
+        if (!operator.isSymbol && index > 0 && !/\s/.test(token[index - 1])) {
             return false;
         }
         const matches = (
             // the current character is the first character of the operator being checked
-            char === operator[0] &&
+            char === operatorStr[0] &&
             // the current operator fits in the bounds of the token
-            index + operator.length - 1 < token.length &&
+            index + operatorStr.length - 1 < token.length &&
             // the current character *is* the start of the operator
-            token.slice(index, index + operator.length).toUpperCase() === operator
+            token.slice(index, index + operatorStr.length).toUpperCase() === operatorStr
         );
         return matches && (
-            // no characters after
-            index + operator.length + 1 < token.length ||
-            // or whitespace after
-            /\s/.test(token[index + operator.length + 1])
+            operator.isSymbol ||
+            // non-symbol operators cannot have non-whitespace preceding characters
+            index + operatorStr.length + 1 < token.length ||
+            // non-symbol operators must be followed by whitespace
+            /\s/.test(token[index + operatorStr.length + 1])
         );
     }
 

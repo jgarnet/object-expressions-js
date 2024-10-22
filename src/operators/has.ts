@@ -9,7 +9,8 @@ const has: Operator = {
             return _has(context.object, conditionValue);
         }
         return _has(value, conditionValue);
-    }
+    },
+    isSymbol: false
 };
 
 export default has;

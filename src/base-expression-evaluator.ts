@@ -4,6 +4,8 @@ import BaseExpressionParser from "./base-expression-parser";
 import ExpressionParser from "./types/expression-parser";
 import ExpressionEvaluator from "./types/expression-evaluator";
 import BaseConditionEvaluator from "./base-condition-evaluator";
+import operators from "./operators/operators";
+import functions from "./functions/functions";
 
 class BaseExpressionEvaluator implements ExpressionEvaluator {
     /**
@@ -35,6 +37,8 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
         context.tokens = [];
         context.childExpressions = new Set<string>();
         context.cache = context.cache ?? new Map<string, boolean>();
+        context.operators = context.operators ?? operators;
+        context.functions = context.functions ?? functions;
         // parse tokens
         this.expressionParser.parse(context);
         // evaluate tokens and return result

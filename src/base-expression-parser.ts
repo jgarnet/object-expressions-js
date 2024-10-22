@@ -2,6 +2,7 @@ import ExpressionParser from "./types/expression-parser";
 import ExpressionContext from "./types/expression-context";
 import functions from "./functions/functions";
 import ExpressionFunction from "./types/expression-function";
+import Operator from "./types/operator";
 
 const LOGICAL_OPERATORS = ['AND', 'OR', 'NOT'];
 
@@ -9,7 +10,6 @@ class BaseExpressionParser implements ExpressionParser {
     parse<T>(context: ExpressionContext<T>): void {
         const expression = context.expression;
         const childExpressions = context.childExpressions as Set<string>;
-        const _functions = (context.functions ?? functions) as Map<string, ExpressionFunction>;
         let buffer = '';
         let parenCount = 0;
         let inString = false;
@@ -17,7 +17,7 @@ class BaseExpressionParser implements ExpressionParser {
         for (let i = 0; i < expression.length; i++) {
             const char = expression[i];
             if (char === '(') {
-                if (parenCount === 0 && this.isFunction(buffer, funcCount, _functions)) {
+                if (parenCount === 0 && this.isFunction(buffer, funcCount, context.functions as Map<string, ExpressionFunction>)) {
                     funcCount++;
                     buffer += char;
                 } else {
@@ -68,9 +68,9 @@ class BaseExpressionParser implements ExpressionParser {
             // check for operators
             if (parenCount === 0 && funcCount === 0 && !inString) {
                 for (const operator of LOGICAL_OPERATORS) {
-                    if (this.isOperator(operator, expression, i)) {
+                    if (this.isLogicalOperator(operator, expression, i)) {
                         // add the operator to the current tokens
-                        this.addOperator(operator, buffer, context);
+                        this.addLogicalOperator(operator, buffer, context);
                         // clear the current buffer
                         buffer = '';
                         // move the buffer index forward past the operator
@@ -102,7 +102,7 @@ class BaseExpressionParser implements ExpressionParser {
      * @param index The index of the current position / character in the expression string.
      * @private
      */
-    private isOperator(operator: string, expression: string, index: number): boolean {
+    private isLogicalOperator(operator: string, expression: string, index: number): boolean {
         const char = expression[index].toUpperCase();
         // if there is a non-whitespace preceding character, this is not a logical operator
         if (index > 0 && !/\s/.test(expression[index - 1])) {
@@ -132,7 +132,7 @@ class BaseExpressionParser implements ExpressionParser {
      * @param context The {@link ExpressionContext}.
      * @private
      */
-    private addOperator<T>(operator: string, buffer: string, context: ExpressionContext<T>): void {
+    private addLogicalOperator<T>(operator: string, buffer: string, context: ExpressionContext<T>): void {
         buffer = buffer.slice(0, buffer.length - 1);
         this.addToken(buffer, context);
         this.addToken(operator, context);

@@ -6,7 +6,8 @@ const _in: Operator = {
     evaluate<T>(value: any, conditionValue: string, tokens: string[], context: ExpressionContext<T>): boolean {
         const values = conditionValue.split(',').map(val => val.trim());
         return some(values, (val: any) => val == value);
-    }
+    },
+    isSymbol: false
 };
 
 export default _in;
