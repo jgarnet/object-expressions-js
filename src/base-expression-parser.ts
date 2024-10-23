@@ -1,8 +1,6 @@
 import ExpressionParser from "./types/expression-parser";
 import ExpressionContext from "./types/expression-context";
-import functions from "./functions/functions";
 import ExpressionFunction from "./types/expression-function";
-import Operator from "./types/operator";
 
 const LOGICAL_OPERATORS = ['AND', 'OR', 'NOT'];
 
@@ -81,13 +79,13 @@ class BaseExpressionParser implements ExpressionParser {
             }
         }
         if (funcCount > 0 || funcCount < 0) {
-            throw new Error('SyntaxError: unclosed function');
+            throw new Error('SyntaxError: expression contained an unclosed function');
         }
         if (parenCount > 0 || parenCount < 0) {
-            throw new Error('SyntaxError: unclosed group');
+            throw new Error('SyntaxError: expression contains an unclosed group');
         }
         if (inString) {
-            throw new Error('SyntaxError: unclosed string');
+            throw new Error('SyntaxError: expression contains an unclosed string');
         }
         // if a buffer remains, add it as a token
         if (buffer.length > 0) {
