@@ -5,6 +5,10 @@ module.exports = {
     "**/__tests__/**/*.+(ts|tsx|js)",
     "**/?(*.)+(spec|test).+(ts|tsx|js)"
   ],
+  testPathIgnorePatterns: [
+    "<rootDir>/node_modules/",
+    "<rootDir>/dist/"
+  ],
   transform: {
     "^.+\\.(ts|tsx)$": "ts-jest"
   },

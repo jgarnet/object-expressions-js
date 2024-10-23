@@ -103,18 +103,18 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         const firstParen = token.indexOf('(');
         const lastParen = token.lastIndexOf(')');
         const input = token.slice(firstParen + 1, lastParen);
-        const args = this.parseFunctionArgs(input);
+        const funcKey = token.slice(0, firstParen).trim().toUpperCase();
+        const args = this.parseFunctionArgs(input, funcKey);
         for (let i = 0; i < args.length; i++) {
             if (this.isFunction(args[i], functions)) {
                 args[i] = this.evaluateFunction(args[i], functions, context);
             }
         }
-        const funcKey = token.slice(0, firstParen).trim().toUpperCase();
         const func = functions.get(funcKey) as ExpressionFunction;
         return func.evaluate(context, ...args);
     }
 
-    private parseFunctionArgs(token: string): string[] {
+    private parseFunctionArgs(token: string, funcKey: string): string[] {
         const args = [];
         let buffer = '';
         let inString = false;
@@ -124,15 +124,21 @@ class BaseConditionEvaluator implements ConditionEvaluator {
                 inString = !inString;
             } else if (char === ',') {
                 if (!inString) {
-                    args.push(buffer.trim());
+                    const token = buffer.trim();
+                    if (token.length === 0) {
+                        throw new Error(`SyntaxError: invalid function argument passed to ${funcKey}`);
+                    }
+                    args.push(token);
                     buffer = '';
+                    continue;
                 }
             }
             buffer += char;
         }
-        if (buffer.trim().length > 0) {
-            args.push(buffer.trim());
+        if (buffer.trim().length === 0 && token.trim().length > 0) {
+            throw new Error(`SyntaxError: invalid function argument passed to ${funcKey}`);
         }
+        args.push(buffer.trim());
         return args;
     }
 }

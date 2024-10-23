@@ -16,6 +16,16 @@ const testAssertion = (token: string, object: any, result: boolean) => {
     expect(evaluator.evaluate(token, ctx)).toEqual(result);
 };
 
+const testError = (token: string, object: any, expectedError: Error) => {
+    const ctx: ExpressionContext<any> = {
+        expression: '',
+        object,
+        operators,
+        functions
+    };
+    expect(() => evaluator.evaluate(token, ctx)).toThrowError(expectedError);
+};
+
 describe('BaseConditionEvaluator tests', () => {
     it('should evaluate equality', () => {
         // numbers
@@ -43,6 +53,16 @@ describe('BaseConditionEvaluator tests', () => {
     });
     it('should evaluate functions', () => {
         testAssertion('LEN(field) = 4', { field: 'test' }, true);
+        testAssertion('LEN(field  ) = 4', { field: 'test' }, true);
+        testAssertion('LEN(  field  ) = 4', { field: 'test' }, true);
+        testAssertion('LEN(  field) = 4', { field: 'test' }, true);
+    });
+    it('should throw errors for invalid function syntax', () => {
+        testError('LEN(field,  ) = 4', {}, new Error('SyntaxError: invalid function argument passed to LEN'));
+        testError('LEN(field,) = 4', {}, new Error('SyntaxError: invalid function argument passed to LEN'));
+        testError('LEN(field,,5) = 4', {}, new Error('SyntaxError: invalid function argument passed to LEN'));
+        testError('LEN(,field) = 4', {}, new Error('SyntaxError: invalid function argument passed to LEN'));
+        testError('LEN(  ,field) = 4', {}, new Error('SyntaxError: invalid function argument passed to LEN'));
     });
     it('should evaluate symbols regardless of whitespace', () => {
         testAssertion('field=5', { field: 5 }, true);
