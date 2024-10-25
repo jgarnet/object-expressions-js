@@ -104,6 +104,16 @@ If an expression contains unclosed strings, a SyntaxError will be thrown during 
 
 ### Functions
 
+```javascript
+const evaluator = new BaseExpressionEvaluator();
+const result = evaluator.evaluate({
+  expression: 'ADD(LEN(field), 4) = 8',
+  object: {
+      field: 'test'
+  }
+}); // result = true
+```
+
 Functions can be applied to a field's value during evaluation. The following functions are provided:
 - `LEN`
   - Returns the length of a field's value.
