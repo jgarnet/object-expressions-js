@@ -5,7 +5,8 @@ const greaterEquals: Operator = {
     evaluate<T>(value: any, conditionValue: string, tokens: string[], context: ExpressionContext<T>): boolean {
         return value >= conditionValue;
     },
-    isSymbol: true
+    isSymbol: true,
+    regex: '>='
 };
 
 export default greaterEquals;

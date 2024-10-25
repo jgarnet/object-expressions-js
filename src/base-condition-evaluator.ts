@@ -121,6 +121,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         const args = [];
         let buffer = '';
         let inString = false;
+        // todo: fix parsing logic to account for nested function calls
         for (let i = 0; i < token.length; i++) {
             const char = token[i];
             if (char === '"') {

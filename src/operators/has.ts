@@ -10,7 +10,8 @@ const has: Operator = {
         }
         return _has(value, conditionValue);
     },
-    isSymbol: false
+    isSymbol: false,
+    regex: 'HAS'
 };
 
 export default has;

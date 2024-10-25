@@ -158,4 +158,9 @@ Care"
         testError('OR OR', new Error('SyntaxError: incomplete logical operation detected in OR OR'));
         testError('OR NOT', new Error('SyntaxError: incomplete logical operation detected in OR NOT'));
     });
+    it('should evaluate expressions with functions', () => {
+        // testAssertion('LEN(a) = LEN(b)', { a: 'test', b: '1234' }, true);
+        // testAssertion('ADD(2,2) = SUBTRACT(8,4)', {}, true);
+        testAssertion('ADD(2,ADD(1,1)) = SUBTRACT(8,4)', {}, true);
+    });
 });

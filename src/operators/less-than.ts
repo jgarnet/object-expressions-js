@@ -5,7 +5,8 @@ const lessThan: Operator = {
     evaluate<T>(value: any, conditionValue: string, tokens: string[], context: ExpressionContext<T>): boolean {
         return value < conditionValue;
     },
-    isSymbol: true
+    isSymbol: true,
+    regex: '<(?!=)'
 };
 
 export default lessThan;

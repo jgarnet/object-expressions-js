@@ -17,7 +17,8 @@ const is: Operator = {
         }
         return false;
     },
-    isSymbol: false
+    isSymbol: false,
+    regex: 'IS'
 };
 
 export default is;

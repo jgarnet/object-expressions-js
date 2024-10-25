@@ -7,7 +7,8 @@ const _in: Operator = {
         const values = conditionValue.split(',').map(val => val.trim());
         return some(values, (val: any) => val == value);
     },
-    isSymbol: false
+    isSymbol: false,
+    regex: 'IN'
 };
 
 export default _in;

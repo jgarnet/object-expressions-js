@@ -1,6 +1,7 @@
 import ExpressionParser from "./types/expression-parser";
 import ExpressionContext from "./types/expression-context";
 import ExpressionFunction from "./types/expression-function";
+import Operator from "./types/operator";
 
 const LOGICAL_OPERATORS = ['AND', 'OR', 'NOT'];
 
@@ -12,10 +13,11 @@ class BaseExpressionParser implements ExpressionParser {
         let parenCount = 0;
         let inString = false;
         let funcCount = 0;
+        let lastFunctionIndex = -1;
         for (let i = 0; i < expression.length; i++) {
             const char = expression[i];
             if (char === '(') {
-                if (parenCount === 0 && this.isFunction(buffer, funcCount, context.functions as Map<string, ExpressionFunction>)) {
+                if (parenCount === 0 && this.isFunction(buffer, funcCount, lastFunctionIndex, context)) {
                     funcCount++;
                     buffer += char;
                 } else {
@@ -40,6 +42,9 @@ class BaseExpressionParser implements ExpressionParser {
                 } else {
                     funcCount--;
                     buffer += char;
+                    if (funcCount === 0) {
+                        lastFunctionIndex = i;
+                    }
                 }
             } else if (char === '"') {
                 // keep track of quotes for strings with whitespace
@@ -144,20 +149,40 @@ class BaseExpressionParser implements ExpressionParser {
         }
     }
 
-    private isFunction<T>(token: string, funcCount: number, functions: Map<string, ExpressionFunction>): boolean {
+    private isFunction<T>(token: string, funcCount: number, lastFunctionIndex: number, context: ExpressionContext<T>): boolean {
+        const functions = context.functions as Map<string, ExpressionFunction>;
+        const operators = context.operators as Map<string, Operator>;
         token = token.trim().toUpperCase();
-        if (funcCount === 0) {
+        if (lastFunctionIndex === -1 && funcCount === 0) {
+            // happiest path; no previous function calls in current token & not inside another function call
             return functions.has(token);
         }
-        const lastComma = token.lastIndexOf(',');
-        if (lastComma !== -1) {
-            const lastQuote = token.lastIndexOf('"');
-            if (lastQuote === -1 || lastComma > lastQuote) {
-                return functions.has(token.slice(lastComma + 1).trim());
+        if (funcCount > 0) {
+            // we are inside a function call; attempt to remove all characters up to the current token
+            // i.e. 'ADD(LEN' --> 'LEN' (remove 'AND('), 'ADD(LEN(a), LEN' --> ' LEN' (remove 'ADD(LEN(A),'), etc.
+            const lastComma = token.lastIndexOf(',');
+            if (lastComma !== -1) {
+                const lastQuote = token.lastIndexOf('"');
+                if (lastQuote === -1 || lastComma > lastQuote) {
+                    return functions.has(token.slice(lastComma + 1).trim());
+                }
             }
+            const lastParen = token.lastIndexOf('(');
+            token = token.slice(lastParen + 1).trim();
         }
-        const lastParen = token.lastIndexOf('(');
-        return functions.has(token.slice(lastParen + 1).trim());
+        // finally, check if this token is preceded by a comparison operator
+        const functionKeyRegex = '[^0-9]+[a-zA-Z0-9_]';
+        const operatorsRegex = [...operators.values()].map(operator => operator.regex).join('|');
+        const regex = `(?<=${operatorsRegex})${functionKeyRegex}`;
+        token = token.slice(lastFunctionIndex + 1);
+        const groups = token.match(regex);
+        if (groups && groups.length >= 0) {
+            // remove preceding comparison operator
+            return functions.has(groups[0].trim());
+        } else {
+            // we can assume the current token is a possible function call with no preceding operators
+            return functions.has(token.trim());
+        }
     }
 }
 

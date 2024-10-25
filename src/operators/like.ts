@@ -5,7 +5,8 @@ const like: Operator = {
     evaluate<T>(value: any, conditionValue: string, tokens: string[], context: ExpressionContext<T>): boolean {
         return new RegExp(conditionValue).test(`${value}`);
     },
-    isSymbol: false
+    isSymbol: false,
+    regex: 'LIKE'
 };
 
 export default like;
