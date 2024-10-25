@@ -159,8 +159,10 @@ Care"
         testError('OR NOT', new Error('SyntaxError: incomplete logical operation detected in OR NOT'));
     });
     it('should evaluate expressions with functions', () => {
-        // testAssertion('LEN(a) = LEN(b)', { a: 'test', b: '1234' }, true);
-        // testAssertion('ADD(2,2) = SUBTRACT(8,4)', {}, true);
-        testAssertion('ADD(2,ADD(1,1)) = SUBTRACT(8,4)', {}, true);
+        testAssertion('LEN(a) = LEN(b)', { a: 'test', b: '1234' }, true);
+        testAssertion('ADD(2,2) = SUBTRACT(8,4)', {}, true);
+        testAssertion('ADD(2,ADD(1,1)) = SUBTRACT(8,ADD(2,2))', {}, true);
+        testAssertion('ADD(2,ADD(1,1)) = SUBTRACT(8,ADD(2,2)) AND ADD(2,2) = 4', {}, true);
+        testAssertion('(ADD(ADD(1,1),ADD(1,1)) = 4) AND (ADD(2,2) = 4 AND ADD(1,1,1,1) = 4)', {}, true);
     });
 });

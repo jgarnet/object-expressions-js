@@ -35,6 +35,8 @@ class BaseExpressionParser implements ExpressionParser {
                         this.addToken(buffer, context);
                         childExpressions.add(buffer.trim());
                         buffer = '';
+                        // reset function index for current buffer
+                        lastFunctionIndex = -1;
                     } else {
                         // continue appending characters to child expression
                         buffer += char;
@@ -76,6 +78,8 @@ class BaseExpressionParser implements ExpressionParser {
                         this.addLogicalOperator(operator, buffer, context);
                         // clear the current buffer
                         buffer = '';
+                        // reset function index for current buffer
+                        lastFunctionIndex = -1;
                         // move the buffer index forward past the operator
                         i += operator.length - 1;
                         break;

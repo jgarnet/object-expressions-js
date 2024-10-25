@@ -121,13 +121,22 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         const args = [];
         let buffer = '';
         let inString = false;
-        // todo: fix parsing logic to account for nested function calls
+        let parenCount = 0;
         for (let i = 0; i < token.length; i++) {
             const char = token[i];
             if (char === '"') {
                 inString = !inString;
-            } else if (char === ',') {
+            } else if (char === '(') {
                 if (!inString) {
+                    parenCount++;
+                }
+            } else if (char === ')') {
+                if (!inString) {
+                    parenCount--;
+                }
+            } else if (char === ',') {
+                if (!inString && parenCount === 0) {
+                    // only break into new argument if not in string or nested function call
                     const token = buffer.trim();
                     if (token.length === 0) {
                         throw new Error(`SyntaxError: invalid function argument passed to ${funcKey}`);
