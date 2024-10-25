@@ -113,6 +113,11 @@ Functions can be applied to a field's value during evaluation. The following fun
   - Requires at least two arguments.
   - String arguments represent field paths which will be retrieved from the object being evaluated.
   - `ADD(fieldA,fieldB.0.value)` `ADD(fieldA,2)` `ADD(2,2)`
+- `SUBTRACT`
+  - Takes the difference of all arguments and returns the result.
+  - Requires at least two arguments.
+  - String arguments represent field paths which will be retrieved from the object being evaluated.
+  - `SUBTRACT(fieldA,fieldB.0.value)` `SUBTRACT(fieldA,2)` `SUBTRACT(2,2)`
 
 Functions can evaluate other functions as arguments.
 
