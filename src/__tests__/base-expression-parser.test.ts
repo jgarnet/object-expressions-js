@@ -1,8 +1,8 @@
 import {describe, expect, it} from "@jest/globals";
 import BaseExpressionParser from "../base-expression-parser";
 import ExpressionContext from "../types/expression-context";
-import operators from "../operators/operators";
-import functions from "../functions/functions";
+import operators from "../operators/_operators";
+import functions from "../functions/_functions";
 
 const parser = new BaseExpressionParser();
 

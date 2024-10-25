@@ -1,8 +1,5 @@
 import BaseExpressionEvaluator from "../base-expression-evaluator";
 import {describe, expect, it} from "@jest/globals";
-import ExpressionContext from "../types/expression-context";
-import operators from "../operators/operators";
-import functions from "../functions/functions";
 
 const testAssertion = (expression: string, object: any, outcome: boolean) => {
     const evaluator = new BaseExpressionEvaluator();

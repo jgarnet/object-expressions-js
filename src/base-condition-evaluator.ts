@@ -22,6 +22,9 @@ class BaseConditionEvaluator implements ConditionEvaluator {
             value = get(object, operandA.trim());
         }
         let conditionValue = operandB.trim();
+        if (this.isFunction(conditionValue, functions)) {
+            conditionValue = this.evaluateFunction(conditionValue, functions, context);
+        }
         // unwrap string values if defined in condition value
         if (conditionValue[0] === '"' && conditionValue[conditionValue.length - 1] === '"') {
             conditionValue = conditionValue

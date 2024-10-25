@@ -4,8 +4,8 @@ import BaseExpressionParser from "./base-expression-parser";
 import ExpressionParser from "./types/expression-parser";
 import ExpressionEvaluator from "./types/expression-evaluator";
 import BaseConditionEvaluator from "./base-condition-evaluator";
-import operators from "./operators/operators";
-import functions from "./functions/functions";
+import operators from "./operators/_operators";
+import functions from "./functions/_functions";
 
 class BaseExpressionEvaluator implements ExpressionEvaluator {
     /**

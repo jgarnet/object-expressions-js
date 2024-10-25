@@ -1,8 +1,8 @@
 import {describe, expect, it} from "@jest/globals";
 import BaseConditionEvaluator from "../base-condition-evaluator";
 import ExpressionContext from "../types/expression-context";
-import operators from "../operators/operators";
-import functions from "../functions/functions";
+import operators from "../operators/_operators";
+import functions from "../functions/_functions";
 
 const evaluator = new BaseConditionEvaluator();
 
@@ -11,7 +11,7 @@ const testAssertion = (token: string, object: any, result: boolean) => {
         expression: '',
         object,
         operators,
-        functions
+        functions: functions
     };
     expect(evaluator.evaluate(token, ctx)).toEqual(result);
 };
@@ -21,7 +21,7 @@ const testError = (token: string, object: any, expectedError: Error) => {
         expression: '',
         object,
         operators,
-        functions
+        functions: functions
     };
     expect(() => evaluator.evaluate(token, ctx)).toThrowError(expectedError);
 };
@@ -56,6 +56,8 @@ describe('BaseConditionEvaluator tests', () => {
         testAssertion('LEN(field  ) = 4', { field: 'test' }, true);
         testAssertion('LEN(  field  ) = 4', { field: 'test' }, true);
         testAssertion('LEN(  field) = 4', { field: 'test' }, true);
+        testAssertion('LEN(field) = LEN(fieldB)', { field: 'a', fieldB: 'b' }, true);
+        testAssertion('ADD(2,a,b) = 12', { a: 4, b: 6 }, true);
     });
     it('should throw errors for invalid function syntax', () => {
         testError('LEN(field,  ) = 4', {}, new Error('SyntaxError: invalid function argument passed to LEN'));

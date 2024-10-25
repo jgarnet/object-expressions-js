@@ -108,6 +108,11 @@ Functions can be applied to a field's value during evaluation. The following fun
 - `LEN`
   - Returns the length of a field's value.
   - `LEN(name)` `LEN(items.0.sku)`
+- `ADD`
+  - Adds all arguments and returns the result.
+  - Requires at least two arguments.
+  - String arguments represent field paths which will be retrieved from the object being evaluated.
+  - `ADD(fieldA,fieldB.0.value)` `ADD(fieldA,2)` `ADD(2,2)`
 
 Functions can evaluate other functions as arguments.
 
