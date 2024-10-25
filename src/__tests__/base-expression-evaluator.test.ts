@@ -1,10 +1,17 @@
 import BaseExpressionEvaluator from "../base-expression-evaluator";
 import {describe, expect, it} from "@jest/globals";
+import ExpressionContext from "../types/expression-context";
+import operators from "../operators/operators";
+import functions from "../functions/functions";
 
 const testAssertion = (expression: string, object: any, outcome: boolean) => {
-    // const evaluator = new BaseExpressionEvaluator(conditionEvaluator);
     const evaluator = new BaseExpressionEvaluator();
     expect(evaluator.evaluate({ expression, object })).toEqual(outcome);
+};
+
+const testError = (expression: string, expectedError: Error) => {
+    const evaluator = new BaseExpressionEvaluator();
+    expect(() => evaluator.evaluate({ expression, object: { A: 2, B: 3 } })).toThrowError(expectedError);
 };
 
 describe('BaseExpressionEvaluator Tests', () => {
@@ -138,5 +145,20 @@ Care"
         testAssertion('a = "a = 1 AND a > 0"', { a: 'a = 1 AND a > 0' }, true);
         testAssertion('a = "a = 1 AND a > 0" AND b = 5', { a: 'a = 1 AND a > 0', b: 5 }, true);
         testAssertion('(a = "a = 1 AND a > 0" AND (b = 5))', { a: 'a = 1 AND a > 0', b: 5 }, true);
+    });
+    it('should throw SyntaxError when incomplete logical operations are detected', () => {
+        testError('A = 1 AND OR', new Error('SyntaxError: incomplete logical operation detected in A = 1 AND OR'));
+        testError('(A = 1) AND OR', new Error('SyntaxError: incomplete logical operation detected in (A = 1) AND OR'));
+        testError('(A = 1 AND) OR', new Error('SyntaxError: incomplete logical operation detected in A = 1 AND'));
+        testError('A = 1 AND AND B = 2', new Error('SyntaxError: incomplete logical operation detected in A = 1 AND AND B = 2'));
+        testError('A = 1 OR OR B = 2', new Error('SyntaxError: incomplete logical operation detected in A = 1 OR OR B = 2'));
+        testError('A = 2 AND B = 3 OR OR', new Error('SyntaxError: incomplete logical operation detected in A = 2 AND B = 3 OR OR'));
+        testError('NOT', new Error('SyntaxError: incomplete logical operation detected in NOT'));
+        testError('AND', new Error('SyntaxError: incomplete logical operation detected in AND'));
+        testError('OR', new Error('SyntaxError: incomplete logical operation detected in OR'));
+        testError('NOT AND', new Error('SyntaxError: incomplete logical operation detected in NOT AND'));
+        testError('AND AND', new Error('SyntaxError: incomplete logical operation detected in AND AND'));
+        testError('OR OR', new Error('SyntaxError: incomplete logical operation detected in OR OR'));
+        testError('OR NOT', new Error('SyntaxError: incomplete logical operation detected in OR NOT'));
     });
 });

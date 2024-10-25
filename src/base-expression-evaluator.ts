@@ -50,10 +50,16 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
         for (let i = 0; i < tokens.length; i++) {
             const token = tokens[i];
             if (token === 'NOT') {
-                isNegate = true;
+                isNegate = !isNegate;
             } else if (token === 'AND') {
+                if (isAnd || isOr) {
+                    throw new Error(`SyntaxError: incomplete logical operation detected in ${expression}`);
+                }
                 isAnd = true;
             } else if (token === 'OR') {
+                if (isAnd || isOr) {
+                    throw new Error(`SyntaxError: incomplete logical operation detected in ${expression}`);
+                }
                 isOr = true;
             } else {
                 let current = this.evaluateToken(token, context);
@@ -75,6 +81,9 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
                 }
                 result = current;
             }
+        }
+        if (isNegate || isAnd || isOr) {
+            throw new Error(`SyntaxError: incomplete logical operation detected in ${expression}`);
         }
         return result;
     }

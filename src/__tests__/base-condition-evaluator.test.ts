@@ -67,4 +67,10 @@ describe('BaseConditionEvaluator tests', () => {
     it('should evaluate symbols regardless of whitespace', () => {
         testAssertion('field=5', { field: 5 }, true);
     });
+    it('should throw errors for invalid operators / conditions', () => {
+        testError('A ~ 1', {}, new Error('SyntaxError: received invalid condition A ~ 1'));
+        testError('A == 1', {}, new Error('SyntaxError: received invalid condition A == 1'));
+        testError('A==1', {}, new Error('SyntaxError: received invalid condition A==1'));
+        testError('A CONTAINS 1', {}, new Error('SyntaxError: received invalid condition A CONTAINS 1'));
+    });
 });

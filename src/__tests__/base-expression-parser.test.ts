@@ -59,11 +59,11 @@ describe('BaseExpressionParser tests', () => {
         testAssertion('field = "\\"AND 1 = 1" AND fieldB = 2', ['field = "\\"AND 1 = 1"', 'AND', 'fieldB = 2']);
     });
     it('should throw SyntaxError when invalid syntax is encountered', () => {
-        testError('(invalid', new Error('SyntaxError: unclosed group'));
-        testError('(invalid))', new Error('SyntaxError: unclosed group'));
-        testError('LEN(invalid', new Error('SyntaxError: unclosed function'));
-        testError('LEN(LEN(invalid)', new Error('SyntaxError: unclosed function'));
-        testError('a = "invalid', new Error('SyntaxError: unclosed string'));
-        testError('a = "invalid""', new Error('SyntaxError: unclosed string'));
+        testError('(invalid', new Error('SyntaxError: expression contains an unclosed group'));
+        testError('(invalid))', new Error('SyntaxError: expression contains an unclosed group'));
+        testError('LEN(invalid', new Error('SyntaxError: expression contains an unclosed function'));
+        testError('LEN(LEN(invalid)', new Error('SyntaxError: expression contains an unclosed function'));
+        testError('a = "invalid', new Error('SyntaxError: expression contains an unclosed string'));
+        testError('a = "invalid""', new Error('SyntaxError: expression contains an unclosed string'));
     });
 });

@@ -12,6 +12,9 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         const functions = context.functions as Map<string, ExpressionFunction>;
         const tokens = this.getOperandsAndOperator(token, operators);
         const [operandA, operator, operandB] = tokens;
+        if (operandA.trim().length === 0 || operator.trim().length === 0 || operandB.trim().length === 0) {
+            throw new SyntaxError(`SyntaxError: received invalid condition ${token}`);
+        }
         let value;
         if (this.isFunction(operandA, functions)) {
             value = this.evaluateFunction(operandA, functions, context);
@@ -25,11 +28,8 @@ class BaseConditionEvaluator implements ConditionEvaluator {
                 .slice(1, conditionValue.length - 1)
                 .replace(/\\"/g, '"');
         }
-        if (operators.has(operator)) {
-            const _operator = operators.get(operator) as Operator;
-            return _operator.evaluate(value, conditionValue, tokens, context);
-        }
-        return false;
+        const _operator = operators.get(operator) as Operator;
+        return _operator.evaluate(value, conditionValue, tokens, context);
     }
 
     private getOperandsAndOperator(token: string, operators: Map<string, Operator>): string[] {

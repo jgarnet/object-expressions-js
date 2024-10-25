@@ -79,7 +79,7 @@ class BaseExpressionParser implements ExpressionParser {
             }
         }
         if (funcCount > 0 || funcCount < 0) {
-            throw new Error('SyntaxError: expression contained an unclosed function');
+            throw new Error('SyntaxError: expression contains an unclosed function');
         }
         if (parenCount > 0 || parenCount < 0) {
             throw new Error('SyntaxError: expression contains an unclosed group');
@@ -106,19 +106,13 @@ class BaseExpressionParser implements ExpressionParser {
         if (index > 0 && !/\s/.test(expression[index - 1])) {
             return false;
         }
-        const matches = (
+        return (
             // the current character is the first character of the operator being checked
             char === operator[0] &&
             // the current operator fits in the bounds of the token
-            index + operator.length < expression.length &&
+            index + operator.length - 1 < expression.length &&
             // the current character *is* the start of the operator
             expression.slice(index, index + operator.length).toUpperCase() === operator
-        );
-        return matches && (
-            // no characters after
-            index + operator.length + 1 < expression.length ||
-            // or whitespace after
-            /\s/.test(expression[index + operator.length + 1])
         );
     }
 
