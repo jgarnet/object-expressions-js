@@ -69,5 +69,7 @@ describe('BaseExpressionParser tests', () => {
         testError('LEN(LEN(invalid)', new Error('SyntaxError: expression contains an unclosed function'));
         testError('a = "invalid', new Error('SyntaxError: expression contains an unclosed string'));
         testError('a = "invalid""', new Error('SyntaxError: expression contains an unclosed string'));
+        testError('a = MULTIPLY(()', new Error('SyntaxError: received invalid function call in a = MULTIPLY(()'));
+        testError('a = MULTIPLY(())', new Error('SyntaxError: received invalid function call in a = MULTIPLY(())'));
     });
 });

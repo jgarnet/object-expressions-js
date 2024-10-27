@@ -21,6 +21,8 @@ class BaseExpressionParser implements ExpressionParser {
                 if (parenCount === 0 && this.isFunction(buffer, funcCount, lastFunctionIndex, context)) {
                     funcCount++;
                     buffer += char;
+                } else if (funcCount > 0 && !inString) {
+                    throw new Error(`SyntaxError: received invalid function call in ${context.expression}`);
                 } else {
                     // check for new child expressions
                     parenCount++;
