@@ -164,5 +164,6 @@ Care"
         testAssertion('ADD(2,ADD(1,1)) = SUBTRACT(8,ADD(2,2))', {}, true);
         testAssertion('ADD(2,ADD(1,1)) = SUBTRACT(8,ADD(2,2)) AND ADD(2,2) = 4', {}, true);
         testAssertion('(ADD(ADD(1,1),ADD(1,1)) = 4) AND (ADD(2,2) = 4 AND ADD(1,1,1,1) = 4)', {}, true);
+        testAssertion('a = MULTIPLY(b, 2)', { a: 4, b: 2 }, true);
     });
 });

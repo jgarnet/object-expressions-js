@@ -165,12 +165,7 @@ class BaseExpressionParser implements ExpressionParser {
 
     private isFunction<T>(token: string, funcCount: number, lastFunctionIndex: number, context: ExpressionContext<T>): boolean {
         const functions = context.functions as Map<string, ExpressionFunction>;
-        const operators = context.operators as Map<string, Operator>;
         token = token.trim().toUpperCase();
-        if (lastFunctionIndex === -1 && funcCount === 0) {
-            // happiest path; no previous function calls in current token & not inside another function call
-            return functions.has(token);
-        }
         if (funcCount > 0) {
             // we are inside a function call; attempt to remove all characters up to the current token
             // i.e. 'ADD(LEN' --> 'LEN' (remove 'AND('), 'ADD(LEN(a), LEN' --> ' LEN' (remove 'ADD(LEN(A),'), etc.

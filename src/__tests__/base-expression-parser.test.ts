@@ -46,6 +46,10 @@ describe('BaseExpressionParser tests', () => {
         testAssertion('LEN(A) = 4 AND A = test', ['LEN(A) = 4', 'AND', 'A = test']);
         testAssertion('LEN(LEN(A)) = 4 AND A = test', ['LEN(LEN(A)) = 4', 'AND', 'A = test']);
         testAssertion('LEN(A, LEN(B)) = 4 AND A = test', ['LEN(A, LEN(B)) = 4', 'AND', 'A = test']);
+        testAssertion('a = MULTIPLY(b, 2)', ['a = MULTIPLY(b, 2)']);
+        testAssertion('MULTIPLY(b, 2) = a', ['MULTIPLY(b, 2) = a']);
+        testAssertion('MULTIPLY(b, 2) = a AND DIVIDE(c,2) = d', ['MULTIPLY(b, 2) = a', 'AND', 'DIVIDE(c,2) = d']);
+        testAssertion('(MULTIPLY(b, 2) = a) AND (DIVIDE(c,2) = d)', ['MULTIPLY(b, 2) = a', 'AND', 'DIVIDE(c,2) = d']);
     });
     it('should parse tokens regardless of whitespace', () => {
         testAssertion(`A    =     1 AND B
