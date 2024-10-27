@@ -17,61 +17,74 @@ class BaseExpressionParser implements ExpressionParser {
         let lastFunctionIndex = -1;
         for (let i = 0; i < expression.length; i++) {
             const char = expression[i];
-            if (char === '(') {
-                if (parenCount === 0 && this.isFunction(buffer, funcCount, lastFunctionIndex, context)) {
-                    funcCount++;
-                    buffer += char;
-                } else if (funcCount > 0 && !inString) {
-                    throw new Error(`SyntaxError: received invalid function call in ${context.expression}`);
-                } else {
-                    // check for new child expressions
-                    parenCount++;
-                    if (parenCount > 1) {
+            switch (char) {
+                case '(':
+                    // represents the start of a root or nested group or function
+                    if (parenCount === 0 && this.isFunction(buffer, funcCount, lastFunctionIndex, context)) {
+                        // function start
+                        funcCount++;
                         buffer += char;
-                    }
-                }
-            } else if (char === ')') {
-                if (funcCount === 0) {
-                    parenCount--;
-                    if (parenCount === 0) {
-                        // end child expression
-                        this.addToken(buffer, context);
-                        childExpressions.add(buffer.trim());
-                        buffer = '';
-                        // reset function index for current buffer
-                        lastFunctionIndex = -1;
+                    } else if (funcCount > 0 && !inString) {
+                        throw new Error(`SyntaxError: received invalid function call in ${context.expression}`);
                     } else {
-                        // continue appending characters to child expression
+                        // group start
+                        parenCount++;
+                        if (parenCount > 1) {
+                            buffer += char;
+                        }
+                    }
+                    break;
+                case ')':
+                    // represents the end of a root or nested group or function
+                    if (funcCount === 0) {
+                        // group end
+                        parenCount--;
+                        if (parenCount === 0) {
+                            // root group has ended
+                            // append the group to the tokens array
+                            this.addToken(buffer, context);
+                            childExpressions.add(buffer.trim());
+                            buffer = '';
+                            // reset function index for current buffer
+                            lastFunctionIndex = -1;
+                        } else {
+                            // nested group has ended
+                            // continue appending characters to group
+                            buffer += char;
+                        }
+                    } else {
+                        // function call has ended
+                        funcCount--;
+                        buffer += char;
+                        if (funcCount === 0) {
+                            // root function call has ended; mark the current index as the last function call
+                            lastFunctionIndex = i;
+                        }
+                    }
+                    break;
+                case '"':
+                    // represents the start or end of a string
+                    if (!inString) {
+                        inString = true;
+                    } else if (expression[i - 1] !== '\\') {
+                        // close current string
+                        inString = false;
+                    }
+                    buffer += char;
+                    break;
+                default:
+                    if (/\s/.test(char)) {
+                        if (inString) {
+                            // allow whitespace to be preserved inside a string
+                            buffer += char;
+                        } else if (i > 0 && !/\s/.test(expression[i - 1])) {
+                            // if not inside a string, only allow one space between tokens
+                            buffer += ' ';
+                        }
+                    } else {
+                        // normal use case -- not inside child expression, string, etc. -- simply append to buffer
                         buffer += char;
                     }
-                } else {
-                    funcCount--;
-                    buffer += char;
-                    if (funcCount === 0) {
-                        lastFunctionIndex = i;
-                    }
-                }
-            } else if (char === '"') {
-                // keep track of quotes for strings with whitespace
-                if (!inString) {
-                    inString = true;
-                } else if (expression[i - 1] !== '\\') {
-                    // close current string
-                    inString = false;
-                }
-                buffer += char;
-            } else if (/\s/.test(char)) {
-                if (inString) {
-                    // allow whitespace to be preserved inside a string
-                    // todo: determine if preserveWhitespace option should be added to toggle this part
-                    buffer += char;
-                } else if (i > 0 && !/\s/.test(expression[i - 1])) {
-                    // if not inside a string, only allow one space between tokens
-                    buffer += ' ';
-                }
-            } else {
-                // normal use case -- not inside child expression, string, etc. -- simply append to buffer
-                buffer += char;
             }
             // check for operators
             if (parenCount === 0 && funcCount === 0 && !inString) {
