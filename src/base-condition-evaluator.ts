@@ -13,7 +13,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         const tokens = this.getOperandsAndOperator(token, operators);
         const [operandA, operator, operandB] = tokens;
         if (operandA.trim().length === 0 || operator.trim().length === 0 || operandB.trim().length === 0) {
-            throw new SyntaxError(`SyntaxError: received invalid condition ${token}`);
+            throw new Error(`SyntaxError: received invalid condition ${token}`);
         }
         let value;
         if (this.isFunction(operandA, functions)) {

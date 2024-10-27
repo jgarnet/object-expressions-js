@@ -2,18 +2,18 @@ import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
 import {parseNumber} from "./_utils";
 
-const add: ExpressionFunction = {
+const multiply: ExpressionFunction = {
     evaluate<T>(context: ExpressionContext<T>, ...args: any[]): any {
         if (args.length < 2) {
-            throw new Error(`SyntaxError: ADD() received invalid arguments in ${context.expression}`);
+            throw new Error(`SyntaxError: MULTIPLY() received invalid arguments in ${context.expression}`);
         }
-        let result = parseNumber('ADD', args[0], context);
+        let result = parseNumber('MULTIPLY', args[0], context);
         for (let i = 1; i < args.length; i++) {
             const arg = args[i];
-            result += parseNumber('ADD', arg, context);
+            result *= parseNumber('MULTIPLY', arg, context);
         }
         return result;
     }
 };
 
-export default add;
+export default multiply;

@@ -1,7 +1,7 @@
 import {describe, it, expect} from "@jest/globals";
 import subtract from "../subtract";
 
-describe('add tests', () => {
+describe('subtract tests', () => {
     it('should subtract primitive numbers', () => {
         expect(subtract.evaluate({ expression: '', object: null }, 2, 2)).toEqual(0);
         expect(subtract.evaluate({ expression: '', object: null }, 2, 4, 6)).toEqual(-8);
