@@ -3,7 +3,7 @@ import ExpressionContext from "../types/expression-context";
 const get = require("lodash/get");
 const isBoolean = require("lodash/isBoolean");
 
-const getValue = <T>(funcKey: string, token: string, context: ExpressionContext<T>) => {
+const parseNumber = <T>(funcKey: string, token: string, context: ExpressionContext<T>) => {
     const numericValue = Number(token);
     if (!Number.isNaN(numericValue) && !isBoolean(token)) {
         return numericValue;
@@ -17,4 +17,4 @@ const getValue = <T>(funcKey: string, token: string, context: ExpressionContext<
     }
 };
 
-export { getValue };
+export { parseNumber };

@@ -7,6 +7,7 @@ const LOGICAL_OPERATORS = ['AND', 'OR', 'NOT'];
 
 class BaseExpressionParser implements ExpressionParser {
     parse<T>(context: ExpressionContext<T>): void {
+        this.initializeFunctionRegex(context);
         const expression = context.expression;
         const childExpressions = context.childExpressions as Set<string>;
         let buffer = '';
@@ -102,6 +103,15 @@ class BaseExpressionParser implements ExpressionParser {
         }
     }
 
+    private initializeFunctionRegex<T>(context: ExpressionContext<T>) {
+        if (!context.functionRegex) {
+            const operators = context.operators as Map<string, Operator>;
+            const functionKeyRegex = '[^0-9]+[a-zA-Z0-9_]';
+            const operatorsRegex = [...operators.values()].map(operator => operator.regex).join('|');
+            context.functionRegex = `(?<=${operatorsRegex})${functionKeyRegex}`;
+        }
+    }
+
     /**
      * Checks if the current character in the parsing buffer is the start of an operator.
      * @param operator The operator being checked.
@@ -175,11 +185,8 @@ class BaseExpressionParser implements ExpressionParser {
             token = token.slice(lastParen + 1).trim();
         }
         // finally, check if this token is preceded by a comparison operator
-        const functionKeyRegex = '[^0-9]+[a-zA-Z0-9_]';
-        const operatorsRegex = [...operators.values()].map(operator => operator.regex).join('|');
-        const regex = `(?<=${operatorsRegex})${functionKeyRegex}`;
         token = token.slice(lastFunctionIndex + 1);
-        const groups = token.match(regex);
+        const groups = token.match(context.functionRegex as string);
         if (groups && groups.length >= 0) {
             // remove preceding comparison operator
             return functions.has(groups[0].trim());
