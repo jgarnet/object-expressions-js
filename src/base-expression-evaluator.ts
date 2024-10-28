@@ -104,11 +104,13 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
         }
         let result;
         if (isGroup) {
-            const newContext = {
+            const newContext: ExpressionContext<T> = {
                 expression: token,
                 object,
                 cache: context.cache,
-                operators: context.operators
+                operators: context.operators,
+                functions: context.functions,
+                functionRegex: context.functionRegex
             };
             result = new BaseExpressionEvaluator(this.conditionEvaluator, this.expressionParser).evaluate(newContext);
         } else {
