@@ -61,6 +61,15 @@ describe('BaseExpressionParser tests', () => {
     });
     it('should ignore keywords inside quotes', () => {
         testAssertion('field = "\\"AND 1 = 1" AND fieldB = 2', ['field = "\\"AND 1 = 1"', 'AND', 'fieldB = 2']);
+        testAssertion('url = "/products/long-sleeve-shirt"', ['url = "/products/long-sleeve-shirt"']);
+    });
+    it('should parse regular expressions', () => {
+        testAssertion('status LIKE /^[a-zA-Z\\(\\)]$/', ['status LIKE /^[a-zA-Z\\(\\)]$/']);
+        testAssertion('status LIKE /[a-zA-Z"]/', ['status LIKE /[a-zA-Z"]/']);
+        testAssertion('status LIKE /[a-zA-Z] AND [0-9]/', ['status LIKE /[a-zA-Z] AND [0-9]/']);
+        testAssertion('status LIKE /(SUCCESS|ERROR)/', ['status LIKE /(SUCCESS|ERROR)/']);
+        testAssertion('status LIKE /ADD()/', ['status LIKE /ADD()/']);
+        testAssertion('status LIKE /[a-zA-Z\\/]/', ['status LIKE /[a-zA-Z\\/]/']);
     });
     it('should throw SyntaxError when invalid syntax is encountered', () => {
         testError('(invalid', new Error('SyntaxError: expression contains an unclosed group'));
@@ -71,5 +80,8 @@ describe('BaseExpressionParser tests', () => {
         testError('a = "invalid""', new Error('SyntaxError: expression contains an unclosed string'));
         testError('a = MULTIPLY(()', new Error('SyntaxError: received invalid function call in a = MULTIPLY(()'));
         testError('a = MULTIPLY(())', new Error('SyntaxError: received invalid function call in a = MULTIPLY(())'));
+        testError('status LIKE /test//', new Error('SyntaxError: expression contains an unclosed regular expression'));
+        testError('status LIKE /test', new Error('SyntaxError: expression contains an unclosed regular expression'));
+        testError('status LIKE test/', new Error('SyntaxError: expression contains an unclosed regular expression'));
     });
 });

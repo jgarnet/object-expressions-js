@@ -166,4 +166,7 @@ Care"
         testAssertion('(ADD(ADD(1,1),ADD(1,1)) = 4) AND (ADD(2,2) = 4 AND ADD(1,1,1,1) = 4)', {}, true);
         testAssertion('a = MULTIPLY(b, 2)', { a: 4, b: 2 }, true);
     });
+    it('should evaluate expressions with regular expressions', () => {
+        testAssertion('url LIKE /\/products\/.*/', { url: '/products/long-sleeve-shirt' }, true);
+    });
 });

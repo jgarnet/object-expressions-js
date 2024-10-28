@@ -109,11 +109,19 @@ The following comparison operators are provided:
 
 ### Strings
 
-Expressions may contain string values, denoted by double quotes `"`. If a string contains child quotes, they must be escaped with a backslash. Text that contains whitespace must be represented in a string.
+Expressions may contain string values, denoted by double quotes `"`. If a string contains child quotes, they must be escaped with a back-slash. Text that contains whitespace must be represented in a string.
 
 `firstName = John` `name = "John Doe"` `relationshipStatus = "It's \"Complicated\""`
 
 If an expression contains unclosed strings, a SyntaxError will be thrown during evaluation.
+
+### Regular Expressions
+
+Regular expressions are supported &amp; must be wrapped in forward-slashes if they contain reserved symbols or keywords. If forward-slashes need to be used inside of a regular expression, they must be escaped using a back-slash.
+
+`url LIKE /\/products\/.*/` `status LIKE /PROCESSED AND SHIPPED/` `status LIKE /(SUCCESS|ERROR)/`
+
+If an expression contains unclosed regular expressions, a SyntaxError will be thrown during evaluation.
 
 ### Functions
 

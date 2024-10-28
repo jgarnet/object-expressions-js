@@ -15,60 +15,80 @@ class BaseExpressionParser implements ExpressionParser {
         let inString = false;
         let funcCount = 0;
         let lastFunctionIndex = -1;
+        let inRegex = false;
         for (let i = 0; i < expression.length; i++) {
             const char = expression[i];
             switch (char) {
                 case '(':
-                    // represents the start of a root or nested group or function
-                    if (parenCount === 0 && this.isFunction(buffer, funcCount, lastFunctionIndex, context)) {
-                        // function start
-                        funcCount++;
-                        buffer += char;
-                    } else if (funcCount > 0 && !inString) {
-                        throw new Error(`SyntaxError: received invalid function call in ${context.expression}`);
-                    } else {
-                        // group start
-                        parenCount++;
-                        if (parenCount > 1) {
+                    if (!inRegex) {
+                        // represents the start of a root or nested group or function
+                        if (parenCount === 0 && this.isFunction(buffer, funcCount, lastFunctionIndex, context)) {
+                            // function start
+                            funcCount++;
                             buffer += char;
+                        } else if (funcCount > 0 && !inString) {
+                            throw new Error(`SyntaxError: received invalid function call in ${context.expression}`);
+                        } else {
+                            // group start
+                            parenCount++;
+                            if (parenCount > 1) {
+                                buffer += char;
+                            }
                         }
+                    } else {
+                        buffer += char;
                     }
                     break;
                 case ')':
-                    // represents the end of a root or nested group or function
-                    if (funcCount === 0) {
-                        // group end
-                        parenCount--;
-                        if (parenCount === 0) {
-                            // root group has ended
-                            // append the group to the tokens array
-                            this.addToken(buffer, context);
-                            childExpressions.add(buffer.trim());
-                            buffer = '';
-                            // reset function index for current buffer
-                            lastFunctionIndex = -1;
+                    if (!inRegex) {
+                        // represents the end of a root or nested group or function
+                        if (funcCount === 0) {
+                            // group end
+                            parenCount--;
+                            if (parenCount === 0) {
+                                // root group has ended
+                                // append the group to the tokens array
+                                this.addToken(buffer, context);
+                                childExpressions.add(buffer.trim());
+                                buffer = '';
+                                // reset function index for current buffer
+                                lastFunctionIndex = -1;
+                            } else {
+                                // nested group has ended
+                                // continue appending characters to group
+                                buffer += char;
+                            }
                         } else {
-                            // nested group has ended
-                            // continue appending characters to group
+                            // function call has ended
+                            funcCount--;
                             buffer += char;
+                            if (funcCount === 0) {
+                                // root function call has ended; mark the current index as the last function call
+                                lastFunctionIndex = i;
+                            }
                         }
                     } else {
-                        // function call has ended
-                        funcCount--;
                         buffer += char;
-                        if (funcCount === 0) {
-                            // root function call has ended; mark the current index as the last function call
-                            lastFunctionIndex = i;
-                        }
                     }
                     break;
                 case '"':
-                    // represents the start or end of a string
+                    if (!inRegex) {
+                        // represents the start or end of a string
+                        if (!inString) {
+                            inString = true;
+                        } else if (expression[i - 1] !== '\\') {
+                            // close current string
+                            inString = false;
+                        }
+                    }
+                    buffer += char;
+                    break;
+                case '/':
                     if (!inString) {
-                        inString = true;
-                    } else if (expression[i - 1] !== '\\') {
-                        // close current string
-                        inString = false;
+                        // either starting, ending, or inside a regular expression
+                        if (i > 0 && expression[i - 1] !== '\\') {
+                            inRegex = !inRegex;
+                        }
                     }
                     buffer += char;
                     break;
@@ -87,7 +107,7 @@ class BaseExpressionParser implements ExpressionParser {
                     }
             }
             // check for operators
-            if (parenCount === 0 && funcCount === 0 && !inString) {
+            if (parenCount === 0 && funcCount === 0 && !inString && !inRegex) {
                 for (const operator of LOGICAL_OPERATORS) {
                     if (this.isLogicalOperator(operator, expression, i)) {
                         // add the operator to the current tokens
@@ -111,6 +131,9 @@ class BaseExpressionParser implements ExpressionParser {
         }
         if (inString) {
             throw new Error('SyntaxError: expression contains an unclosed string');
+        }
+        if (inRegex) {
+            throw new Error('SyntaxError: expression contains an unclosed regular expression');
         }
         // if a buffer remains, add it as a token
         if (buffer.length > 0) {
