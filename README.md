@@ -28,6 +28,19 @@ const result = evaluator.evaluate({
 
 ## Syntax and Rules
 
+### Evaluating Fields
+
+A field may be evaluated on an object by referencing its path in the object. The following conventions are supported:
+- rootField `{"rootField": "value"}`
+- nested.field `{"nested": {"field": "value"}}`
+- collection.0.field `{"collection": [{"field": "value"}]}`
+
+If a field has the same name as a reserved keyword (i.e. a logical operator or comparison operator), the field may be accessed by using the `$.` prefix:
+- $.and `{"and": true}`
+- $.is `{"is": "value"}`
+- $.or `{"or": false}`
+- etc.
+
 ### Logical Operators
 
 The allowed logical operators include:

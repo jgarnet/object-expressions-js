@@ -2,8 +2,7 @@ import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
 import Operator from "./types/operator";
 import ExpressionFunction from "./types/expression-function";
-
-const get = require("lodash/get");
+import {getField} from "./functions/_utils";
 
 class BaseConditionEvaluator implements ConditionEvaluator {
     evaluate<T>(token: string, context: ExpressionContext<T>): boolean {
@@ -19,7 +18,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         if (this.isFunction(operandA, functions)) {
             value = this.evaluateFunction(operandA, functions, context);
         } else {
-            value = get(object, operandA.trim());
+            value = getField(object, operandA.trim());
         }
         let conditionValue = operandB.trim();
         if (this.isFunction(conditionValue, functions)) {
