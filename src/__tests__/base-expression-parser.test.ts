@@ -11,7 +11,6 @@ const testError = (expression: string, expectedError: Error) => {
         expression,
         object: null,
         tokens: [],
-        childExpressions: new Set(),
         operators: operators,
         functions: functions
     };
@@ -23,7 +22,6 @@ const testAssertion = (expression: string, expectedValue: string[]) => {
         expression,
         object: null,
         tokens: [],
-        childExpressions: new Set(),
         operators: operators,
         functions: functions
     };
@@ -39,7 +37,7 @@ describe('BaseExpressionParser tests', () => {
     });
     it('should parse groups', () => {
         testAssertion('A = 1 AND (B = 2 AND (C = 3 OR D = 1)) OR ((B = 1))', [
-            'A = 1', 'AND', 'B = 2 AND (C = 3 OR D = 1)', 'OR', '(B = 1)'
+            'A = 1', 'AND', '(B = 2 AND (C = 3 OR D = 1))', 'OR', '((B = 1))'
         ])
     });
     it('should parse functions', () => {
@@ -49,7 +47,7 @@ describe('BaseExpressionParser tests', () => {
         testAssertion('a = MULTIPLY(b, 2)', ['a = MULTIPLY(b, 2)']);
         testAssertion('MULTIPLY(b, 2) = a', ['MULTIPLY(b, 2) = a']);
         testAssertion('MULTIPLY(b, 2) = a AND DIVIDE(c,2) = d', ['MULTIPLY(b, 2) = a', 'AND', 'DIVIDE(c,2) = d']);
-        testAssertion('(MULTIPLY(b, 2) = a) AND (DIVIDE(c,2) = d)', ['MULTIPLY(b, 2) = a', 'AND', 'DIVIDE(c,2) = d']);
+        testAssertion('(MULTIPLY(b, 2) = a) AND (DIVIDE(c,2) = d)', ['(MULTIPLY(b, 2) = a)', 'AND', '(DIVIDE(c,2) = d)']);
     });
     it('should parse tokens regardless of whitespace', () => {
         testAssertion(`A    =     1 AND B

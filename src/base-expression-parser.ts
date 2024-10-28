@@ -9,7 +9,6 @@ class BaseExpressionParser implements ExpressionParser {
     parse<T>(context: ExpressionContext<T>): void {
         this.initializeFunctionRegex(context);
         const expression = context.expression;
-        const childExpressions = context.childExpressions as Set<string>;
         let buffer = '';
         let parenCount = 0;
         let inString = false;
@@ -20,26 +19,22 @@ class BaseExpressionParser implements ExpressionParser {
             const char = expression[i];
             switch (char) {
                 case '(':
+                    buffer += char;
                     if (!inRegex) {
                         // represents the start of a root or nested group or function
                         if (parenCount === 0 && this.isFunction(buffer, funcCount, lastFunctionIndex, context)) {
                             // function start
                             funcCount++;
-                            buffer += char;
                         } else if (funcCount > 0 && !inString) {
                             throw new Error(`SyntaxError: received invalid function call in ${context.expression}`);
                         } else {
                             // group start
                             parenCount++;
-                            if (parenCount > 1) {
-                                buffer += char;
-                            }
                         }
-                    } else {
-                        buffer += char;
                     }
                     break;
                 case ')':
+                    buffer += char;
                     if (!inRegex) {
                         // represents the end of a root or nested group or function
                         if (funcCount === 0) {
@@ -49,26 +44,18 @@ class BaseExpressionParser implements ExpressionParser {
                                 // root group has ended
                                 // append the group to the tokens array
                                 this.addToken(buffer, context);
-                                childExpressions.add(buffer.trim());
                                 buffer = '';
                                 // reset function index for current buffer
                                 lastFunctionIndex = -1;
-                            } else {
-                                // nested group has ended
-                                // continue appending characters to group
-                                buffer += char;
                             }
                         } else {
                             // function call has ended
                             funcCount--;
-                            buffer += char;
                             if (funcCount === 0) {
                                 // root function call has ended; mark the current index as the last function call
                                 lastFunctionIndex = i;
                             }
                         }
-                    } else {
-                        buffer += char;
                     }
                     break;
                 case '"':
@@ -203,7 +190,8 @@ class BaseExpressionParser implements ExpressionParser {
 
     private isFunction<T>(token: string, funcCount: number, lastFunctionIndex: number, context: ExpressionContext<T>): boolean {
         const functions = context.functions as Map<string, ExpressionFunction>;
-        token = token.trim().toUpperCase();
+        // remove trailing parenthesis, remove whitespace, convert to uppercase
+        token = token.slice(0, token.length - 1).trim().toUpperCase();
         if (funcCount > 0) {
             // we are inside a function call; attempt to remove all characters up to the current token
             // i.e. 'ADD(LEN' --> 'LEN' (remove 'AND('), 'ADD(LEN(a), LEN' --> ' LEN' (remove 'ADD(LEN(A),'), etc.

@@ -6,6 +6,7 @@ import ExpressionEvaluator from "./types/expression-evaluator";
 import BaseConditionEvaluator from "./base-condition-evaluator";
 import operators from "./operators/_operators";
 import functions from "./functions/_functions";
+import {isWrapped, unwrapString} from "./_utils";
 
 class BaseExpressionEvaluator implements ExpressionEvaluator {
     /**
@@ -35,7 +36,6 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
             throw new Error('Expression cannot be empty.');
         }
         context.tokens = [];
-        context.childExpressions = new Set<string>();
         context.cache = context.cache ?? new Map<string, boolean>();
         context.operators = context.operators ?? operators;
         context.functions = context.functions ?? functions;
@@ -48,7 +48,8 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
         let isOr = false;
         let result = false;
         for (let i = 0; i < tokens.length; i++) {
-            const token = tokens[i];
+            const isGroup = isWrapped(tokens[i], '(', ')');
+            const token = isGroup ? unwrapString(tokens[i], '(', ')') : tokens[i];
             if (token === 'NOT') {
                 isNegate = !isNegate;
             } else if (token === 'AND') {
@@ -62,7 +63,7 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
                 }
                 isOr = true;
             } else {
-                let current = this.evaluateToken(token, context);
+                let current = this.evaluateToken(token, isGroup, context);
                 if (isNegate) {
                     current = !current;
                     isNegate = false;
@@ -91,18 +92,18 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
     /**
      * Evaluates a token to determine whether the condition(s) apply to the supplied object.
      * @param token A single condition or a child expression.
+     * @param isGroup Specifies if the current token is a child group.
      * @param context The {@link ExpressionContext}.
      * @private
      */
-    private evaluateToken<T>(token: string, context: ExpressionContext<T>): boolean {
+    private evaluateToken<T>(token: string, isGroup: boolean, context: ExpressionContext<T>): boolean {
         const object = context.object;
         const cache = context.cache as Map<string, boolean>;
-        const childExpressions = context.childExpressions as Set<string>;
         if (cache.has(token)) {
             return cache.get(token) as boolean;
         }
         let result;
-        if (childExpressions.has(token)) {
+        if (isGroup) {
             const newContext = {
                 expression: token,
                 object,

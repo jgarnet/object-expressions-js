@@ -1,4 +1,4 @@
-import ExpressionContext from "../types/expression-context";
+import ExpressionContext from "./types/expression-context";
 
 const get = require("lodash/get");
 const isBoolean = require("lodash/isBoolean");
@@ -24,7 +24,22 @@ const parseNumber = <T>(funcKey: string, token: string, context: ExpressionConte
     }
 };
 
+const isWrapped = (value: string, startTag: string, endTag: string): boolean => {
+    return (
+        // value starts with start tag
+        value.slice(0, startTag.length) === startTag &&
+        // value ends with end tag
+        value.slice(value.length - endTag.length, value.length) === endTag
+    );
+};
+
+const unwrapString = (value: string, startTag: string, endTag: string): string => {
+    return isWrapped(value, startTag, endTag) ? value.slice(startTag.length, value.length - endTag.length) : value;
+};
+
 export {
     getField,
-    parseNumber
+    isWrapped,
+    parseNumber,
+    unwrapString
 };

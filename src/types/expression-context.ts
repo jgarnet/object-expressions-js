@@ -19,11 +19,6 @@ type ExpressionContext<T> = {
      */
     cache?: Map<string, boolean>;
     /**
-     * Stores all child expressions contained within the expression being evaluated.
-     * Used during evaluation to recursively evaluate child expressions.
-     */
-    childExpressions?: Set<string>;
-    /**
      * Stores all tokens (condition strings, operators, and child expression strings) for the expression being evaluated.
      */
     tokens?: string[];

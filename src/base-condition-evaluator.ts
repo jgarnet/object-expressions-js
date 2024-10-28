@@ -2,7 +2,7 @@ import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
 import Operator from "./types/operator";
 import ExpressionFunction from "./types/expression-function";
-import {getField} from "./functions/_utils";
+import {getField} from "./_utils";
 
 class BaseConditionEvaluator implements ConditionEvaluator {
     evaluate<T>(token: string, context: ExpressionContext<T>): boolean {

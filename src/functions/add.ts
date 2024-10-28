@@ -1,6 +1,6 @@
 import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
-import {parseNumber} from "./_utils";
+import {parseNumber} from "../_utils";
 
 const add: ExpressionFunction = {
     evaluate<T>(context: ExpressionContext<T>, ...args: any[]): any {

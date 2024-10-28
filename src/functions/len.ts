@@ -1,6 +1,6 @@
 import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
-import {getField} from "./_utils";
+import {getField} from "../_utils";
 
 const len: ExpressionFunction = {
     evaluate<T>(context: ExpressionContext<T>, ...args: any[]): any {
