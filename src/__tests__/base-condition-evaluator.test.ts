@@ -81,4 +81,7 @@ describe('BaseConditionEvaluator tests', () => {
         testError('A==1', {}, new Error('SyntaxError: received invalid condition A==1'));
         testError('A CONTAINS 1', {}, new Error('SyntaxError: received invalid condition A CONTAINS 1'));
     });
+    it('should not evaluate functions inside strings', () => {
+        testAssertion('field = "LEN(field)"', { field: 'LEN(field)' }, true);
+    });
 });

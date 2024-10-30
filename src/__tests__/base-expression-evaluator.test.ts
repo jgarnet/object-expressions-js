@@ -143,6 +143,11 @@ Care"
         testAssertion('a = "a = 1 AND a > 0" AND b = 5', { a: 'a = 1 AND a > 0', b: 5 }, true);
         testAssertion('(a = "a = 1 AND a > 0" AND (b = 5))', { a: 'a = 1 AND a > 0', b: 5 }, true);
     });
+    it('should not parse parentheses inside strings', () => {
+        testAssertion('a = "(a = 5) OR (a = 6)"', { a: '(a = 5) OR (a = 6)' }, true);
+        testAssertion('a = "))"', { a: '))' }, true);
+        testAssertion('a = "(("', { a: '((' }, true);
+    });
     it('should throw SyntaxError when incomplete logical operations are detected', () => {
         testError('A = 1 AND OR', new Error('SyntaxError: incomplete logical operation detected in A = 1 AND OR'));
         testError('(A = 1) AND OR', new Error('SyntaxError: incomplete logical operation detected in (A = 1) AND OR'));

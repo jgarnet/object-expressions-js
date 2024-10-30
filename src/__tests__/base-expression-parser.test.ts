@@ -66,6 +66,12 @@ describe('BaseExpressionParser tests', () => {
         testAssertion('field = "\\"AND 1 = 1" AND fieldB = 2', ['field = "\\"AND 1 = 1"', 'AND', 'fieldB = 2']);
         testAssertion('url = "/products/long-sleeve-shirt"', ['url = "/products/long-sleeve-shirt"']);
     });
+    it('should ignore parentheses inside strings', () => {
+        testAssertion('field = "(test"', ['field = "(test"']);
+        testAssertion('field = "test)"', ['field = "test)"']);
+        testAssertion('field = "(test)"', ['field = "(test)"']);
+        testAssertion('field = "(test) AND field > 5"', ['field = "(test) AND field > 5"']);
+    });
     it('should parse regular expressions', () => {
         testAssertion('status LIKE /^[a-zA-Z\\(\\)]$/', ['status LIKE /^[a-zA-Z\\(\\)]$/']);
         testAssertion('status LIKE /[a-zA-Z"]/', ['status LIKE /[a-zA-Z"]/']);

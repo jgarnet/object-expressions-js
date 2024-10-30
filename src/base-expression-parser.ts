@@ -18,7 +18,7 @@ class BaseExpressionParser implements ExpressionParser {
             switch (char) {
                 case '(':
                     buffer += char;
-                    if (!inRegex) {
+                    if (!inRegex && !inString) {
                         // represents the start of a root or nested group or function
                         if (parenCount === 0 && this.isFunction(buffer, funcCount, lastFunctionIndex, context)) {
                             // function start
@@ -33,7 +33,7 @@ class BaseExpressionParser implements ExpressionParser {
                     break;
                 case ')':
                     buffer += char;
-                    if (!inRegex) {
+                    if (!inRegex && !inString) {
                         // represents the end of a root or nested group or function
                         if (funcCount === 0) {
                             // group end
