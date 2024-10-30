@@ -11,7 +11,7 @@ const has: ComparisonOperator = {
         return _has(value, conditionValue);
     },
     isSymbol: false,
-    regex: 'HAS'
+    regex: '\\sHAS\\s'
 };
 
 export default has;

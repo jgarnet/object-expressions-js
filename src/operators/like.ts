@@ -9,7 +9,7 @@ const like: ComparisonOperator = {
         return new RegExp(conditionValue).test(`${value}`);
     },
     isSymbol: false,
-    regex: 'LIKE'
+    regex: '\\sLIKE\\s'
 };
 
 export default like;

@@ -18,7 +18,7 @@ const is: ComparisonOperator = {
         return false;
     },
     isSymbol: false,
-    regex: 'IS'
+    regex: '\\sIS\\s'
 };
 
 export default is;

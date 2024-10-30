@@ -8,7 +8,7 @@ const _in: ComparisonOperator = {
         return some(values, (val: any) => val == value);
     },
     isSymbol: false,
-    regex: 'IN'
+    regex: '\\sIN\\s'
 };
 
 export default _in;
