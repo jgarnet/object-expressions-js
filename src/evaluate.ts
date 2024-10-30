@@ -4,4 +4,6 @@ const object = JSON.parse(process.argv[3]);
 
 const evaluator = new BaseExpressionEvaluator();
 
-console.log(evaluator.evaluate({ expression, object }));
+console.log(`Evaluating expression: ${expression}`);
+const result = evaluator.evaluate({ expression, object });
+console.log(`Result: ${result}`);
