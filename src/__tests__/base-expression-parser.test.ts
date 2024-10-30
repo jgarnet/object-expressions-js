@@ -54,6 +54,8 @@ describe('BaseExpressionParser tests', () => {
         testAssertion('MULTIPLY(b, 2) = a', ['MULTIPLY(b, 2) = a']);
         testAssertion('MULTIPLY(b, 2) = a AND DIVIDE(c,2) = d', ['MULTIPLY(b, 2) = a', 'AND', 'DIVIDE(c,2) = d']);
         testAssertion('(MULTIPLY(b, 2) = a) AND (DIVIDE(c,2) = d)', ['(MULTIPLY(b, 2) = a)', 'AND', '(DIVIDE(c,2) = d)']);
+        testAssertion('EVAL("EVAL(a)",b)', ['EVAL("EVAL(a)",b)']);
+        testAssertion('EVAL(/EVAL(a)/,b)', ['EVAL(/EVAL(a)/,b)']);
     });
     it('should parse tokens regardless of whitespace', () => {
         testAssertion(`A    =     1 AND B

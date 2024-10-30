@@ -117,30 +117,51 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         const args = [];
         let buffer = '';
         let inString = false;
+        let inRegex = false;
         let parenCount = 0;
         for (let i = 0; i < token.length; i++) {
             const char = token[i];
-            if (char === '"') {
-                inString = !inString;
-            } else if (char === '(') {
-                if (!inString) {
-                    parenCount++;
-                }
-            } else if (char === ')') {
-                if (!inString) {
-                    parenCount--;
-                }
-            } else if (char === ',') {
-                if (!inString && parenCount === 0) {
-                    // only break into new argument if not in string or nested function call
-                    const token = buffer.trim();
-                    if (token.length === 0) {
-                        throw new Error(`SyntaxError: invalid function argument passed to ${funcKey}`);
+            switch (char) {
+                case '"':
+                    if (!inRegex) {
+                        if (!inString) {
+                            inString = true;
+                        } else if (token[i - 1] !== '\\') {
+                            inString = false;
+                        }
                     }
-                    args.push(token);
-                    buffer = '';
-                    continue;
-                }
+                    break;
+                case '(':
+                    if (!inString && !inRegex) {
+                        parenCount++;
+                    }
+                    break;
+                case ')':
+                    if (!inString && !inRegex) {
+                        parenCount--;
+                    }
+                    break;
+                case '/':
+                    if (!inString) {
+                        if (!inRegex) {
+                            inRegex = true;
+                        } else if (token[i - 1] !== '\\') {
+                            inRegex = false;
+                        }
+                    }
+                    break;
+                case ',':
+                    if (!inString && !inRegex && parenCount === 0) {
+                        // only break into new argument if not in string or nested function call
+                        const token = buffer.trim();
+                        if (token.length === 0) {
+                            throw new Error(`SyntaxError: invalid function argument passed to ${funcKey}`);
+                        }
+                        args.push(token);
+                        buffer = '';
+                        continue;
+                    }
+                    break;
             }
             buffer += char;
         }

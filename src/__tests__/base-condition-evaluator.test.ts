@@ -83,5 +83,12 @@ describe('BaseConditionEvaluator tests', () => {
     });
     it('should not evaluate functions inside strings', () => {
         testAssertion('field = "LEN(field)"', { field: 'LEN(field)' }, true);
+        testAssertion('LEN("LEN(FIELD)") = 10', { field: 'test' }, true);
+        testAssertion('LEN(/LEN(FIELD)/) = 0', { field: 'test' }, true);
+        testAssertion('LEN("TEST,") = 5', {}, true);
+        testAssertion('LEN(/TEST,/) = 0', {}, true);
+    });
+    it('should not evaluate functions inside regex', () => {
+        testAssertion('field = /LEN(field)/', { field: '/LEN(field)/' }, true);
     });
 });
