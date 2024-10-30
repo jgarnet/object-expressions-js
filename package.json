@@ -1,7 +1,7 @@
 {
   "name": "expression-evaluator",
   "version": "1.0.0",
-  "description": "Evaluates expressions composed of conditions which specify business logic.",
+  "description": "Evaluates expressions against objects to determine if all conditions are met.",
   "author": "jgarnett",
   "license": "MIT",
   "keywords": [
