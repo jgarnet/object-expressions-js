@@ -39,6 +39,7 @@ describe('BaseExpressionParser tests', () => {
         testAssertion('A > 10 AND B < 5', ['A > 10', 'AND', 'B < 5']);
         testAssertion('A = 1 OR B = 2', ['A = 1', 'OR', 'B = 2']);
         testAssertion('NOT A = 1', ['NOT', 'A = 1']);
+        testAssertion('organWeight = 5 and organName = Heart', ['organWeight = 5', 'AND', 'organName = Heart']);
     });
     it('should parse groups', () => {
         testAssertion('A = 1 AND (B = 2 AND (C = 3 OR D = 1)) OR ((B = 1))', [

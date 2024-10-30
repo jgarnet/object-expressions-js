@@ -145,7 +145,9 @@ class BaseExpressionParser implements ExpressionParser {
             // the current operator fits in the bounds of the token
             index + operator.length - 1 < expression.length &&
             // the current character *is* the start of the operator
-            expression.slice(index, index + operator.length).toUpperCase() === operator
+            expression.slice(index, index + operator.length).toUpperCase() === operator &&
+            // there are no non-whitespace characters after the operator (if there are characters after)
+            (index + operator.length >= expression.length || /\s/.test(expression[index + operator.length]))
         );
     }
 
