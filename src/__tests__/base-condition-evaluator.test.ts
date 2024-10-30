@@ -3,26 +3,30 @@ import BaseConditionEvaluator from "../base-condition-evaluator";
 import ExpressionContext from "../types/expression-context";
 import operators from "../operators/_operators";
 import functions from "../functions/_functions";
+import createContext from "../create-context";
 
 const evaluator = new BaseConditionEvaluator();
 
 const testAssertion = (token: string, object: any, result: boolean) => {
-    const ctx: ExpressionContext<any> = {
+    // https://youtrack.jetbrains.com/issue/WEB-36766
+    // noinspection TypeScriptValidateTypes
+    const ctx: ExpressionContext<any> = createContext({
         expression: '',
         object,
         operators,
         functions: functions
-    };
+    });
     expect(evaluator.evaluate(token, ctx)).toEqual(result);
 };
 
 const testError = (token: string, object: any, expectedError: Error) => {
-    const ctx: ExpressionContext<any> = {
+    // noinspection TypeScriptValidateTypes
+    const ctx: ExpressionContext<any> = createContext({
         expression: '',
         object,
         operators,
         functions: functions
-    };
+    });
     expect(() => evaluator.evaluate(token, ctx)).toThrowError(expectedError);
 };
 

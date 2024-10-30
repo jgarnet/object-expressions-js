@@ -1,28 +1,25 @@
 import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
-import Operator from "./types/operator";
+import ComparisonOperator from "./types/comparison-operator";
 import ExpressionFunction from "./types/expression-function";
 import {getField} from "./_utils";
 
 class BaseConditionEvaluator implements ConditionEvaluator {
     evaluate<T>(token: string, context: ExpressionContext<T>): boolean {
-        const object = context.object;
-        const operators = context.operators as Map<string, Operator>;
-        const functions = context.functions as Map<string, ExpressionFunction>;
-        const tokens = this.getOperandsAndOperator(token, operators);
+        const tokens = this.getOperandsAndOperator(token, context.operators);
         const [operandA, operator, operandB] = tokens;
         if (operandA.trim().length === 0 || operator.trim().length === 0 || operandB.trim().length === 0) {
             throw new Error(`SyntaxError: received invalid condition ${token}`);
         }
         let value;
-        if (this.isFunction(operandA, functions)) {
-            value = this.evaluateFunction(operandA, functions, context);
+        if (this.isFunction(operandA, context.functions)) {
+            value = this.evaluateFunction(operandA, context.functions, context);
         } else {
-            value = getField(object, operandA.trim());
+            value = getField(context, operandA.trim());
         }
         let conditionValue = operandB.trim();
-        if (this.isFunction(conditionValue, functions)) {
-            conditionValue = this.evaluateFunction(conditionValue, functions, context);
+        if (this.isFunction(conditionValue, context.functions)) {
+            conditionValue = this.evaluateFunction(conditionValue, context.functions, context);
         }
         // unwrap string values if defined in condition value
         if (conditionValue[0] === '"' && conditionValue[conditionValue.length - 1] === '"') {
@@ -30,11 +27,11 @@ class BaseConditionEvaluator implements ConditionEvaluator {
                 .slice(1, conditionValue.length - 1)
                 .replace(/\\"/g, '"');
         }
-        const _operator = operators.get(operator) as Operator;
+        const _operator = context.operators.get(operator) as ComparisonOperator;
         return _operator.evaluate(value, conditionValue, tokens, context);
     }
 
-    private getOperandsAndOperator(token: string, operators: Map<string, Operator>): string[] {
+    private getOperandsAndOperator(token: string, operators: Map<string, ComparisonOperator>): string[] {
         let operandA = '';
         let operator = '';
         let operandB = '';
@@ -68,7 +65,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         return [operandA, operator, operandB];
     }
 
-    private isOperator(operatorStr: string, operator: Operator, token: string, index: number): boolean {
+    private isOperator(operatorStr: string, operator: ComparisonOperator, token: string, index: number): boolean {
         const char = token[index].toUpperCase();
         // for non-symbol operators, if there is a non-whitespace preceding character, it is not an operator
         if (!operator.isSymbol && index > 0 && !/\s/.test(token[index - 1])) {

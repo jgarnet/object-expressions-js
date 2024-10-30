@@ -1,46 +1,22 @@
-import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
-import BaseExpressionParser from "./base-expression-parser";
-import ExpressionParser from "./types/expression-parser";
 import ExpressionEvaluator from "./types/expression-evaluator";
-import BaseConditionEvaluator from "./base-condition-evaluator";
-import operators from "./operators/_operators";
-import functions from "./functions/_functions";
 import {isWrapped, unwrapString} from "./_utils";
+import createContext from "./create-context";
 
 class BaseExpressionEvaluator implements ExpressionEvaluator {
     /**
-     * Evaluates a condition string against an object.
-     * @private
-     */
-    private conditionEvaluator: ConditionEvaluator;
-    /**
-     * Parses all conditions, operators, and child expressions.
-     * @private
-     */
-    private expressionParser: ExpressionParser;
-
-    constructor(conditionEvaluator?: ConditionEvaluator, expressionParser?: ExpressionParser) {
-        this.conditionEvaluator = conditionEvaluator ?? new BaseConditionEvaluator();
-        this.expressionParser = expressionParser ?? new BaseExpressionParser();
-    }
-
-    /**
      * Parses and evaluates an expression against an object to determine if all conditions apply.
-     * @param context The {@link ExpressionContext}.
+     * @param initialContext The {@link ExpressionContext}.
      */
-    evaluate<T>(context: ExpressionContext<T>): boolean {
+    evaluate<T>(initialContext: Partial<ExpressionContext<T>>): boolean {
+        const context = createContext(initialContext);
         // initialize state
         const expression = context.expression;
         if (!expression || expression.trim() === '') {
             throw new Error('Expression cannot be empty.');
         }
-        context.tokens = [];
-        context.cache = context.cache ?? new Map<string, boolean>();
-        context.operators = context.operators ?? operators;
-        context.functions = context.functions ?? functions;
         // parse tokens
-        this.expressionParser.parse(context);
+        context.expressionParser.parse(context);
         // evaluate tokens and return result
         const tokens = context.tokens;
         let isNegate = false;
@@ -104,17 +80,19 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
         }
         let result;
         if (isGroup) {
-            const newContext: ExpressionContext<T> = {
+            // https://youtrack.jetbrains.com/issue/WEB-36766
+            // noinspection TypeScriptValidateTypes
+            const newContext: ExpressionContext<T> = createContext({
                 expression: token,
                 object,
                 cache: context.cache,
                 operators: context.operators,
                 functions: context.functions,
                 functionRegex: context.functionRegex
-            };
-            result = new BaseExpressionEvaluator(this.conditionEvaluator, this.expressionParser).evaluate(newContext);
+            });
+            result = this.evaluate(newContext);
         } else {
-            result = this.conditionEvaluator.evaluate(token, context);
+            result = context.conditionEvaluator.evaluate(token, context);
         }
         cache.set(token, result);
         return result;

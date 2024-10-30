@@ -1,8 +1,8 @@
-import Operator from "../types/operator";
+import ComparisonOperator from "../types/comparison-operator";
 import ExpressionContext from "../types/expression-context";
 const _has = require("lodash/has");
 
-const has: Operator = {
+const has: ComparisonOperator = {
     evaluate<T>(value: any, conditionValue: string, tokens: string[], context: ExpressionContext<T>): boolean {
         const [operandA] = tokens;
         if (operandA === '$') {

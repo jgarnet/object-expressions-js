@@ -3,28 +3,33 @@ import BaseExpressionParser from "../base-expression-parser";
 import ExpressionContext from "../types/expression-context";
 import operators from "../operators/_operators";
 import functions from "../functions/_functions";
+import createContext from "../create-context";
 
 const parser = new BaseExpressionParser();
 
 const testError = (expression: string, expectedError: Error) => {
-    const ctx: ExpressionContext<any> = {
+    // https://youtrack.jetbrains.com/issue/WEB-36766
+    // noinspection TypeScriptValidateTypes
+    const ctx: ExpressionContext<any> = createContext({
         expression,
         object: null,
         tokens: [],
         operators: operators,
         functions: functions
-    };
+    });
     expect(() => parser.parse(ctx)).toThrowError(expectedError);
 };
 
 const testAssertion = (expression: string, expectedValue: string[]) => {
-    const ctx: ExpressionContext<any> = {
+    // https://youtrack.jetbrains.com/issue/WEB-36766
+    // noinspection TypeScriptValidateTypes
+    const ctx: ExpressionContext<any> = createContext({
         expression,
         object: null,
         tokens: [],
         operators: operators,
         functions: functions
-    };
+    });
     parser.parse(ctx);
     expect(ctx.tokens).toEqual(expectedValue);
 };

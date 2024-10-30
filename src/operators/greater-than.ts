@@ -1,7 +1,7 @@
-import Operator from "../types/operator";
+import ComparisonOperator from "../types/comparison-operator";
 import ExpressionContext from "../types/expression-context";
 
-const greaterThan: Operator = {
+const greaterThan: ComparisonOperator = {
     evaluate<T>(value: any, conditionValue: string, tokens: string[], context: ExpressionContext<T>): boolean {
         return value > conditionValue;
     },

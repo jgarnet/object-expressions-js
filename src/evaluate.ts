@@ -1,4 +1,4 @@
-import BaseExpressionEvaluator from "./base-expression-evaluator";
+import BaseExpressionEvaluator from "./index";
 const expression = process.argv[2];
 const object = JSON.parse(process.argv[3]);
 

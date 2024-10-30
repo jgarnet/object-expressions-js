@@ -1,9 +1,9 @@
-import Operator from "../types/operator";
+import ComparisonOperator from "../types/comparison-operator";
 import ExpressionContext from "../types/expression-context";
 const isEmpty = require("lodash/isEmpty");
 const isNil = require("lodash/isNil");
 
-const is: Operator = {
+const is: ComparisonOperator = {
     evaluate<T>(value: any, conditionValue: string, tokens: string[], context: ExpressionContext<T>): boolean {
         switch (conditionValue.toUpperCase()) {
             case 'EMPTY':

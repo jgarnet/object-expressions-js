@@ -1,4 +1,4 @@
-import Operator from "../types/operator";
+import ComparisonOperator from "../types/comparison-operator";
 import equals from "./equals";
 import greaterThan from "./greater-than";
 import is from "./is";
@@ -8,7 +8,7 @@ import greaterEquals from "./greater-equals";
 import lessEquals from "./less-equals";
 import like from "./like";
 
-const operators = new Map<string, Operator>;
+const operators = new Map<string, ComparisonOperator>;
 operators.set('=', equals);
 operators.set('>', greaterThan);
 operators.set('<', lessThan);

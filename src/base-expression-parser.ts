@@ -1,13 +1,11 @@
 import ExpressionParser from "./types/expression-parser";
 import ExpressionContext from "./types/expression-context";
 import ExpressionFunction from "./types/expression-function";
-import Operator from "./types/operator";
 
 const LOGICAL_OPERATORS = ['AND', 'OR', 'NOT'];
 
 class BaseExpressionParser implements ExpressionParser {
     parse<T>(context: ExpressionContext<T>): void {
-        this.initializeFunctionRegex(context);
         const expression = context.expression;
         let buffer = '';
         let parenCount = 0;
@@ -125,15 +123,6 @@ class BaseExpressionParser implements ExpressionParser {
         // if a buffer remains, add it as a token
         if (buffer.length > 0) {
             this.addToken(buffer, context);
-        }
-    }
-
-    private initializeFunctionRegex<T>(context: ExpressionContext<T>) {
-        if (!context.functionRegex) {
-            const operators = context.operators as Map<string, Operator>;
-            const functionKeyRegex = '[^0-9]+[a-zA-Z0-9_]';
-            const operatorsRegex = [...operators.values()].map(operator => operator.regex).join('|');
-            context.functionRegex = `(?<=${operatorsRegex})${functionKeyRegex}`;
         }
     }
 
