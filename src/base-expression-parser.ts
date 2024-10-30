@@ -190,9 +190,15 @@ class BaseExpressionParser implements ExpressionParser {
             if (lastComma !== -1) {
                 const lastQuote = token.lastIndexOf('"');
                 if (lastQuote === -1 || lastComma > lastQuote) {
+                    // we are inside a function call with other args
+                    // i.e. ADD(a, ADD
+                    // strip everything from last function arg; i.e. remove "ADD(a," to get " ADD"
                     return functions.has(token.slice(lastComma + 1).trim());
                 }
             }
+            // this is the first argument inside another function
+            // i.e. ADD(ADD
+            // strip everything from parent function; i.e. remove "ADD(" to get "ADD"
             const lastParen = token.lastIndexOf('(');
             token = token.slice(lastParen + 1).trim();
         }
