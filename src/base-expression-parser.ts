@@ -23,7 +23,7 @@ class BaseExpressionParser implements ExpressionParser {
                         if (parenCount === 0 && this.isFunction(buffer, funcCount, lastFunctionIndex, context)) {
                             // function start
                             funcCount++;
-                        } else if (funcCount > 0 && !inString) {
+                        } else if (funcCount > 0) {
                             throw new Error(`SyntaxError: received invalid function call in ${context.expression}`);
                         } else {
                             // group start
