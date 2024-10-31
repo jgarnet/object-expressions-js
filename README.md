@@ -31,6 +31,17 @@ const result = evaluate({
 
 ### Evaluating Fields
 
+```javascript
+import evaluate from 'object-expressions-js';
+
+const result = evaluate({
+  expression: '$a = 1',
+  object: {
+    a: 1
+  }
+}); // result = true
+```
+
 A field may be evaluated on an object by referencing its path in the object, preceded by the `$` symbol. The following conventions are supported:
 - $rootField `{"rootField": "value"}`
 - $nested.field `{"nested": {"field": "value"}}`
@@ -41,6 +52,18 @@ Field paths which contain whitespace or symbols must be enclosed in brackets:
 - $[field with /)("] `{"field with /)(\"": "value"}`
 
 ### Logical Operators
+
+```javascript
+import evaluate from 'object-expressions-js';
+
+const result = evaluate({
+  expression: '$firstName = John AND $lastName = Doe',
+  object: {
+    firstName: 'John',
+    lastName: 'Doe'
+  }
+}); // result = true
+```
 
 The allowed logical operators include:
 - `AND`
@@ -61,6 +84,18 @@ If an expression contains imbalanced logical operators, a SyntaxError will be th
 
 ### Groups
 
+```javascript
+import evaluate from 'object-expressions-js';
+
+const result = evaluate({
+  expression: '($firstName = John OR $firstName = Jane) AND $lastName = Doe',
+  object: {
+    firstName: 'John',
+    lastName: 'Doe'
+  }
+}); // result = true
+```
+
 Groups are evaluated as child expressions and are represented using parentheses.
 
 `A AND (B OR (C AND D))` `(A) AND (B)` `(A OR B)`
@@ -68,6 +103,17 @@ Groups are evaluated as child expressions and are represented using parentheses.
 If an expression contains imbalanced groups, a SyntaxError will be thrown during evaluation.
 
 ### Conditions
+
+```javascript
+import evaluate from 'object-expressions-js';
+
+const result = evaluate({
+  expression: '$a >= 1',
+  object: {
+    a: 5
+  }
+}); // result = true
+```
 
 Conditions are represented via an operation containing a left-hand operand, a comparison operator, and a right-hand operand.
 
@@ -108,6 +154,17 @@ The following comparison operators are provided:
 
 ### Strings
 
+```javascript
+import evaluate from 'object-expressions-js';
+
+const result = evaluate({
+  expression: '$field = "Hello, World"',
+  object: {
+    field: 'Hello, World'
+  }
+}); // result = true
+```
+
 Expressions may contain string values, denoted by double quotes `"`. If a string contains child quotes, they must be escaped with a back-slash. Text that contains whitespace must be represented in a string.
 
 `$firstName = John` `$name = "John Doe"` `$relationshipStatus = "It's \"Complicated\""`
@@ -115,6 +172,17 @@ Expressions may contain string values, denoted by double quotes `"`. If a string
 If an expression contains unclosed strings, a SyntaxError will be thrown during evaluation.
 
 ### Regular Expressions
+
+```javascript
+import evaluate from 'object-expressions-js';
+
+const result = evaluate({
+  expression: '$firstName LIKE /^[A-Z]{1}[a-z]+$/',
+  object: {
+    firstName: 'John'
+  }
+}); // result = true
+```
 
 Regular expressions are supported &amp; must be wrapped in forward-slashes if they contain reserved symbols or keywords. If forward-slashes need to be used inside of a regular expression, they must be escaped using a back-slash.
 
@@ -125,8 +193,9 @@ If an expression contains unclosed regular expressions, a SyntaxError will be th
 ### Functions
 
 ```javascript
-const evaluator = new BaseExpressionEvaluator();
-const result = evaluator.evaluate({
+import evaluate from 'object-expressions-js';
+
+const result = evaluate({
   expression: 'ADD(LEN($field), 4) = 8',
   object: {
       field: 'test'

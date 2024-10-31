@@ -4,7 +4,7 @@ const isEmpty = require("lodash/isEmpty");
 const isNil = require("lodash/isNil");
 
 const is: ComparisonOperator = {
-    evaluate<T>(value: any, conditionValue: string, tokens: string[], context: ExpressionContext<T>): boolean {
+    evaluate<T>(value: any, conditionValue: any, tokens: string[], context: ExpressionContext<T>): boolean {
         switch (conditionValue.toUpperCase()) {
             case 'EMPTY':
                 return isEmpty(value);
