@@ -85,14 +85,14 @@ class BaseConditionEvaluator implements ConditionEvaluator {
     }
 
     private getValue<T>(token: string, context: ExpressionContext<T>): any {
-        if (context.functionEvaluator.isFunction(token, context)) {
-            return context.functionEvaluator.evaluate(token, context);
-        }
         if (token.startsWith('$')) {
             return getField(context, token);
         }
         if (isWrapped(token, '"', '"')) {
             return unwrapString(token, '"', '"').replace(/\\"/g, '"');
+        }
+        if (context.functionEvaluator.isFunction(token, context)) {
+            return context.functionEvaluator.evaluate(token, context);
         }
         return token;
     }
