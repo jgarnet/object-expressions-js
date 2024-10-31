@@ -3,6 +3,7 @@ import ExpressionFunction from "./expression-function";
 import PathEvaluator from "./path-evaluator";
 import ConditionEvaluator from "./condition-evaluator";
 import ExpressionParser from "./expression-parser";
+import FunctionEvaluator from "./function-evaluator";
 
 /**
  * Stores data relevant for evaluating expressions.
@@ -30,6 +31,10 @@ type ExpressionContext<T> = {
      * Used to parse tokens within an expression.
      */
     expressionParser: ExpressionParser;
+    /**
+     * Used to evaluate functions during condition evaluation.
+     */
+    functionEvaluator: FunctionEvaluator;
     /**
      * Caches the outcome for all condition strings and child expressions to avoid duplicate computations.
      */

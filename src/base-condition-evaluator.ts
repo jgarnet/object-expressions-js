@@ -1,25 +1,24 @@
 import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
 import ComparisonOperator from "./types/comparison-operator";
-import ExpressionFunction from "./types/expression-function";
 import {getField} from "./_utils";
 
 class BaseConditionEvaluator implements ConditionEvaluator {
     evaluate<T>(token: string, context: ExpressionContext<T>): boolean {
-        const tokens = this.getOperandsAndOperator(token, context.operators);
+        const tokens = this.getOperandsAndOperator(token, context);
         const [operandA, operator, operandB] = tokens;
         if (operandA.trim().length === 0 || operator.trim().length === 0 || operandB.trim().length === 0) {
             throw new Error(`SyntaxError: received invalid condition ${token}`);
         }
         let value;
-        if (this.isFunction(operandA, context.functions)) {
-            value = this.evaluateFunction(operandA, context.functions, context);
+        if (context.functionEvaluator.isFunction(operandA, context)) {
+            value = context.functionEvaluator.evaluate(operandA, context);
         } else {
             value = getField(context, operandA.trim());
         }
         let conditionValue = operandB.trim();
-        if (this.isFunction(conditionValue, context.functions)) {
-            conditionValue = this.evaluateFunction(conditionValue, context.functions, context);
+        if (context.functionEvaluator.isFunction(conditionValue, context)) {
+            conditionValue = context.functionEvaluator.evaluate(conditionValue, context);
         }
         // unwrap string values if defined in condition value
         if (conditionValue[0] === '"' && conditionValue[conditionValue.length - 1] === '"') {
@@ -31,20 +30,31 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         return _operator.evaluate(value, conditionValue, tokens, context);
     }
 
-    private getOperandsAndOperator(token: string, operators: Map<string, ComparisonOperator>): string[] {
+    private getOperandsAndOperator<T>(token: string, context: ExpressionContext<T>): string[] {
         let operandA = '';
         let operator = '';
         let operandB = '';
         let buffer = '';
         let inString = false;
+        let inRegex = false;
         for (let i = 0; i < token.length; i++) {
             const char = token[i];
             if (char === '"') {
-                inString = !inString;
+                if (!inString) {
+                    inString = true;
+                } else if (token[i - 1] !== '\\') {
+                    inString = false;
+                }
+            } else if (char === '/') {
+                if (!inRegex) {
+                    inRegex = true;
+                } else if (token[i - 1] !== '\\') {
+                    inRegex = false;
+                }
             }
-            if (!inString) {
+            if (!inString && !inRegex) {
                 const addOperator = (): boolean => {
-                    for (const [operatorStr, _operator] of operators) {
+                    for (const [operatorStr, _operator] of context.operators) {
                         if (this.isOperator(operatorStr, _operator, token, i)) {
                             operandA = buffer;
                             buffer = '';
@@ -86,90 +96,6 @@ class BaseConditionEvaluator implements ConditionEvaluator {
             // non-symbol operators must be followed by whitespace
             /\s/.test(token[index + operatorStr.length + 1])
         );
-    }
-
-    private isFunction(token: string, functions: Map<string, ExpressionFunction>): boolean {
-        const firstParen = token.indexOf('(');
-        const lastParen = token.lastIndexOf(')');
-        if (firstParen === -1 || lastParen === -1) {
-            return false;
-        }
-        const possibleKey = token.slice(0, firstParen).trim().toUpperCase();
-        return functions.has(possibleKey);
-    }
-
-    private evaluateFunction<T>(token: string, functions: Map<string, ExpressionFunction>, context: ExpressionContext<T>): any {
-        const firstParen = token.indexOf('(');
-        const lastParen = token.lastIndexOf(')');
-        const input = token.slice(firstParen + 1, lastParen);
-        const funcKey = token.slice(0, firstParen).trim().toUpperCase();
-        const args = this.parseFunctionArgs(input, funcKey);
-        for (let i = 0; i < args.length; i++) {
-            if (this.isFunction(args[i], functions)) {
-                args[i] = this.evaluateFunction(args[i], functions, context);
-            }
-        }
-        const func = functions.get(funcKey) as ExpressionFunction;
-        return func.evaluate(context, ...args);
-    }
-
-    private parseFunctionArgs(token: string, funcKey: string): string[] {
-        const args = [];
-        let buffer = '';
-        let inString = false;
-        let inRegex = false;
-        let parenCount = 0;
-        for (let i = 0; i < token.length; i++) {
-            const char = token[i];
-            switch (char) {
-                case '"':
-                    if (!inRegex) {
-                        if (!inString) {
-                            inString = true;
-                        } else if (token[i - 1] !== '\\') {
-                            inString = false;
-                        }
-                    }
-                    break;
-                case '(':
-                    if (!inString && !inRegex) {
-                        parenCount++;
-                    }
-                    break;
-                case ')':
-                    if (!inString && !inRegex) {
-                        parenCount--;
-                    }
-                    break;
-                case '/':
-                    if (!inString) {
-                        if (!inRegex) {
-                            inRegex = true;
-                        } else if (token[i - 1] !== '\\') {
-                            inRegex = false;
-                        }
-                    }
-                    break;
-                case ',':
-                    if (!inString && !inRegex && parenCount === 0) {
-                        // only break into new argument if not in string or nested function call
-                        const token = buffer.trim();
-                        if (token.length === 0) {
-                            throw new Error(`SyntaxError: invalid function argument passed to ${funcKey}`);
-                        }
-                        args.push(token);
-                        buffer = '';
-                        continue;
-                    }
-                    break;
-            }
-            buffer += char;
-        }
-        if (buffer.trim().length === 0 && token.trim().length > 0) {
-            throw new Error(`SyntaxError: invalid function argument passed to ${funcKey}`);
-        }
-        args.push(buffer.trim());
-        return args;
     }
 }
 
