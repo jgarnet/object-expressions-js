@@ -172,15 +172,13 @@ class BaseExpressionParser implements ExpressionParser {
      * @private
      */
     private addToken<T>(token: string, context: ExpressionContext<T>): void {
-        const tokens = context.tokens as string[];
         const trimmed = token.trim();
         if (trimmed.length > 0) {
-            tokens.push(trimmed);
+            context.tokens.push(trimmed);
         }
     }
 
     private isFunction<T>(token: string, funcCount: number, lastFunctionIndex: number, context: ExpressionContext<T>): boolean {
-        const functions = context.functions as Map<string, ExpressionFunction>;
         // remove trailing parenthesis, remove whitespace, convert to uppercase
         token = token.slice(0, token.length - 1).trim().toUpperCase();
         if (funcCount > 0) {
@@ -193,7 +191,7 @@ class BaseExpressionParser implements ExpressionParser {
                     // we are inside a function call with other args
                     // i.e. ADD(a, ADD
                     // strip everything from last function arg; i.e. remove "ADD(a," to get " ADD"
-                    return functions.has(token.slice(lastComma + 1).trim());
+                    return context.functions.has(token.slice(lastComma + 1).trim());
                 }
             }
             // this is the first argument inside another function
@@ -207,10 +205,10 @@ class BaseExpressionParser implements ExpressionParser {
         const groups = token.match(context.functionRegex as string);
         if (groups && groups.length >= 0) {
             // remove preceding comparison operator
-            return functions.has(groups[0].trim());
+            return context.functions.has(groups[0].trim());
         } else {
             // we can assume the current token is a possible function call with no preceding operators
-            return functions.has(token.trim());
+            return context.functions.has(token.trim());
         }
     }
 }

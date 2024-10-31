@@ -73,10 +73,8 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
      * @private
      */
     private evaluateToken<T>(token: string, isGroup: boolean, context: ExpressionContext<T>): boolean {
-        const object = context.object;
-        const cache = context.cache as Map<string, boolean>;
-        if (cache.has(token)) {
-            return cache.get(token) as boolean;
+        if (context.cache.has(token)) {
+            return context.cache.get(token) as boolean;
         }
         let result;
         if (isGroup) {
@@ -84,7 +82,7 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
             // noinspection TypeScriptValidateTypes
             const newContext: ExpressionContext<T> = createContext({
                 expression: token,
-                object,
+                object: context.object,
                 cache: context.cache,
                 operators: context.operators,
                 functions: context.functions,
@@ -94,7 +92,7 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
         } else {
             result = context.conditionEvaluator.evaluate(token, context);
         }
-        cache.set(token, result);
+        context.cache.set(token, result);
         return result;
     }
 }
