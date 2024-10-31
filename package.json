@@ -16,7 +16,7 @@
   "scripts": {
     "build": "tsup --dts --minify --clean --format cjs src/index.ts",
     "test": "jest",
-    "dev": "tsup --outDir build --clean src/evaluate.ts",
+    "dev": "tsup --outDir build --clean src/_evaluate.ts",
     "evaluate": "sh ./scripts/evaluate.sh"
   },
   "devDependencies": {

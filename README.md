@@ -5,7 +5,7 @@
 Evaluates expressions against objects to determine if all conditions are met.
 
 ```javascript
-import BaseExpressionEvaluator from 'object-expressions-js';
+import evaluate from 'object-expressions-js';
 
 const order = {
     type: 'ONLINE',
@@ -21,8 +21,7 @@ const order = {
     total: 10.70
 };
 
-const evaluator = new BaseExpressionEvaluator();
-const result = evaluator.evaluate({
+const result = evaluate({
   expression: '(type = ONLINE AND status = SHIPPED) AND total >= 10',
   object: order
 }); // result = true

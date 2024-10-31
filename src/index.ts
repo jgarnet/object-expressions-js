@@ -6,6 +6,7 @@ import BasePathEvaluator from "./base-path-evaluator";
 import ComparisonOperator from "./types/comparison-operator";
 import ConditionEvaluator from "./types/condition-evaluator";
 import createContext from "./create-context";
+import evaluate from "./evaluate";
 import ExpressionContext from "./types/expression-context";
 import ExpressionEvaluator from "./types/expression-evaluator";
 import ExpressionParser from "./types/expression-parser";
@@ -18,12 +19,14 @@ import * as utils from './_utils';
 
 export {
     BaseConditionEvaluator,
+    BaseExpressionEvaluator,
     BaseExpressionParser,
     BaseFunctionEvaluator,
     BasePathEvaluator,
     ComparisonOperator,
     ConditionEvaluator,
     createContext,
+    evaluate,
     ExpressionContext,
     ExpressionEvaluator,
     ExpressionParser,
@@ -35,4 +38,4 @@ export {
     utils
 };
 
-export default BaseExpressionEvaluator;
+export default evaluate;

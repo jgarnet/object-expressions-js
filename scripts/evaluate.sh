@@ -4,4 +4,4 @@ if [ ! -d "build" ]; then
   yarn dev
 fi
 
-node ./build/evaluate.js "$@"
+node ./build/_evaluate.js "$@"

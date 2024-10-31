@@ -4,6 +4,7 @@ import PathEvaluator from "./path-evaluator";
 import ConditionEvaluator from "./condition-evaluator";
 import ExpressionParser from "./expression-parser";
 import FunctionEvaluator from "./function-evaluator";
+import ExpressionEvaluator from "./expression-evaluator";
 
 /**
  * Stores data relevant for evaluating expressions.
@@ -19,6 +20,10 @@ type ExpressionContext<T> = {
      * The object being evaluated.
      */
     object: T;
+    /**
+     * Used to evaluate expressions.
+     */
+    expressionEvaluator: ExpressionEvaluator;
     /**
      * Used to retrieve a value from the object given a path.
      */

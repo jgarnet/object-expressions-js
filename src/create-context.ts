@@ -6,6 +6,7 @@ import BasePathEvaluator from "./base-path-evaluator";
 import BaseConditionEvaluator from "./base-condition-evaluator";
 import BaseExpressionParser from "./base-expression-parser";
 import BaseFunctionEvaluator from "./base-function-evaluator";
+import BaseExpressionEvaluator from "./base-expression-evaluator";
 
 const createContext = <T> (context: Partial<ExpressionContext<T>>): ExpressionContext<T> => {
     const operators = context.operators ?? new Map(_operators);
@@ -13,6 +14,7 @@ const createContext = <T> (context: Partial<ExpressionContext<T>>): ExpressionCo
     return {
         expression: context.expression as string,
         object: context.object as T,
+        expressionEvaluator: context.expressionEvaluator ?? new BaseExpressionEvaluator(),
         pathEvaluator: context.pathEvaluator ?? new BasePathEvaluator(),
         conditionEvaluator: context.conditionEvaluator ?? new BaseConditionEvaluator(),
         expressionParser: context.expressionParser ?? new BaseExpressionParser(),
