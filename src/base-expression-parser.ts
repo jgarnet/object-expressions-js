@@ -13,12 +13,13 @@ class BaseExpressionParser implements ExpressionParser {
         let funcCount = 0;
         let lastFunctionIndex = -1;
         let inRegex = false;
+        let bracketCount = 0;
         for (let i = 0; i < expression.length; i++) {
             const char = expression[i];
             switch (char) {
                 case '(':
                     buffer += char;
-                    if (!inRegex && !inString) {
+                    if (!inRegex && !inString && bracketCount === 0) {
                         // represents the start of a root or nested group or function
                         if (parenCount === 0 && this.isFunction(buffer, funcCount, lastFunctionIndex, context)) {
                             // function start
@@ -33,11 +34,14 @@ class BaseExpressionParser implements ExpressionParser {
                     break;
                 case ')':
                     buffer += char;
-                    if (!inRegex && !inString) {
+                    if (!inRegex && !inString && bracketCount === 0) {
                         // represents the end of a root or nested group or function
                         if (funcCount === 0) {
                             // group end
                             parenCount--;
+                            if (parenCount < 0) {
+                                throw new Error('SyntaxError: expression contains an unclosed group');
+                            }
                             if (parenCount === 0) {
                                 // root group has ended
                                 // append the group to the tokens array
@@ -57,7 +61,7 @@ class BaseExpressionParser implements ExpressionParser {
                     }
                     break;
                 case '"':
-                    if (!inRegex) {
+                    if (!inRegex && bracketCount === 0) {
                         // represents the start or end of a string
                         if (!inString) {
                             inString = true;
@@ -69,7 +73,7 @@ class BaseExpressionParser implements ExpressionParser {
                     buffer += char;
                     break;
                 case '/':
-                    if (!inString) {
+                    if (!inString && bracketCount === 0) {
                         // either starting, ending, or inside a regular expression
                         if (i > 0 && expression[i - 1] !== '\\') {
                             inRegex = !inRegex;
@@ -77,22 +81,26 @@ class BaseExpressionParser implements ExpressionParser {
                     }
                     buffer += char;
                     break;
-                default:
-                    if (/\s/.test(char)) {
-                        if (inString) {
-                            // allow whitespace to be preserved inside a string
-                            buffer += char;
-                        } else if (i > 0 && !/\s/.test(expression[i - 1])) {
-                            // if not inside a string, only allow one space between tokens
-                            buffer += ' ';
-                        }
-                    } else {
-                        // normal use case -- not inside child expression, string, etc. -- simply append to buffer
-                        buffer += char;
+                case '[':
+                    if (!inString && !inRegex) {
+                        bracketCount++;
                     }
+                    buffer += char;
+                    break;
+                case ']':
+                    if (!inString && !inRegex) {
+                        bracketCount--;
+                        if (bracketCount < 0) {
+                            throw new Error(`SyntaxError: expression contains an unclosed field reference: ${expression}`);
+                        }
+                    }
+                    buffer += char;
+                    break;
+                default:
+                    buffer += char;
             }
             // check for operators
-            if (parenCount === 0 && funcCount === 0 && !inString && !inRegex) {
+            if (bracketCount === 0 && parenCount === 0 && funcCount === 0 && !inString && !inRegex) {
                 for (const operator of LOGICAL_OPERATORS) {
                     if (this.isLogicalOperator(operator, expression, i)) {
                         // add the operator to the current tokens
@@ -107,6 +115,9 @@ class BaseExpressionParser implements ExpressionParser {
                     }
                 }
             }
+        }
+        if (bracketCount !== 0) {
+            throw new Error(`SyntaxError: expression contains an unclosed field reference: ${expression}`);
         }
         if (funcCount > 0 || funcCount < 0) {
             throw new Error('SyntaxError: expression contains an unclosed function');

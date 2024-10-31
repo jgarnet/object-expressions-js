@@ -33,11 +33,12 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
         let inString = false;
         let inRegex = false;
         let parenCount = 0;
+        let bracketCount = 0;
         for (let i = 0; i < token.length; i++) {
             const char = token[i];
             switch (char) {
                 case '"':
-                    if (!inRegex) {
+                    if (!inRegex && bracketCount === 0) {
                         if (!inString) {
                             inString = true;
                         } else if (token[i - 1] !== '\\') {
@@ -46,17 +47,17 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
                     }
                     break;
                 case '(':
-                    if (!inString && !inRegex) {
+                    if (!inString && !inRegex && bracketCount === 0) {
                         parenCount++;
                     }
                     break;
                 case ')':
-                    if (!inString && !inRegex) {
+                    if (!inString && !inRegex && bracketCount === 0) {
                         parenCount--;
                     }
                     break;
                 case '/':
-                    if (!inString) {
+                    if (!inString && bracketCount === 0) {
                         if (!inRegex) {
                             inRegex = true;
                         } else if (token[i - 1] !== '\\') {
@@ -65,7 +66,7 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
                     }
                     break;
                 case ',':
-                    if (!inString && !inRegex && parenCount === 0) {
+                    if (!inString && !inRegex && parenCount === 0 && bracketCount === 0) {
                         // only break into new argument if not in string or nested function call
                         const token = buffer.trim();
                         if (token.length === 0) {
@@ -74,6 +75,16 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
                         args.push(token);
                         buffer = '';
                         continue;
+                    }
+                    break;
+                case '[':
+                    if (!inRegex && !inString) {
+                        bracketCount++;
+                    }
+                    break;
+                case ']':
+                    if (!inRegex && !inString) {
+                        bracketCount--;
                     }
                     break;
             }

@@ -82,7 +82,7 @@ describe('BaseExpressionEvaluator Tests', () => {
         `, { a: 'testing\nmultiple\nlines' }, true);
         testAssertion(`
             $a = testing\nmultiple\nlines
-        `, { a: 'testing\nmultiple\nlines' }, false);
+        `, { a: 'testing\nmultiple\nlines' }, true);
         testAssertion('$a = "Testing \\"nested\\" quotes"', { a: 'Testing "nested" quotes'}, true);
         testAssertion(
             `
@@ -138,12 +138,17 @@ Care"
             { firstName: 'John', lastName: 'Doe', age: 23, profession: 'Health\nCare' },
             true
         );
+        testAssertion('$a = $[b with spaces    ]', { a: 1, 'b with spaces    ': 1 }, true);
     });
     it('should not parse tokens inside strings as operators', () => {
         testAssertion('$a = "NOT test"', { a: 'NOT test' }, true);
         testAssertion('$a = "a = 1 AND a > 0"', { a: 'a = 1 AND a > 0' }, true);
         testAssertion('$a = "a = 1 AND a > 0" AND $b = 5', { a: 'a = 1 AND a > 0', b: 5 }, true);
         testAssertion('($a = "a = 1 AND a > 0" AND ($b = 5))', { a: 'a = 1 AND a > 0', b: 5 }, true);
+    });
+    it('should not parse tokens inside field references', () => {
+        testAssertion('$[some ") field/] = 1', { 'some ") field/': 1 }, true);
+        testAssertion('$[$field = AND test] = 1', { '$field = AND test': 1 }, true);
     });
     it('should not parse parentheses inside strings', () => {
         testAssertion('$a = "(a = 5) OR (a = 6)"', { a: '(a = 5) OR (a = 6)' }, true);

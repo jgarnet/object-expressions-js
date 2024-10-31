@@ -36,6 +36,10 @@ A field may be evaluated on an object by referencing its path in the object, pre
 - $nested.field `{"nested": {"field": "value"}}`
 - $collection.0.field `{"collection": [{"field": "value"}]}`
 
+Field paths which contain whitespace or symbols must be enclosed in brackets:
+- $[field with whitespace] `{"field with whitespace": "value"}`
+- $[field with /)("] `{"field with /)(\"": "value"}`
+
 ### Logical Operators
 
 The allowed logical operators include:

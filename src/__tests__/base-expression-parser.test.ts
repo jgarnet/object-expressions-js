@@ -59,11 +59,11 @@ describe('BaseExpressionParser tests', () => {
     });
     it('should parse tokens regardless of whitespace', () => {
         testAssertion(`$A    =     1 AND $B
-        = 5`, ['$A = 1', 'AND', '$B = 5']);
+= 5`, ['$A    =     1', 'AND', '$B\n= 5']);
         testAssertion('$A>2 AND $B=5', ['$A>2', 'AND', '$B=5']);
     });
     it('should preserve whitespace within quotes', () => {
-        testAssertion('$A = "    test   " AND     $B =     5', ['$A = "    test   "', 'AND', '$B = 5']);
+        testAssertion('$A = "    test   " AND     $B =     5', ['$A = "    test   "', 'AND', '$B =     5']);
     });
     it('should ignore keywords inside quotes', () => {
         testAssertion('$field = "\\"AND 1 = 1" AND $fieldB = 2', ['$field = "\\"AND 1 = 1"', 'AND', '$fieldB = 2']);
@@ -85,6 +85,7 @@ describe('BaseExpressionParser tests', () => {
     });
     it('should throw SyntaxError when invalid syntax is encountered', () => {
         testError('(invalid', new Error('SyntaxError: expression contains an unclosed group'));
+        testError(')(', new Error('SyntaxError: expression contains an unclosed group'));
         testError('(invalid))', new Error('SyntaxError: expression contains an unclosed group'));
         testError('LEN(invalid', new Error('SyntaxError: expression contains an unclosed function'));
         testError('LEN(LEN(invalid)', new Error('SyntaxError: expression contains an unclosed function'));
@@ -95,5 +96,9 @@ describe('BaseExpressionParser tests', () => {
         testError('$status LIKE /test//', new Error('SyntaxError: expression contains an unclosed regular expression'));
         testError('$status LIKE /test', new Error('SyntaxError: expression contains an unclosed regular expression'));
         testError('$status LIKE test/', new Error('SyntaxError: expression contains an unclosed regular expression'));
+        testError('$[a = 2', new Error(`SyntaxError: expression contains an unclosed field reference: $[a = 2`));
+        testError('] = 2', new Error(`SyntaxError: expression contains an unclosed field reference: ] = 2`));
+        testError('$] = 2', new Error(`SyntaxError: expression contains an unclosed field reference: $] = 2`));
+        testError('$][ = 2', new Error(`SyntaxError: expression contains an unclosed field reference: $][ = 2`));
     });
 });

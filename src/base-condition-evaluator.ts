@@ -23,22 +23,40 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         let buffer = '';
         let inString = false;
         let inRegex = false;
+        let bracketCount = 0;
         for (let i = 0; i < token.length; i++) {
             const char = token[i];
-            if (char === '"') {
-                if (!inString) {
-                    inString = true;
-                } else if (token[i - 1] !== '\\') {
-                    inString = false;
-                }
-            } else if (char === '/') {
-                if (!inRegex) {
-                    inRegex = true;
-                } else if (token[i - 1] !== '\\') {
-                    inRegex = false;
-                }
+            switch (char) {
+                case '"':
+                    if (!inRegex && bracketCount === 0) {
+                        if (!inString) {
+                            inString = true;
+                        } else if (token[i - 1] !== '\\') {
+                            inString = false;
+                        }
+                    }
+                    break;
+                case '/':
+                    if (!inString && bracketCount === 0) {
+                        if (!inRegex) {
+                            inRegex = true;
+                        } else if (token[i - 1] !== '\\') {
+                            inRegex = false;
+                        }
+                    }
+                    break;
+                case '[':
+                    if (!inRegex && !inString) {
+                        bracketCount++;
+                    }
+                    break;
+                case ']':
+                    if (!inRegex && !inString) {
+                        bracketCount--;
+                    }
+                    break;
             }
-            if (!inString && !inRegex) {
+            if (!inString && !inRegex && bracketCount === 0) {
                 const addOperator = (): boolean => {
                     for (const [operatorStr, _operator] of context.operators) {
                         if (this.isOperator(operatorStr, _operator, token, i)) {
