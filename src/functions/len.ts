@@ -7,7 +7,7 @@ const len: ExpressionFunction = {
         let value = args[0];
         if (value[0] === '"' && value[value.length - 1] === '"') {
             value = value.slice(1, value.length - 1);
-        } else {
+        } else if (value.startsWith('$')) {
             value = getField(context, value);
         }
         return `${value ?? ''}`.length;
