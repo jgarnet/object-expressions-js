@@ -1,9 +1,10 @@
 import ComparisonOperator from "../types/comparison-operator";
 import ExpressionContext from "../types/expression-context";
+import {unwrapString} from "../_utils";
 
 const greaterEquals: ComparisonOperator = {
     evaluate<T>(value: any, conditionValue: any, tokens: string[], context: ExpressionContext<T>): boolean {
-        return value >= conditionValue;
+        return unwrapString(value) >= unwrapString(conditionValue);
     },
     isSymbol: true,
     regex: '>='

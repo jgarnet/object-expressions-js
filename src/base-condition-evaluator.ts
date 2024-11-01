@@ -1,7 +1,7 @@
 import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
 import ComparisonOperator from "./types/comparison-operator";
-import {consoleColors, debug, getField, isWrapped, unwrapString} from "./_utils";
+import {consoleColors, debug, getField, isWrapped, unwrapValue} from "./_utils";
 
 class BaseConditionEvaluator implements ConditionEvaluator {
     evaluate<T>(token: string, context: ExpressionContext<T>): boolean {
@@ -121,9 +121,6 @@ class BaseConditionEvaluator implements ConditionEvaluator {
     private getValue<T>(token: string, context: ExpressionContext<T>): any {
         if (token.startsWith('$')) {
             return getField(context, token);
-        }
-        if (isWrapped(token, '"', '"')) {
-            return unwrapString(token, '"', '"').replace(/\\"/g, '"');
         }
         if (context.functionEvaluator.isFunction(token, context)) {
             return context.functionEvaluator.evaluate(token, context);

@@ -55,6 +55,16 @@ describe('BaseConditionEvaluator tests', () => {
         testAssertion('$field IS false', { field: false }, true);
         testAssertion('$field IS true', { field: false }, false);
     });
+    it('should evaluate IN', () => {
+        testAssertion('$field IN "value with spaces",test', { field: 'value with spaces' }, true);
+        testAssertion('$field IN "value with spaces"', { field: 'value with spaces' }, true);
+        testAssertion('$field IN test', { field: 'value with spaces' }, false);
+        testAssertion('$field IN test', { field: 'value with spaces' }, false);
+        testAssertion('$a in $b', { a: 'test field', b: ['value', 'test field'] }, true);
+        testAssertion('"test field" in $b', { a: 'test field', b: ['value', 'test field'] }, true);
+        testAssertion('value in $b', { a: 'test field', b: ['value', 'test field'] }, true);
+        testAssertion('test in $b', { a: 'test field', b: ['value', 'test field'] }, false);
+    });
     it('should evaluate HAS', () => {
         testAssertion('$ HAS field', { field: 1 }, true);
     });

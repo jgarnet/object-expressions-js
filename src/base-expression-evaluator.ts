@@ -1,6 +1,6 @@
 import ExpressionContext from "./types/expression-context";
 import ExpressionEvaluator from "./types/expression-evaluator";
-import {consoleColors, debug, isWrapped, unwrapString} from "./_utils";
+import {consoleColors, debug, isWrapped, unwrapValue} from "./_utils";
 import createContext from "./create-context";
 import ExpressionNode from "./types/expression-node";
 
@@ -32,7 +32,7 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
         } else {
             const isGroup = isWrapped(node.token, '(', ')');
             if (isGroup) {
-                const token = unwrapString(node.token, '(', ')');
+                const token = unwrapValue(node.token, '(', ')');
                 // https://youtrack.jetbrains.com/issue/WEB-36766
                 // noinspection TypeScriptValidateTypes
                 const newContext: ExpressionContext<T> = createContext({

@@ -35,8 +35,15 @@ const isWrapped = (value: string, startTag: string, endTag: string): boolean => 
     );
 };
 
-const unwrapString = (value: string, startTag: string, endTag: string): string => {
-    return isWrapped(value, startTag, endTag) ? value.slice(startTag.length, value.length - endTag.length) : value;
+const unwrapValue = (value: string, startTag: string, endTag: string): string => {
+    return value.slice(startTag.length, value.length - endTag.length);
+};
+
+const unwrapString = (value: any): string => {
+    if (typeof value === 'string' && isWrapped(value, '"', '"')) {
+        return unwrapValue(value, '"', '"').replace(/\\"/g, '"');
+    }
+    return value;
 };
 
 const consoleColors = {
@@ -59,10 +66,11 @@ const debug = <T>(text: string, context: ExpressionContext<T>) => {
 };
 
 export {
+    consoleColors,
+    debug,
     getField,
     isWrapped,
     parseNumber,
-    unwrapString,
-    consoleColors,
-    debug
+    unwrapValue,
+    unwrapString
 };
