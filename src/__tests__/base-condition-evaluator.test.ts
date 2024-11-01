@@ -71,6 +71,8 @@ describe('BaseConditionEvaluator tests', () => {
         testAssertion('ADD(2,$a,$b) = 12', { a: 4, b: 6 }, true);
         testAssertion('ADD(LEN($field), 4) = 8', { field: 'test' }, true);
         testAssertion('LEN($a) = LEN($b)', { a: 'test', b: '1234' }, true);
+        testAssertion("LEN($>) > 5", { '>': 'test string'}, true);
+        testAssertion("LEN($[ IS ]) > 5", { ' IS ': 'test string'}, true);
     });
     it('should throw errors for invalid function syntax', () => {
         testError('LEN($field,  ) = 4', {}, new Error('SyntaxError: invalid function argument passed to LEN'));

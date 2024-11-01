@@ -29,6 +29,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         let inString = false;
         let inRegex = false;
         let bracketCount = 0;
+        let parenCount = 0;
         for (let i = 0; i < token.length; i++) {
             const char = token[i];
             switch (char) {
@@ -60,8 +61,18 @@ class BaseConditionEvaluator implements ConditionEvaluator {
                         bracketCount--;
                     }
                     break;
+                case '(':
+                    if (!inRegex && !inString && bracketCount === 0) {
+                        parenCount++;
+                    }
+                    break;
+                case ')':
+                    if (!inRegex && !inString && bracketCount === 0) {
+                        parenCount--;
+                    }
+                    break;
             }
-            if (!inString && !inRegex && bracketCount === 0) {
+            if (!inString && !inRegex && bracketCount === 0 && parenCount === 0) {
                 const addOperator = (): boolean => {
                     for (const [operatorStr, _operator] of context.operators) {
                         if (this.isOperator(operatorStr, _operator, token, i)) {
