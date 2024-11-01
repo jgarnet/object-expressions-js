@@ -7,6 +7,7 @@ import _in from "./in";
 import greaterEquals from "./greater-equals";
 import lessEquals from "./less-equals";
 import like from "./like";
+import has from "./has";
 
 const operators = new Map<string, ComparisonOperator>;
 operators.set('=', equals);
@@ -17,5 +18,6 @@ operators.set('<=', lessEquals);
 operators.set('IN', _in);
 operators.set('IS', is);
 operators.set('LIKE', like);
+operators.set('HAS', has);
 
 export default operators;

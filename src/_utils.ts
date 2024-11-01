@@ -3,6 +3,9 @@ import ExpressionContext from "./types/expression-context";
 const isBoolean = require("lodash/isBoolean");
 
 const getField = <T>(context: ExpressionContext<T>, field: string): any => {
+    if (field === '$') {
+        return context.object;
+    }
     if (field.startsWith('$')) {
         field = field.slice(1);
     }

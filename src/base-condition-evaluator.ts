@@ -7,11 +7,11 @@ class BaseConditionEvaluator implements ConditionEvaluator {
     evaluate<T>(token: string, context: ExpressionContext<T>): boolean {
         const tokens = this.getOperandsAndOperator(token, context);
         const [operandA, operator, operandB] = tokens;
-        if (operandA.trim().length === 0 || operator.trim().length === 0 || operandB.trim().length === 0) {
+        if (operandA.length === 0 || operator.length === 0 || operandB.length === 0) {
             throw new Error(`SyntaxError: received invalid condition ${token}`);
         }
-        const leftSide = this.getValue(operandA.trim(), context);
-        const rightSide = this.getValue(operandB.trim(), context);
+        const leftSide = this.getValue(operandA, context);
+        const rightSide = this.getValue(operandB, context);
         const _operator = context.operators.get(operator) as ComparisonOperator;
         const result = _operator.evaluate(leftSide, rightSide, tokens, context);
         debug(consoleColors.blue + token + consoleColors.reset + ' = ' +
@@ -81,7 +81,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
             buffer += char;
         }
         operandB = buffer;
-        return [operandA, operator, operandB];
+        return [operandA.trim(), operator.trim(), operandB.trim()];
     }
 
     private isOperator(operatorStr: string, operator: ComparisonOperator, token: string, index: number): boolean {

@@ -55,6 +55,13 @@ describe('BaseConditionEvaluator tests', () => {
         testAssertion('$field IS false', { field: false }, true);
         testAssertion('$field IS true', { field: false }, false);
     });
+    it('should evaluate HAS', () => {
+        testAssertion('$ HAS field', { field: 1 }, true);
+    });
+    it('should evaluate SIZE', () => {
+        testAssertion('SIZE($) = 1', [1], true);
+        testAssertion('SIZE($items) = 2', { items: [1,2] }, true);
+    });
     it('should evaluate functions', () => {
         testAssertion('LEN($field) = 4', { field: 'test' }, true);
         testAssertion('LEN($field  ) = 4', { field: 'test' }, true);

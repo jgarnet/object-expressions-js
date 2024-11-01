@@ -51,6 +51,10 @@ Field paths which contain whitespace or symbols must be enclosed in brackets:
 - $[field with whitespace] `{"field with whitespace": "value"}`
 - $[field with /)("] `{"field with /)(\"": "value"}`
 
+The object itself may be referenced using the `$` symbol:
+- $ HAS field
+- SIZE($)
+
 ### Logical Operators
 
 ```javascript
@@ -227,6 +231,9 @@ Functions can be applied to a field's value during evaluation. The following fun
   - Requires at least two arguments.
   - String arguments represent field paths which will be retrieved from the object being evaluated.
   - `DIVIDE($fieldA,$fieldB.0.value)` `DIVIDE($fieldA,2)` `DIVIDE(2,2)`
+- `SIZE`
+  - Returns the size of a collection.
+  - `SIZE($)` `SIZE($items)`
 
 Functions can evaluate other functions as arguments.
 

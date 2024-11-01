@@ -1,6 +1,7 @@
 import FunctionEvaluator from "./types/function-evaluator";
 import ExpressionContext from "./types/expression-context";
 import ExpressionFunction from "./types/expression-function";
+import {getField} from "./_utils";
 
 class BaseFunctionEvaluator implements FunctionEvaluator {
     isFunction<T>(token: string, context: ExpressionContext<T>): boolean {
@@ -21,6 +22,8 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
         for (let i = 0; i < args.length; i++) {
             if (this.isFunction(args[i], context)) {
                 args[i] = this.evaluate(args[i], context);
+            } else if (typeof args[i] === 'string' && args[i].startsWith('$')) {
+                args[i] = getField(context, args[i]);
             }
         }
         const func = context.functions.get(funcKey) as ExpressionFunction;
