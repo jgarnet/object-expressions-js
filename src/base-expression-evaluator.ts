@@ -26,29 +26,30 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
      * @private
      */
     private evaluateNode<T>(node: ExpressionNode, context: ExpressionContext<T>): boolean {
-        if (context.cache.has(node.token)) {
-            return context.cache.get(node.token) as boolean;
-        }
         let result;
-        const isGroup = isWrapped(node.token, '(', ')');
-        if (isGroup) {
-            const token = unwrapString(node.token, '(', ')');
-            // https://youtrack.jetbrains.com/issue/WEB-36766
-            // noinspection TypeScriptValidateTypes
-            const newContext: ExpressionContext<T> = createContext({
-                expression: token,
-                object: context.object,
-                cache: context.cache,
-                operators: context.operators,
-                functions: context.functions,
-                functionRegex: context.functionRegex,
-                debug: context.debug,
-                nestLevel: context.nestLevel + 1
-            });
-            result = this.evaluate(newContext);
+        if (context.cache.has(node.token)) {
+            result = context.cache.get(node.token) as boolean;
         } else {
-            result = context.conditionEvaluator.evaluate(node.token, context);
-            context.cache.set(node.token, result);
+            const isGroup = isWrapped(node.token, '(', ')');
+            if (isGroup) {
+                const token = unwrapString(node.token, '(', ')');
+                // https://youtrack.jetbrains.com/issue/WEB-36766
+                // noinspection TypeScriptValidateTypes
+                const newContext: ExpressionContext<T> = createContext({
+                    expression: token,
+                    object: context.object,
+                    cache: context.cache,
+                    operators: context.operators,
+                    functions: context.functions,
+                    functionRegex: context.functionRegex,
+                    debug: context.debug,
+                    nestLevel: context.nestLevel + 1
+                });
+                result = this.evaluate(newContext);
+            } else {
+                result = context.conditionEvaluator.evaluate(node.token, context);
+                context.cache.set(node.token, result);
+            }
         }
         if (node.negate) {
             result = !result;
