@@ -1,11 +1,11 @@
 import ExpressionParser from "./types/expression-parser";
 import ExpressionContext from "./types/expression-context";
-import ExpressionFunction from "./types/expression-function";
+import ExpressionNode from "./types/expression-node";
 
 const LOGICAL_OPERATORS = ['AND', 'OR', 'NOT'];
 
 class BaseExpressionParser implements ExpressionParser {
-    parse<T>(context: ExpressionContext<T>): void {
+    parse<T>(context: ExpressionContext<T>): ExpressionNode {
         const expression = context.expression;
         let buffer = '';
         let parenCount = 0;
@@ -14,6 +14,7 @@ class BaseExpressionParser implements ExpressionParser {
         let lastFunctionIndex = -1;
         let inRegex = false;
         let bracketCount = 0;
+        const tokens: string[] = [];
         for (let i = 0; i < expression.length; i++) {
             const char = expression[i];
             switch (char) {
@@ -45,7 +46,7 @@ class BaseExpressionParser implements ExpressionParser {
                             if (parenCount === 0) {
                                 // root group has ended
                                 // append the group to the tokens array
-                                this.addToken(buffer, context);
+                                this.addToken(buffer, tokens);
                                 buffer = '';
                                 // reset function index for current buffer
                                 lastFunctionIndex = -1;
@@ -104,7 +105,7 @@ class BaseExpressionParser implements ExpressionParser {
                 for (const operator of LOGICAL_OPERATORS) {
                     if (this.isLogicalOperator(operator, expression, i)) {
                         // add the operator to the current tokens
-                        this.addLogicalOperator(operator, buffer, context);
+                        this.addLogicalOperator(operator, buffer, tokens);
                         // clear the current buffer
                         buffer = '';
                         // reset function index for current buffer
@@ -133,8 +134,9 @@ class BaseExpressionParser implements ExpressionParser {
         }
         // if a buffer remains, add it as a token
         if (buffer.length > 0) {
-            this.addToken(buffer, context);
+            this.addToken(buffer, tokens);
         }
+        return this.buildNodes(tokens, context);
     }
 
     /**
@@ -167,25 +169,25 @@ class BaseExpressionParser implements ExpressionParser {
      * If a buffer is already populated, it will be added to the token collection as well.
      * @param operator The operator being added.
      * @param buffer The current buffer that has been parsed up until this point in the expression string.
-     * @param context The {@link ExpressionContext}.
+     * @param tokens The current tokens.
      * @private
      */
-    private addLogicalOperator<T>(operator: string, buffer: string, context: ExpressionContext<T>): void {
+    private addLogicalOperator<T>(operator: string, buffer: string, tokens: string[]): void {
         buffer = buffer.slice(0, buffer.length - 1);
-        this.addToken(buffer, context);
-        this.addToken(operator, context);
+        this.addToken(buffer, tokens);
+        this.addToken(operator, tokens);
     }
 
     /**
      * Adds a token which represents a condition string, an operator, or a child expression contained within the expression string.
      * @param token The value being added to the token collection.
-     * @param context The {@link ExpressionContext}.
+     * @param tokens The current tokens.
      * @private
      */
-    private addToken<T>(token: string, context: ExpressionContext<T>): void {
+    private addToken<T>(token: string, tokens: string[]): void {
         const trimmed = token.trim();
         if (trimmed.length > 0) {
-            context.tokens.push(trimmed);
+            tokens.push(trimmed);
         }
     }
 
@@ -221,6 +223,45 @@ class BaseExpressionParser implements ExpressionParser {
             // we can assume the current token is a possible function call with no preceding operators
             return context.functions.has(token.trim());
         }
+    }
+
+    /**
+     * Transforms all parsed tokens into ExpressionNodes.
+     * @param tokens All tokens parsed from the expression.
+     * @param context The {@link ExpressionContext}.
+     * @private
+     */
+    private buildNodes<T>(tokens: string[], context: ExpressionContext<T>): ExpressionNode {
+        const root: ExpressionNode = {
+            token: '',
+            negate: false
+        };
+        let current = root;
+        for (let i = 0; i < tokens.length; i++) {
+            const token = tokens[i];
+            if (token === 'NOT') {
+                if (current.token.trim() !== '' || i + 1 >= tokens.length) {
+                    throw new Error(`SyntaxError: incomplete logical operation detected in ${context.expression}`);
+                }
+                current.negate = !current.negate;
+            } else if (token === 'OR' || token === 'AND') {
+                if (current.token.trim() === '' || i + 1 >= tokens.length) {
+                    throw new Error(`SyntaxError: incomplete logical operation detected in ${context.expression}`);
+                }
+                const next: ExpressionNode = {
+                    token: '',
+                    negate: false
+                };
+                current.next = {
+                    node: next,
+                    relationship: token
+                };
+                current = next;
+            } else {
+                current.token = token;
+            }
+        }
+        return root;
     }
 }
 

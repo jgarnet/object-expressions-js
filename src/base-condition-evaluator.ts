@@ -1,7 +1,7 @@
 import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
 import ComparisonOperator from "./types/comparison-operator";
-import {getField, isWrapped, unwrapString} from "./_utils";
+import {consoleColors, debug, getField, isWrapped, unwrapString} from "./_utils";
 
 class BaseConditionEvaluator implements ConditionEvaluator {
     evaluate<T>(token: string, context: ExpressionContext<T>): boolean {
@@ -13,7 +13,15 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         const leftSide = this.getValue(operandA.trim(), context);
         const rightSide = this.getValue(operandB.trim(), context);
         const _operator = context.operators.get(operator) as ComparisonOperator;
-        return _operator.evaluate(leftSide, rightSide, tokens, context);
+        const result = _operator.evaluate(leftSide, rightSide, tokens, context);
+        if (context.debug) {
+            debug('Condition: ' +
+                consoleColors.blue + token + consoleColors.reset + ' = ' +
+                (result ? consoleColors.green : consoleColors.red) + result + consoleColors.reset,
+                context
+            );
+        }
+        return result;
     }
 
     private getOperandsAndOperator<T>(token: string, context: ExpressionContext<T>): string[] {

@@ -30,6 +30,8 @@ describe('BaseExpressionEvaluator Tests', () => {
         testAssertion('$field > 4 AND $fieldB < 20', { field: 5, fieldB: 10 }, true);
         testAssertion('$field > 4 AND $fieldB IN TST,TST1,TST2', { field: 5, fieldB: 'TST' }, true);
         testAssertion('$field > 4 AND $fieldB IN TST,TST1,TST2', { field: 5, fieldB: 'TST' }, true);
+        testAssertion('$a = 1 OR $a = 2 OR $a = 3', { a: 3 }, true);
+        testAssertion('$a = 1 AND $b = 1 OR $b = 2', { a: 1, b: 2 }, true);
     });
     it('should evaluate child expressions', () => {
         testAssertion(
@@ -158,7 +160,7 @@ Care"
     it('should throw SyntaxError when incomplete logical operations are detected', () => {
         testError('$A = 1 AND OR', new Error('SyntaxError: incomplete logical operation detected in $A = 1 AND OR'));
         testError('($A = 1) AND OR', new Error('SyntaxError: incomplete logical operation detected in ($A = 1) AND OR'));
-        testError('($A = 1 AND) OR', new Error('SyntaxError: incomplete logical operation detected in $A = 1 AND'));
+        testError('($A = 1 AND) OR', new Error('SyntaxError: incomplete logical operation detected in ($A = 1 AND) OR'));
         testError('$A = 1 AND AND $B = 2', new Error('SyntaxError: incomplete logical operation detected in $A = 1 AND AND $B = 2'));
         testError('$A = 1 OR OR $B = 2', new Error('SyntaxError: incomplete logical operation detected in $A = 1 OR OR $B = 2'));
         testError('$A = 2 AND $B = 3 OR OR', new Error('SyntaxError: incomplete logical operation detected in $A = 2 AND $B = 3 OR OR'));
@@ -169,6 +171,7 @@ Care"
         testError('AND AND', new Error('SyntaxError: incomplete logical operation detected in AND AND'));
         testError('OR OR', new Error('SyntaxError: incomplete logical operation detected in OR OR'));
         testError('OR NOT', new Error('SyntaxError: incomplete logical operation detected in OR NOT'));
+        testError('$A = 1 NOT', new Error('SyntaxError: incomplete logical operation detected in $A = 1 NOT'));
     });
     it('should evaluate expressions with functions', () => {
         testAssertion('LEN($a) = LEN($b)', { a: 'test', b: '1234' }, true);

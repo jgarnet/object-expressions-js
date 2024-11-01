@@ -36,9 +36,28 @@ const unwrapString = (value: string, startTag: string, endTag: string): string =
     return isWrapped(value, startTag, endTag) ? value.slice(startTag.length, value.length - endTag.length) : value;
 };
 
+const consoleColors = {
+    red: '\x1b[31m',
+    green: '\x1b[32m',
+    blue: '\x1b[34m',
+    reset: '\x1b[0m'
+};
+
+const debug = <T>(text: string, context: ExpressionContext<T>) => {
+    let output = '';
+    const { nestLevel = 0 } = context;
+    for (let i = 0; i < nestLevel; i++) {
+        output += '. ';
+    }
+    output += text;
+    console.log(output);
+};
+
 export {
     getField,
     isWrapped,
     parseNumber,
-    unwrapString
+    unwrapString,
+    consoleColors,
+    debug
 };

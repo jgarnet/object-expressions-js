@@ -20,10 +20,11 @@ const createContext = <T> (context: Partial<ExpressionContext<T>>): ExpressionCo
         expressionParser: context.expressionParser ?? new BaseExpressionParser(),
         functionEvaluator: context.functionEvaluator ?? new BaseFunctionEvaluator(),
         cache: context.cache ?? new Map<string, boolean>,
-        tokens: context.tokens ?? [],
         operators,
         functions,
-        functionRegex: context.functionRegex ?? createFunctionRegex(operators)
+        functionRegex: context.functionRegex ?? createFunctionRegex(operators),
+        debug: context.debug ?? false,
+        nestLevel: context.nestLevel ?? 0
     };
 };
 

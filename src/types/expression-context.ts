@@ -45,10 +45,6 @@ type ExpressionContext<T> = {
      */
     cache: Map<string, boolean>;
     /**
-     * Stores all tokens (condition strings, operators, and child expression strings) for the expression being evaluated.
-     */
-    tokens: string[];
-    /**
      * Stores all comparison operators, mapping their symbol and their associated {@link ComparisonOperator} implementation.
      */
     operators: Map<string, ComparisonOperator>;
@@ -61,6 +57,14 @@ type ExpressionContext<T> = {
      * i.e. "2>MY_FUNC()" or "2 > MY_FUNC()" are both function calls which are preceded by a comparison operator.
      */
     functionRegex: string;
+    /**
+     * Enables debugging output.
+     */
+    debug: boolean;
+    /**
+     * Tracks the nest level of a child group. Used for debugging output.
+     */
+    nestLevel: number;
 };
 
 export default ExpressionContext;
