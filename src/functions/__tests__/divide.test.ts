@@ -1,6 +1,7 @@
 import {describe, it, expect} from "@jest/globals";
 import divide from "../divide";
 import createContext from "../../create-context";
+import ExpressionError from "../../expression-error";
 
 describe('divide tests', () => {
     it('should divide primitive numbers', () => {
@@ -28,16 +29,16 @@ describe('divide tests', () => {
     it('should throw error if invalid number of arguments received', () => {
         // noinspection TypeScriptValidateTypes
         const context = createContext({ expression: 'exp', object: { a: 2, b: 4, c: 6 } });
-        expect(() => divide.evaluate(context)).toThrowError(new Error('SyntaxError: DIVIDE() received invalid arguments in exp'));
-        expect(() => divide.evaluate(context, 1)).toThrowError(new Error('SyntaxError: DIVIDE() received invalid arguments in exp'));
+        expect(() => divide.evaluate(context)).toThrowError(new ExpressionError('DIVIDE() received invalid arguments in exp'));
+        expect(() => divide.evaluate(context, 1)).toThrowError(new ExpressionError('DIVIDE() received invalid arguments in exp'));
     });
     it('should throw error if invalid argument received', () => {
         // noinspection TypeScriptValidateTypes
         const context = createContext({ expression: 'exp', object: { a: undefined, b: 'test', c: {}, d: true } });
-        expect(() => divide.evaluate(context, 2, 'a')).toThrowError(new Error('SyntaxError: DIVIDE() received non-numeric value in exp'));
-        expect(() => divide.evaluate(context, 2, 'b')).toThrowError(new Error('SyntaxError: DIVIDE() received non-numeric value in exp'));
-        expect(() => divide.evaluate(context, 2, 'c')).toThrowError(new Error('SyntaxError: DIVIDE() received non-numeric value in exp'));
-        expect(() => divide.evaluate(context, 2, 'd')).toThrowError(new Error('SyntaxError: DIVIDE() received non-numeric value in exp'));
-        expect(() => divide.evaluate(context, 2, 0)).toThrowError(new Error('EvaluationError: attempted to divide by zero in exp'));
+        expect(() => divide.evaluate(context, 2, 'a')).toThrowError(new ExpressionError('DIVIDE() received non-numeric value in exp'));
+        expect(() => divide.evaluate(context, 2, 'b')).toThrowError(new ExpressionError('DIVIDE() received non-numeric value in exp'));
+        expect(() => divide.evaluate(context, 2, 'c')).toThrowError(new ExpressionError('DIVIDE() received non-numeric value in exp'));
+        expect(() => divide.evaluate(context, 2, 'd')).toThrowError(new ExpressionError('DIVIDE() received non-numeric value in exp'));
+        expect(() => divide.evaluate(context, 2, 0)).toThrowError(new ExpressionError('attempted to divide by zero in exp'));
     });
 });

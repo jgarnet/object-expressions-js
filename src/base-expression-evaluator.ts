@@ -3,6 +3,7 @@ import ExpressionEvaluator from "./types/expression-evaluator";
 import {consoleColors, debug, isWrapped, unwrapValue} from "./_utils";
 import createContext from "./create-context";
 import ExpressionNode from "./types/expression-node";
+import ExpressionError from "./expression-error";
 
 class BaseExpressionEvaluator implements ExpressionEvaluator {
     /**
@@ -13,7 +14,7 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
         const context = createContext(initialContext);
         const expression = context.expression;
         if (!expression || expression.trim() === '') {
-            throw new Error('Expression cannot be empty.');
+            throw new ExpressionError('Expression cannot be empty.');
         }
         const node = context.expressionParser.parse(context);
         return this.evaluateNode(node, context);

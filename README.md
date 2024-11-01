@@ -247,3 +247,11 @@ When evaluating an expression, the following tokens are parsed:
 - Logical Operators
 
 Each token is evaluated from left to right. If a token contains a group, all tokens within the group will be evaluated before moving to the next token.
+
+## Error Handling
+
+During evaluation, an `ExpressionError` will be thrown if errors occur. Errors will be thrown in the following situations:
+- A syntax error is encountered during parsing; in this case, a `SyntaxError` will be thrown.
+- A function or operator encounters invalid values; in this case, an `ExpressionError` will be thrown.
+- A runtime error is encountered; in this case, an `ExpressionError` will be thrown.
+  - The original error will be stored in the `cause` field on the `ExpressionError`.

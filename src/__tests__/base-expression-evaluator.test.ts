@@ -1,5 +1,6 @@
 import BaseExpressionEvaluator from "../base-expression-evaluator";
 import {describe, expect, it} from "@jest/globals";
+import SyntaxError from "../syntax-error";
 
 const testAssertion = (expression: string, object: any, outcome: boolean) => {
     const evaluator = new BaseExpressionEvaluator();
@@ -158,20 +159,20 @@ Care"
         testAssertion('$a = "(("', { a: '((' }, true);
     });
     it('should throw SyntaxError when incomplete logical operations are detected', () => {
-        testError('$A = 1 AND OR', new Error('SyntaxError: incomplete logical operation detected in $A = 1 AND OR'));
-        testError('($A = 1) AND OR', new Error('SyntaxError: incomplete logical operation detected in ($A = 1) AND OR'));
-        testError('($A = 1 AND) OR', new Error('SyntaxError: incomplete logical operation detected in ($A = 1 AND) OR'));
-        testError('$A = 1 AND AND $B = 2', new Error('SyntaxError: incomplete logical operation detected in $A = 1 AND AND $B = 2'));
-        testError('$A = 1 OR OR $B = 2', new Error('SyntaxError: incomplete logical operation detected in $A = 1 OR OR $B = 2'));
-        testError('$A = 2 AND $B = 3 OR OR', new Error('SyntaxError: incomplete logical operation detected in $A = 2 AND $B = 3 OR OR'));
-        testError('NOT', new Error('SyntaxError: incomplete logical operation detected in NOT'));
-        testError('AND', new Error('SyntaxError: incomplete logical operation detected in AND'));
-        testError('OR', new Error('SyntaxError: incomplete logical operation detected in OR'));
-        testError('NOT AND', new Error('SyntaxError: incomplete logical operation detected in NOT AND'));
-        testError('AND AND', new Error('SyntaxError: incomplete logical operation detected in AND AND'));
-        testError('OR OR', new Error('SyntaxError: incomplete logical operation detected in OR OR'));
-        testError('OR NOT', new Error('SyntaxError: incomplete logical operation detected in OR NOT'));
-        testError('$A = 1 NOT', new Error('SyntaxError: incomplete logical operation detected in $A = 1 NOT'));
+        testError('$A = 1 AND OR', new SyntaxError('incomplete logical operation detected in $A = 1 AND OR'));
+        testError('($A = 1) AND OR', new SyntaxError('incomplete logical operation detected in ($A = 1) AND OR'));
+        testError('($A = 1 AND) OR', new SyntaxError('incomplete logical operation detected in ($A = 1 AND) OR'));
+        testError('$A = 1 AND AND $B = 2', new SyntaxError('incomplete logical operation detected in $A = 1 AND AND $B = 2'));
+        testError('$A = 1 OR OR $B = 2', new SyntaxError('incomplete logical operation detected in $A = 1 OR OR $B = 2'));
+        testError('$A = 2 AND $B = 3 OR OR', new SyntaxError('incomplete logical operation detected in $A = 2 AND $B = 3 OR OR'));
+        testError('NOT', new SyntaxError('incomplete logical operation detected in NOT'));
+        testError('AND', new SyntaxError('incomplete logical operation detected in AND'));
+        testError('OR', new SyntaxError('incomplete logical operation detected in OR'));
+        testError('NOT AND', new SyntaxError('incomplete logical operation detected in NOT AND'));
+        testError('AND AND', new SyntaxError('incomplete logical operation detected in AND AND'));
+        testError('OR OR', new SyntaxError('incomplete logical operation detected in OR OR'));
+        testError('OR NOT', new SyntaxError('incomplete logical operation detected in OR NOT'));
+        testError('$A = 1 NOT', new SyntaxError('incomplete logical operation detected in $A = 1 NOT'));
     });
     it('should evaluate expressions with functions', () => {
         testAssertion('LEN($a) = LEN($b)', { a: 'test', b: '1234' }, true);

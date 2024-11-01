@@ -1,6 +1,7 @@
 import ExpressionParser from "./types/expression-parser";
 import ExpressionContext from "./types/expression-context";
 import ExpressionNode from "./types/expression-node";
+import SyntaxError from "./syntax-error";
 
 const LOGICAL_OPERATORS = ['AND', 'OR', 'NOT'];
 
@@ -26,7 +27,7 @@ class BaseExpressionParser implements ExpressionParser {
                             // function start
                             funcCount++;
                         } else if (funcCount > 0) {
-                            throw new Error(`SyntaxError: received invalid function call in ${context.expression}`);
+                            throw new SyntaxError(`received invalid function call in ${context.expression}`);
                         } else {
                             // group start
                             parenCount++;
@@ -41,7 +42,7 @@ class BaseExpressionParser implements ExpressionParser {
                             // group end
                             parenCount--;
                             if (parenCount < 0) {
-                                throw new Error('SyntaxError: expression contains an unclosed group');
+                                throw new SyntaxError('expression contains an unclosed group');
                             }
                             if (parenCount === 0) {
                                 // root group has ended
@@ -92,7 +93,7 @@ class BaseExpressionParser implements ExpressionParser {
                     if (!inString && !inRegex) {
                         bracketCount--;
                         if (bracketCount < 0) {
-                            throw new Error(`SyntaxError: expression contains an unclosed field reference: ${expression}`);
+                            throw new SyntaxError(`expression contains an unclosed field reference: ${expression}`);
                         }
                     }
                     buffer += char;
@@ -118,19 +119,19 @@ class BaseExpressionParser implements ExpressionParser {
             }
         }
         if (bracketCount !== 0) {
-            throw new Error(`SyntaxError: expression contains an unclosed field reference: ${expression}`);
+            throw new Error(`expression contains an unclosed field reference: ${expression}`);
         }
         if (funcCount > 0 || funcCount < 0) {
-            throw new Error('SyntaxError: expression contains an unclosed function');
+            throw new SyntaxError('expression contains an unclosed function');
         }
         if (parenCount > 0 || parenCount < 0) {
-            throw new Error('SyntaxError: expression contains an unclosed group');
+            throw new SyntaxError('expression contains an unclosed group');
         }
         if (inString) {
-            throw new Error('SyntaxError: expression contains an unclosed string');
+            throw new SyntaxError('expression contains an unclosed string');
         }
         if (inRegex) {
-            throw new Error('SyntaxError: expression contains an unclosed regular expression');
+            throw new SyntaxError('expression contains an unclosed regular expression');
         }
         // if a buffer remains, add it as a token
         if (buffer.length > 0) {
@@ -241,12 +242,12 @@ class BaseExpressionParser implements ExpressionParser {
             const token = tokens[i];
             if (token === 'NOT') {
                 if (current.token.trim() !== '' || i + 1 >= tokens.length) {
-                    throw new Error(`SyntaxError: incomplete logical operation detected in ${context.expression}`);
+                    throw new SyntaxError(`incomplete logical operation detected in ${context.expression}`);
                 }
                 current.negate = !current.negate;
             } else if (token === 'OR' || token === 'AND') {
                 if (current.token.trim() === '' || i + 1 >= tokens.length) {
-                    throw new Error(`SyntaxError: incomplete logical operation detected in ${context.expression}`);
+                    throw new SyntaxError(`incomplete logical operation detected in ${context.expression}`);
                 }
                 const next: ExpressionNode = {
                     token: '',

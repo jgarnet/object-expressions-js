@@ -8,6 +8,7 @@ import ConditionEvaluator from "./types/condition-evaluator";
 import createContext from "./create-context";
 import evaluate from "./evaluate";
 import ExpressionContext from "./types/expression-context";
+import ExpressionError from "./expression-error";
 import ExpressionEvaluator from "./types/expression-evaluator";
 import ExpressionParser from "./types/expression-parser";
 import ExpressionFunction from "./types/expression-function";
@@ -15,6 +16,7 @@ import functions from "./functions/_functions";
 import FunctionEvaluator from "./types/function-evaluator";
 import operators from "./operators/_operators";
 import PathEvaluator from "./types/path-evaluator";
+import SyntaxError from "./syntax-error";
 import * as utils from './_utils';
 
 export {
@@ -28,6 +30,7 @@ export {
     createContext,
     evaluate,
     ExpressionContext,
+    ExpressionError,
     ExpressionEvaluator,
     ExpressionParser,
     ExpressionFunction,
@@ -35,6 +38,7 @@ export {
     FunctionEvaluator,
     operators,
     PathEvaluator,
+    SyntaxError,
     utils
 };
 

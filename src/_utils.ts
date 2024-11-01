@@ -1,4 +1,5 @@
 import ExpressionContext from "./types/expression-context";
+import SyntaxError from "./syntax-error";
 
 const isBoolean = require("lodash/isBoolean");
 
@@ -20,7 +21,7 @@ const parseNumber = <T>(funcKey: string, token: string, context: ExpressionConte
         const value = getField(context, token);
         const numericValue = Number(value);
         if (Number.isNaN(numericValue) || isBoolean(value)) {
-            throw new Error(`SyntaxError: ${funcKey}() received non-numeric value in ${context.expression}`);
+            throw new SyntaxError(`${funcKey}() received non-numeric value in ${context.expression}`);
         }
         return numericValue;
     }

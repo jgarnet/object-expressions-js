@@ -2,16 +2,17 @@ import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
 import ComparisonOperator from "./types/comparison-operator";
 import {consoleColors, debug, getField, isWrapped, unwrapValue} from "./_utils";
+import SyntaxError from "./syntax-error";
 
 class BaseConditionEvaluator implements ConditionEvaluator {
     evaluate<T>(token: string, context: ExpressionContext<T>): boolean {
-        const tokens = this.getOperandsAndOperator(token, context);
+        const tokens = this.getTokens(token, context);
         const [operandA, operator, operandB] = tokens;
         if (operandA.length === 0 || operator.length === 0 || operandB.length === 0) {
-            throw new Error(`SyntaxError: received invalid condition ${token}`);
+            throw new SyntaxError(`received invalid condition ${token}`);
         }
-        const leftSide = this.getValue(operandA, context);
-        const rightSide = this.getValue(operandB, context);
+        const leftSide = this.evaluateOperand(operandA, context);
+        const rightSide = this.evaluateOperand(operandB, context);
         const _operator = context.operators.get(operator) as ComparisonOperator;
         const result = _operator.evaluate(leftSide, rightSide, tokens, context);
         debug(consoleColors.blue + token + consoleColors.reset + ' = ' +
@@ -21,7 +22,13 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         return result;
     }
 
-    private getOperandsAndOperator<T>(token: string, context: ExpressionContext<T>): string[] {
+    /**
+     * Extracts the operator and operands from the condition operation.
+     * @param token The condition operation.
+     * @param context The {@link ExpressionContext}.
+     * @private
+     */
+    private getTokens<T>(token: string, context: ExpressionContext<T>): string[] {
         let operandA = '';
         let operator = '';
         let operandB = '';
@@ -95,6 +102,14 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         return [operandA.trim(), operator.trim(), operandB.trim()];
     }
 
+    /**
+     * Determine if the current fragment is a comparison operator when parsing a condition operation.
+     * @param operatorStr The string value of the operator being checked.
+     * @param operator The {@link ComparisonOperator} being checked.
+     * @param token The condition operation string.
+     * @param index The current index in the condition operation string.
+     * @private
+     */
     private isOperator(operatorStr: string, operator: ComparisonOperator, token: string, index: number): boolean {
         const char = token[index].toUpperCase();
         // for non-symbol operators, if there is a non-whitespace preceding character, it is not an operator
@@ -118,13 +133,22 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         );
     }
 
-    private getValue<T>(token: string, context: ExpressionContext<T>): any {
+    /**
+     * Evaluates and returns the value of an operand.
+     * @param token The operand.
+     * @param context The {@link ExpressionContext}.
+     * @private
+     */
+    private evaluateOperand<T>(token: string, context: ExpressionContext<T>): any {
         if (token.startsWith('$')) {
+            // the operand is a field or object reference -- return the result
             return getField(context, token);
         }
         if (context.functionEvaluator.isFunction(token, context)) {
+            // the operand is a function call -- return the result
             return context.functionEvaluator.evaluate(token, context);
         }
+        // the operand is some primitive or other value -- return as-is
         return token;
     }
 }

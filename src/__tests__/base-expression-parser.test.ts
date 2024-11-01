@@ -5,6 +5,7 @@ import operators from "../operators/_operators";
 import functions from "../functions/_functions";
 import createContext from "../create-context";
 import ExpressionNode from "../types/expression-node";
+import SyntaxError from "../syntax-error";
 
 const parser = new BaseExpressionParser();
 
@@ -204,21 +205,21 @@ describe('BaseExpressionParser tests', () => {
         testAssertion('$status LIKE /[a-zA-Z\\/]/', { token: '$status LIKE /[a-zA-Z\\/]/' });
     });
     it('should throw SyntaxError when invalid syntax is encountered', () => {
-        testError('(invalid', new Error('SyntaxError: expression contains an unclosed group'));
-        testError(')(', new Error('SyntaxError: expression contains an unclosed group'));
-        testError('(invalid))', new Error('SyntaxError: expression contains an unclosed group'));
-        testError('LEN(invalid', new Error('SyntaxError: expression contains an unclosed function'));
-        testError('LEN(LEN(invalid)', new Error('SyntaxError: expression contains an unclosed function'));
-        testError('$a = "invalid', new Error('SyntaxError: expression contains an unclosed string'));
-        testError('$a = "invalid""', new Error('SyntaxError: expression contains an unclosed string'));
-        testError('$a = MULTIPLY(()', new Error('SyntaxError: received invalid function call in $a = MULTIPLY(()'));
-        testError('$a = MULTIPLY(())', new Error('SyntaxError: received invalid function call in $a = MULTIPLY(())'));
-        testError('$status LIKE /test//', new Error('SyntaxError: expression contains an unclosed regular expression'));
-        testError('$status LIKE /test', new Error('SyntaxError: expression contains an unclosed regular expression'));
-        testError('$status LIKE test/', new Error('SyntaxError: expression contains an unclosed regular expression'));
-        testError('$[a = 2', new Error(`SyntaxError: expression contains an unclosed field reference: $[a = 2`));
-        testError('] = 2', new Error(`SyntaxError: expression contains an unclosed field reference: ] = 2`));
-        testError('$] = 2', new Error(`SyntaxError: expression contains an unclosed field reference: $] = 2`));
-        testError('$][ = 2', new Error(`SyntaxError: expression contains an unclosed field reference: $][ = 2`));
+        testError('(invalid', new SyntaxError('expression contains an unclosed group'));
+        testError(')(', new SyntaxError('expression contains an unclosed group'));
+        testError('(invalid))', new SyntaxError('expression contains an unclosed group'));
+        testError('LEN(invalid', new SyntaxError('expression contains an unclosed function'));
+        testError('LEN(LEN(invalid)', new SyntaxError('expression contains an unclosed function'));
+        testError('$a = "invalid', new SyntaxError('expression contains an unclosed string'));
+        testError('$a = "invalid""', new SyntaxError('expression contains an unclosed string'));
+        testError('$a = MULTIPLY(()', new SyntaxError('received invalid function call in $a = MULTIPLY(()'));
+        testError('$a = MULTIPLY(())', new SyntaxError('received invalid function call in $a = MULTIPLY(())'));
+        testError('$status LIKE /test//', new SyntaxError('expression contains an unclosed regular expression'));
+        testError('$status LIKE /test', new SyntaxError('expression contains an unclosed regular expression'));
+        testError('$status LIKE test/', new SyntaxError('expression contains an unclosed regular expression'));
+        testError('$[a = 2', new SyntaxError(`expression contains an unclosed field reference: $[a = 2`));
+        testError('] = 2', new SyntaxError(`expression contains an unclosed field reference: ] = 2`));
+        testError('$] = 2', new SyntaxError(`expression contains an unclosed field reference: $] = 2`));
+        testError('$][ = 2', new SyntaxError(`expression contains an unclosed field reference: $][ = 2`));
     });
 });

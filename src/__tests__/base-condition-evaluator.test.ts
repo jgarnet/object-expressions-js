@@ -4,6 +4,7 @@ import ExpressionContext from "../types/expression-context";
 import operators from "../operators/_operators";
 import functions from "../functions/_functions";
 import createContext from "../create-context";
+import SyntaxError from "../syntax-error";
 
 const evaluator = new BaseConditionEvaluator();
 
@@ -85,20 +86,20 @@ describe('BaseConditionEvaluator tests', () => {
         testAssertion("LEN($[ IS ]) > 5", { ' IS ': 'test string'}, true);
     });
     it('should throw errors for invalid function syntax', () => {
-        testError('LEN($field,  ) = 4', {}, new Error('SyntaxError: invalid function argument passed to LEN'));
-        testError('LEN($field,) = 4', {}, new Error('SyntaxError: invalid function argument passed to LEN'));
-        testError('LEN($field,,5) = 4', {}, new Error('SyntaxError: invalid function argument passed to LEN'));
-        testError('LEN(,$field) = 4', {}, new Error('SyntaxError: invalid function argument passed to LEN'));
-        testError('LEN(  ,$field) = 4', {}, new Error('SyntaxError: invalid function argument passed to LEN'));
+        testError('LEN($field,  ) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
+        testError('LEN($field,) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
+        testError('LEN($field,,5) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
+        testError('LEN(,$field) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
+        testError('LEN(  ,$field) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
     });
     it('should evaluate symbols regardless of whitespace', () => {
         testAssertion('$field=5', { field: 5 }, true);
     });
     it('should throw errors for invalid operators / conditions', () => {
-        testError('$A ~ 1', {}, new Error('SyntaxError: received invalid condition $A ~ 1'));
-        testError('$A == 1', {}, new Error('SyntaxError: received invalid condition $A == 1'));
-        testError('$A==1', {}, new Error('SyntaxError: received invalid condition $A==1'));
-        testError('$A CONTAINS 1', {}, new Error('SyntaxError: received invalid condition $A CONTAINS 1'));
+        testError('$A ~ 1', {}, new SyntaxError('received invalid condition $A ~ 1'));
+        testError('$A == 1', {}, new SyntaxError('received invalid condition $A == 1'));
+        testError('$A==1', {}, new SyntaxError('received invalid condition $A==1'));
+        testError('$A CONTAINS 1', {}, new SyntaxError('received invalid condition $A CONTAINS 1'));
     });
     it('should not evaluate functions inside strings', () => {
         testAssertion('$field = "LEN($field)"', { field: 'LEN($field)' }, true);

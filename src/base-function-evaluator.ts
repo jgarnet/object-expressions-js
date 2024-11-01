@@ -2,8 +2,14 @@ import FunctionEvaluator from "./types/function-evaluator";
 import ExpressionContext from "./types/expression-context";
 import ExpressionFunction from "./types/expression-function";
 import {getField} from "./_utils";
+import ExpressionError from "./expression-error";
 
 class BaseFunctionEvaluator implements FunctionEvaluator {
+    /**
+     * Determines if a token represents a function call.
+     * @param token The token being evaluated.
+     * @param context The {@link ExpressionContext}.
+     */
     isFunction<T>(token: string, context: ExpressionContext<T>): boolean {
         const firstParen = token.indexOf('(');
         const lastParen = token.lastIndexOf(')');
@@ -13,6 +19,12 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
         const possibleKey = token.slice(0, firstParen).trim().toUpperCase();
         return context.functions.has(possibleKey);
     }
+
+    /**
+     * Evaluates a function call and returns the result.
+     * @param token The token containing a function call.
+     * @param context The {@link ExpressionContext}.
+     */
     evaluate<T, R>(token: string, context: ExpressionContext<T>): any {
         const firstParen = token.indexOf('(');
         const lastParen = token.lastIndexOf(')');
@@ -30,6 +42,12 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
         return func.evaluate(context, ...args);
     }
 
+    /**
+     * Parses function call token to retrieve all function arguments.
+     * @param token The token containing a function call.
+     * @param funcKey The name of the function being called.
+     * @private
+     */
     private parseFunctionArgs(token: string, funcKey: string): string[] {
         const args = [];
         let buffer = '';
@@ -73,7 +91,7 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
                         // only break into new argument if not in string or nested function call
                         const token = buffer.trim();
                         if (token.length === 0) {
-                            throw new Error(`SyntaxError: invalid function argument passed to ${funcKey}`);
+                            throw new ExpressionError(`invalid function argument passed to ${funcKey}`);
                         }
                         args.push(token);
                         buffer = '';
@@ -94,7 +112,7 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
             buffer += char;
         }
         if (buffer.trim().length === 0 && token.trim().length > 0) {
-            throw new Error(`SyntaxError: invalid function argument passed to ${funcKey}`);
+            throw new ExpressionError(`invalid function argument passed to ${funcKey}`);
         }
         args.push(buffer.trim());
         return args;
