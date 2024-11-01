@@ -1,6 +1,6 @@
 import ExpressionContext from "./types/expression-context";
 import ExpressionEvaluator from "./types/expression-evaluator";
-import {isWrapped, unwrapString} from "./_utils";
+import {consoleColors, debug, isWrapped, unwrapString} from "./_utils";
 import createContext from "./create-context";
 import ExpressionNode from "./types/expression-node";
 
@@ -57,10 +57,12 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
         if (node.next) {
             if (node.next.relationship === 'AND') {
                 if (result) {
+                    debug(consoleColors.blue + 'AND' + consoleColors.reset, context);
                     result = this.evaluateNode(node.next.node, context);
                 }
             } else {
                 if (!result) {
+                    debug(consoleColors.blue + 'OR' + consoleColors.reset, context);
                     result = this.evaluateNode(node.next.node, context);
                 }
             }
