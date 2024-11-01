@@ -14,13 +14,11 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         const rightSide = this.getValue(operandB.trim(), context);
         const _operator = context.operators.get(operator) as ComparisonOperator;
         const result = _operator.evaluate(leftSide, rightSide, tokens, context);
-        if (context.debug) {
-            debug('Condition: ' +
-                consoleColors.blue + token + consoleColors.reset + ' = ' +
-                (result ? consoleColors.green : consoleColors.red) + result + consoleColors.reset,
-                context
-            );
-        }
+        debug('Condition: ' +
+            consoleColors.blue + token + consoleColors.reset + ' = ' +
+            (result ? consoleColors.green : consoleColors.red) + result + consoleColors.reset,
+            context
+        );
         return result;
     }
 

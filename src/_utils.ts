@@ -44,13 +44,15 @@ const consoleColors = {
 };
 
 const debug = <T>(text: string, context: ExpressionContext<T>) => {
-    let output = '';
-    const { nestLevel = 0 } = context;
-    for (let i = 0; i < nestLevel; i++) {
-        output += '. ';
+    if (context.debug) {
+        let output = '';
+        const { nestLevel = 0 } = context;
+        for (let i = 0; i < nestLevel; i++) {
+            output += '. ';
+        }
+        output += text;
+        console.log(output);
     }
-    output += text;
-    console.log(output);
 };
 
 export {
