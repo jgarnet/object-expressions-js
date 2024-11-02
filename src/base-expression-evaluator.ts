@@ -4,6 +4,10 @@ import {consoleColors, debug, isWrapped, unwrapValue} from "./_utils";
 import createContext from "./create-context";
 import ExpressionNode from "./types/expression-node";
 import ExpressionError from "./expression-error";
+import PathEvaluator from "./types/path-evaluator";
+import ConditionEvaluator from "./types/condition-evaluator";
+import ExpressionParser from "./types/expression-parser";
+import FunctionEvaluator from "./types/function-evaluator";
 
 class BaseExpressionEvaluator implements ExpressionEvaluator {
     /**
@@ -34,11 +38,14 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
             const isGroup = isWrapped(node.token, '(', ')');
             if (isGroup) {
                 const token = unwrapValue(node.token, '(', ')');
-                // https://youtrack.jetbrains.com/issue/WEB-36766
-                // noinspection TypeScriptValidateTypes
                 const newContext: ExpressionContext<T> = createContext({
                     expression: token,
                     object: context.object,
+                    expressionEvaluator: context.expressionEvaluator,
+                    pathEvaluator: context.pathEvaluator,
+                    conditionEvaluator: context.conditionEvaluator,
+                    expressionParser: context.expressionParser,
+                    functionEvaluator: context.functionEvaluator,
                     cache: context.cache,
                     operators: context.operators,
                     functions: context.functions,
