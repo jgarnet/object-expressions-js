@@ -1,7 +1,7 @@
 import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
 import ComparisonOperator from "./types/comparison-operator";
-import {consoleColors, debug, getField, isWrapped, unwrapValue} from "./_utils";
+import {consoleColors, debug, getField} from "./_utils";
 import SyntaxError from "./syntax-error";
 
 class BaseConditionEvaluator implements ConditionEvaluator {
@@ -14,7 +14,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         const leftSide = this.evaluateOperand(operandA, context);
         const rightSide = this.evaluateOperand(operandB, context);
         const _operator = context.operators.get(operator) as ComparisonOperator;
-        const result = _operator.evaluate(leftSide, rightSide, tokens, context);
+        const result = _operator.evaluate(leftSide, rightSide, context);
         debug(consoleColors.blue + token + consoleColors.reset + ' = ' +
             (result ? consoleColors.green : consoleColors.red) + result + consoleColors.reset,
             context
@@ -112,8 +112,9 @@ class BaseConditionEvaluator implements ConditionEvaluator {
      */
     private isOperator(operatorStr: string, operator: ComparisonOperator, token: string, index: number): boolean {
         const char = token[index].toUpperCase();
+        const isSymbol = !/\w/.test(operatorStr);
         // for non-symbol operators, if there is a non-whitespace preceding character, it is not an operator
-        if (!operator.isSymbol && index > 0 && !/\s/.test(token[index - 1])) {
+        if (!isSymbol && index > 0 && !/\s/.test(token[index - 1])) {
             return false;
         }
         const matches = (
@@ -125,7 +126,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
             token.slice(index, index + operatorStr.length).toUpperCase() === operatorStr
         );
         return matches && (
-            operator.isSymbol ||
+            isSymbol ||
             // non-symbol operators cannot have non-whitespace preceding characters
             index + operatorStr.length + 1 < token.length ||
             // non-symbol operators must be followed by whitespace

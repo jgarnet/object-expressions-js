@@ -4,6 +4,10 @@
 
 Evaluates expressions against objects to determine if all conditions are met.
 
+The [evaluate](./src/evaluate.ts) function accepts an [ExpressionContext](./src/types/expression-context.ts) and returns `true` if all conditions are met, or `false` otherwise.
+
+At a minimum, an `expression` and `object` are required for evaluation.
+
 ```javascript
 import evaluate from 'object-expressions-js';
 
@@ -26,7 +30,6 @@ const result = evaluate({
   object: order
 }); // result = true
 ```
-
 ## Syntax and Rules
 
 ### Evaluating Fields
@@ -127,6 +130,10 @@ If an expression contains imbalanced or invalid conditions (invalid number of op
 
 #### Comparison Operators
 
+[Comparison Operators](./src/types/comparison-operator.ts) are used to evaluate conditions against an object during evaluation.
+
+Various comparison operators are provided by default, but it is possible to overwrite or extend the provided [operators](./src/operators/_operators.ts) via the [ExpressionContext](./src/types/expression-context.ts).
+
 The following comparison operators are provided:
 - `=`
   - Determines if a field's value is equal to a primitive value.
@@ -207,11 +214,13 @@ const result = evaluate({
 }); // result = true
 ```
 
-Functions can be applied to a field's value during evaluation.
+[Functions](./src/types/expression-function.ts) can be applied to a field's value during evaluation.
 
 Functions can evaluate other functions as arguments.
 
 If an expression contains an unclosed function or invalid function argument, an `ExpressionError` will be thrown during evaluation.
+
+Various functions are provided by default, but it is possible to overwrite or extend the provided [functions](./src/functions/_functions.ts) via the [ExpressionContext](./src/types/expression-context.ts).
 
 #### Math Functions
 
@@ -268,3 +277,17 @@ During evaluation, an `ExpressionError` will be thrown if errors occur. Errors w
 - A function or operator encounters invalid values; in this case, an `ExpressionError` will be thrown.
 - A runtime error is encountered; in this case, an `ExpressionError` will be thrown.
   - The original error will be stored in the `cause` field on the `ExpressionError`.
+
+## Custom Implementations
+
+The [ExpressionContext](./src/types/expression-context.ts) can be configured to provide alternative implementations for the following classes:
+- [ConditionEvaluator](./src/types/condition-evaluator.ts)
+  - Evaluates a condition (containing a comparison operation) against an object.
+- [ExpressionEvaluator](./src/types/expression-evaluator.ts)
+  - Evaluates an expression (containing conditions, logical operators, and child groups) against an object.
+- [ExpressionParser](./src/types/expression-parser.ts)
+  - Parses all tokens (conditions, logical operators, child groups) from an expression, and returns an [ExpressionNode](./src/types/expression-node.ts) chain.
+- [FunctionEvaluator](./src/types/function-evaluator.ts)
+  - Evaluates a function within a condition.
+- [PathEvaluator](./src/types/path-evaluator.ts)
+  - Retrieves values from an object given a path.

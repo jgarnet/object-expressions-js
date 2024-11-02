@@ -4,21 +4,19 @@ const isEmpty = require("lodash/isEmpty");
 const isNil = require("lodash/isNil");
 
 const is: ComparisonOperator = {
-    evaluate<T>(value: any, conditionValue: any, tokens: string[], context: ExpressionContext<T>): boolean {
-        switch (conditionValue.toUpperCase()) {
+    evaluate<T>(leftSide: any, rightSide: any, context: ExpressionContext<T>): boolean {
+        switch (rightSide.toUpperCase()) {
             case 'EMPTY':
-                return isEmpty(value);
+                return isEmpty(leftSide);
             case "NULL":
-                return isNil(value);
+                return isNil(leftSide);
             case "TRUE":
-                return value === true;
+                return leftSide === true;
             case "FALSE":
-                return value === false;
+                return leftSide === false;
         }
         return false;
-    },
-    isSymbol: false,
-    regex: '\\sIS\\s'
+    }
 };
 
 export default is;

@@ -4,11 +4,9 @@ import {unwrapString} from "../_utils";
 const _has = require("lodash/has");
 
 const has: ComparisonOperator = {
-    evaluate<T>(value: any, conditionValue: any, tokens: string[], context: ExpressionContext<T>): boolean {
-        return _has(value, unwrapString(conditionValue));
-    },
-    isSymbol: false,
-    regex: '\\sHAS\\s'
+    evaluate<T>(leftSide: any, rightSide: any, context: ExpressionContext<T>): boolean {
+        return _has(leftSide, unwrapString(rightSide));
+    }
 };
 
 export default has;

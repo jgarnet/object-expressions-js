@@ -6,16 +6,14 @@ const isArray = require("lodash/isArray");
 const isSet = require("lodash/isSet");
 
 const _in: ComparisonOperator = {
-    evaluate<T>(value: any, conditionValue: any, tokens: string[], context: ExpressionContext<T>): boolean {
-        value = unwrapString(value);
-        if (isSet(conditionValue)) {
-            return conditionValue.has(value);
+    evaluate<T>(leftSide: any, rightSide: any, context: ExpressionContext<T>): boolean {
+        leftSide = unwrapString(leftSide);
+        if (isSet(rightSide)) {
+            return rightSide.has(leftSide);
         }
-        const values = isArray(conditionValue) ? conditionValue : conditionValue.split(',').map((val: any) => unwrapString(val.trim()));
-        return some(values, (val: any) => val == value);
-    },
-    isSymbol: false,
-    regex: '\\sIN\\s'
+        const values = isArray(rightSide) ? rightSide : rightSide.split(',').map((val: any) => unwrapString(val.trim()));
+        return some(values, (val: any) => val == leftSide);
+    }
 };
 
 export default _in;
