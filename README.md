@@ -84,7 +84,7 @@ Logical operators can be applied to root-level conditions and groups:
 `NOT A`
 `A AND NOT B`
 
-If an expression contains imbalanced logical operators, a SyntaxError will be thrown during evaluation.
+If an expression contains imbalanced logical operators, a `SyntaxError` will be thrown during evaluation.
 
 ### Groups
 
@@ -104,7 +104,7 @@ Groups are evaluated as child expressions and are represented using parentheses.
 
 `A AND (B OR (C AND D))` `(A) AND (B)` `(A OR B)`
 
-If an expression contains imbalanced groups, a SyntaxError will be thrown during evaluation.
+If an expression contains imbalanced groups, a `SyntaxError` will be thrown during evaluation.
 
 ### Conditions
 
@@ -123,7 +123,7 @@ Conditions are represented via an operation containing a left-hand operand, a co
 
 `$cost > 10` `$firstName LIKE ^J.+N$` `$fullName = "John Doe"`
 
-If an expression contains imbalanced or invalid conditions (invalid number of operands, invalid comparison operators), a SyntaxError will be thrown during evaluation.
+If an expression contains imbalanced or invalid conditions (invalid number of operands, invalid comparison operators), a `SyntaxError` will be thrown during evaluation.
 
 #### Comparison Operators
 
@@ -173,7 +173,7 @@ Expressions may contain string values, denoted by double quotes `"`. If a string
 
 `$firstName = John` `$name = "John Doe"` `$relationshipStatus = "It's \"Complicated\""`
 
-If an expression contains unclosed strings, a SyntaxError will be thrown during evaluation.
+If an expression contains unclosed strings, a `SyntaxError` will be thrown during evaluation.
 
 ### Regular Expressions
 
@@ -192,7 +192,7 @@ Regular expressions are supported &amp; must be wrapped in forward-slashes if th
 
 `$url LIKE /\/products\/.*/` `$status LIKE /PROCESSED AND SHIPPED/` `$status LIKE /(SUCCESS|ERROR)/`
 
-If an expression contains unclosed regular expressions, a SyntaxError will be thrown during evaluation.
+If an expression contains unclosed regular expressions, a `SyntaxError` will be thrown during evaluation.
 
 ### Functions
 
@@ -207,10 +207,14 @@ const result = evaluate({
 }); // result = true
 ```
 
-Functions can be applied to a field's value during evaluation. The following functions are provided:
-- `LEN`
-  - Returns the length of a field's value.
-  - `LEN($name)` `LEN($items.0.sku)`
+Functions can be applied to a field's value during evaluation.
+
+Functions can evaluate other functions as arguments.
+
+If an expression contains an unclosed function or invalid function argument, an `ExpressionError` will be thrown during evaluation.
+
+#### Math Functions
+
 - `ADD`
   - Calculates the sum of all arguments and returns the result.
   - Requires at least two arguments.
@@ -231,13 +235,22 @@ Functions can be applied to a field's value during evaluation. The following fun
   - Requires at least two arguments.
   - String arguments represent field paths which will be retrieved from the object being evaluated.
   - `DIVIDE($fieldA,$fieldB.0.value)` `DIVIDE($fieldA,2)` `DIVIDE(2,2)`
+- `POW`
+  - Calculates and returns the result of a base raised to the power of an exponent.
+  - Requires two numeric arguments.
+  - `POW($a,2)` `POW(10,2)` `POW($a,$b)`
+
+#### String Functions
+
+- `LEN`
+  - Returns the length of a field's value.
+  - `LEN($name)` `LEN($items.0.sku)`
+
+#### Collection Functions
+
 - `SIZE`
   - Returns the size of a collection.
   - `SIZE($)` `SIZE($items)`
-
-Functions can evaluate other functions as arguments.
-
-If an expression contains an unclosed function or invalid function argument, a SyntaxError will be thrown during evaluation.
 
 ### Precedence
 

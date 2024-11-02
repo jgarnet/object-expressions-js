@@ -142,7 +142,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
     private evaluateOperand<T>(token: string, context: ExpressionContext<T>): any {
         if (token.startsWith('$')) {
             // the operand is a field or object reference -- return the result
-            return getField(context, token);
+            return getField(token, context);
         }
         if (context.functionEvaluator.isFunction(token, context)) {
             // the operand is a function call -- return the result

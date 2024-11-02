@@ -35,7 +35,7 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
             if (this.isFunction(args[i], context)) {
                 args[i] = this.evaluate(args[i], context);
             } else if (typeof args[i] === 'string' && args[i].startsWith('$')) {
-                args[i] = getField(context, args[i]);
+                args[i] = getField(args[i], context);
             }
         }
         const func = context.functions.get(funcKey) as ExpressionFunction;

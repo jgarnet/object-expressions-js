@@ -73,6 +73,11 @@ describe('BaseConditionEvaluator tests', () => {
         testAssertion('SIZE($) = 1', [1], true);
         testAssertion('SIZE($items) = 2', { items: [1,2] }, true);
     });
+    it('should evaluate POW', () => {
+        testAssertion('POW($a,$b) = $c', {a: 10, b: 2, c: 100}, true);
+        testAssertion('POW($a,2) = $c', {a: 10, b: 2, c: 100}, true);
+        testAssertion('POW(10,2) = $c', {a: 10, b: 2, c: 100}, true);
+    });
     it('should evaluate functions', () => {
         testAssertion('LEN($field) = 4', { field: 'test' }, true);
         testAssertion('LEN($field  ) = 4', { field: 'test' }, true);
