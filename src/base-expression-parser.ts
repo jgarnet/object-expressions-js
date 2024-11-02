@@ -191,7 +191,7 @@ class BaseExpressionParser implements ExpressionParser {
      * @private
      */
     private isFunction<T>(token: string, context: ExpressionContext<T>): boolean {
-        const groups = token.trim().match(/(?!<\s)\w+(?=\()/g);
+        const groups = token.toUpperCase().trim().match(/(?!<\s)\w+(?=\()/g);
         return groups !== null && context.functions.has(groups.pop() ?? '');
     }
 
