@@ -22,16 +22,9 @@ const createContext = <T> (context: Partial<ExpressionContext<T>>): ExpressionCo
         cache: context.cache ?? new Map<string, boolean>,
         operators,
         functions,
-        functionRegex: context.functionRegex ?? createFunctionRegex(operators),
         debug: context.debug ?? false,
         nestLevel: context.nestLevel ?? 0
     };
-};
-
-const createFunctionRegex = <T> (operators: Map<string, ComparisonOperator>) => {
-    const functionKeyRegex = '[^0-9]+[a-zA-Z0-9_]';
-    const operatorsRegex = [...operators.values()].map(operator => operator.regex).join('|');
-    return `(?<=${operatorsRegex})${functionKeyRegex}`;
 };
 
 export default createContext;

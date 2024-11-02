@@ -53,11 +53,6 @@ type ExpressionContext<T> = {
      */
     functions: Map<string, ExpressionFunction>;
     /**
-     * Used during parsing to determine if a token is a function which is preceded by a comparison operator.
-     * i.e. "2>MY_FUNC()" or "2 > MY_FUNC()" are both function calls which are preceded by a comparison operator.
-     */
-    functionRegex: string;
-    /**
      * Enables debugging output.
      */
     debug: boolean;

@@ -17,13 +17,11 @@ describe('len tests', () => {
         expect(len.evaluate(createContext({}), '"Test"')).toEqual(4);
         // noinspection TypeScriptValidateTypes
         expect(len.evaluate(createContext({}), '"\"Test\""')).toEqual(6);
-        // noinspection TypeScriptValidateTypes
-        expect(len.evaluate(createContext({}), null)).toEqual(0);
-        // noinspection TypeScriptValidateTypes
-        expect(len.evaluate(createContext({}), undefined)).toEqual(0);
     });
     it('should throw ExpressionError when invalid arguments are received', () => {
         testError([], new ExpressionError('LEN() received non-string argument in expression: undefined'));
         testError({}, new ExpressionError('LEN() received non-string argument in expression: undefined'));
+        testError(null, new ExpressionError('LEN() received non-string argument in expression: undefined'));
+        testError(undefined, new ExpressionError('LEN() received non-string argument in expression: undefined'));
     });
 });

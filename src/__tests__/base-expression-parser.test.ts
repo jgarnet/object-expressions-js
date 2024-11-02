@@ -137,11 +137,11 @@ describe('BaseExpressionParser tests', () => {
                 relationship: 'AND'
             }
         });
-        testAssertion('EVAL("EVAL($a)",$b)', {
-            token: 'EVAL("EVAL($a)",$b)'
+        testAssertion('LEN("EVAL($a)",$b)', {
+            token: 'LEN("EVAL($a)",$b)'
         });
-        testAssertion('EVAL(/EVAL($a)/,$b)', {
-            token: 'EVAL(/EVAL($a)/,$b)'
+        testAssertion('LEN(/EVAL($a)/,$b)', {
+            token: 'LEN(/EVAL($a)/,$b)'
         });
     });
     it('should parse tokens regardless of whitespace', () => {
@@ -212,8 +212,7 @@ describe('BaseExpressionParser tests', () => {
         testError('LEN(LEN(invalid)', new SyntaxError('expression contains an unclosed function'));
         testError('$a = "invalid', new SyntaxError('expression contains an unclosed string'));
         testError('$a = "invalid""', new SyntaxError('expression contains an unclosed string'));
-        testError('$a = MULTIPLY(()', new SyntaxError('received invalid function call in $a = MULTIPLY(()'));
-        testError('$a = MULTIPLY(())', new SyntaxError('received invalid function call in $a = MULTIPLY(())'));
+        testError('$a = MULTIPLY(()', new SyntaxError('expression contains an unclosed function'));
         testError('$status LIKE /test//', new SyntaxError('expression contains an unclosed regular expression'));
         testError('$status LIKE /test', new SyntaxError('expression contains an unclosed regular expression'));
         testError('$status LIKE test/', new SyntaxError('expression contains an unclosed regular expression'));

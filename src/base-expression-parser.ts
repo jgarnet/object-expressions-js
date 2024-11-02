@@ -12,7 +12,6 @@ class BaseExpressionParser implements ExpressionParser {
         let parenCount = 0;
         let inString = false;
         let funcCount = 0;
-        let lastFunctionIndex = -1;
         let inRegex = false;
         let bracketCount = 0;
         const tokens: string[] = [];
@@ -23,11 +22,12 @@ class BaseExpressionParser implements ExpressionParser {
                     buffer += char;
                     if (!inRegex && !inString && bracketCount === 0) {
                         // represents the start of a root or nested group or function
-                        if (parenCount === 0 && this.isFunction(buffer, funcCount, lastFunctionIndex, context)) {
+                        if (parenCount === 0 && /(?!<\s)\w+(?=\()/.test(buffer)) {
+                            if (!this.isFunction(buffer, context)) {
+                                throw new SyntaxError(`Unknown function ${buffer.match(/(?!<\s)\w+(?=\()/g)?.pop()}() contained in ${expression}`);
+                            }
                             // function start
                             funcCount++;
-                        } else if (funcCount > 0) {
-                            throw new SyntaxError(`received invalid function call in ${context.expression}`);
                         } else {
                             // group start
                             parenCount++;
@@ -49,16 +49,10 @@ class BaseExpressionParser implements ExpressionParser {
                                 // append the group to the tokens array
                                 this.addToken(buffer, tokens);
                                 buffer = '';
-                                // reset function index for current buffer
-                                lastFunctionIndex = -1;
                             }
                         } else {
                             // function call has ended
                             funcCount--;
-                            if (funcCount === 0) {
-                                // root function call has ended; mark the current index as the last function call
-                                lastFunctionIndex = i;
-                            }
                         }
                     }
                     break;
@@ -109,8 +103,6 @@ class BaseExpressionParser implements ExpressionParser {
                         this.addLogicalOperator(operator, buffer, tokens);
                         // clear the current buffer
                         buffer = '';
-                        // reset function index for current buffer
-                        lastFunctionIndex = -1;
                         // move the buffer index forward past the operator
                         i += operator.length - 1;
                         break;
@@ -192,38 +184,15 @@ class BaseExpressionParser implements ExpressionParser {
         }
     }
 
-    private isFunction<T>(token: string, funcCount: number, lastFunctionIndex: number, context: ExpressionContext<T>): boolean {
-        // remove trailing parenthesis, remove whitespace, convert to uppercase
-        token = token.slice(0, token.length - 1).trim().toUpperCase();
-        if (funcCount > 0) {
-            // we are inside a function call; attempt to remove all characters up to the current token
-            // i.e. 'ADD(LEN' --> 'LEN' (remove 'AND('), 'ADD(LEN(a), LEN' --> ' LEN' (remove 'ADD(LEN(A),'), etc.
-            const lastComma = token.lastIndexOf(',');
-            if (lastComma !== -1) {
-                const lastQuote = token.lastIndexOf('"');
-                if (lastQuote === -1 || lastComma > lastQuote) {
-                    // we are inside a function call with other args
-                    // i.e. ADD(a, ADD
-                    // strip everything from last function arg; i.e. remove "ADD(a," to get " ADD"
-                    return context.functions.has(token.slice(lastComma + 1).trim());
-                }
-            }
-            // this is the first argument inside another function
-            // i.e. ADD(ADD
-            // strip everything from parent function; i.e. remove "ADD(" to get "ADD"
-            const lastParen = token.lastIndexOf('(');
-            token = token.slice(lastParen + 1).trim();
-        }
-        // finally, check if this token is preceded by a comparison operator
-        token = token.slice(lastFunctionIndex + 1);
-        const groups = token.match(context.functionRegex as string);
-        if (groups && groups.length >= 0) {
-            // remove preceding comparison operator
-            return context.functions.has(groups[0].trim());
-        } else {
-            // we can assume the current token is a possible function call with no preceding operators
-            return context.functions.has(token.trim());
-        }
+    /**
+     * Determines if the token is a defined function.
+     * @param token The token being evaluated.
+     * @param context The {@link ExpressionContext}.
+     * @private
+     */
+    private isFunction<T>(token: string, context: ExpressionContext<T>): boolean {
+        const groups = token.trim().match(/(?!<\s)\w+(?=\()/g);
+        return groups !== null && context.functions.has(groups.pop() ?? '');
     }
 
     /**

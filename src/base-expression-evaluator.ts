@@ -42,7 +42,6 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
                     cache: context.cache,
                     operators: context.operators,
                     functions: context.functions,
-                    functionRegex: context.functionRegex,
                     debug: context.debug,
                     nestLevel: context.nestLevel + 1
                 });
