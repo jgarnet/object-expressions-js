@@ -2,12 +2,12 @@ import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
 import {requireString, unwrapString} from "../_utils";
 
-const len: ExpressionFunction = {
+const upper: ExpressionFunction = {
     evaluate<T>(context: ExpressionContext<T>, ...args: any[]): any {
-        requireString(context, 'LEN', args[0]);
+        requireString(context, 'UPPER', args[0]);
         const value = unwrapString(args[0]);
-        return `${value ?? ''}`.length;
+        return value.toUpperCase();
     }
 };
 
-export default len;
+export default upper;

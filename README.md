@@ -254,6 +254,12 @@ Various functions are provided by default, but it is possible to overwrite or ex
 - `LEN`
   - Returns the length of a field's value.
   - `LEN($name)` `LEN($items.0.sku)`
+- `LOWER`
+  - Transforms a string to use all lowercase letters.
+  - `LOWER($name)` `LOWER("value")`
+- `UPPER`
+  - Transforms a string to use all uppercase letters.
+  - `UPPER($name)` `UPPER("value")`
 
 #### Collection Functions
 

@@ -47,6 +47,14 @@ const unwrapString = (value: any): string => {
     return value;
 };
 
+const requireString = <T>(context: ExpressionContext<T>, funcKey: string, ...values: any[]): void => {
+    for (const value of values) {
+        if (typeof value !== 'string') {
+            throw new ExpressionError(`${funcKey}() received non-string argument in expression: ${context.expression}`);
+        }
+    }
+};
+
 const consoleColors = {
     red: '\x1b[31m',
     green: '\x1b[32m',
@@ -72,6 +80,7 @@ export {
     getField,
     isWrapped,
     parseNumber,
+    requireString,
     unwrapValue,
     unwrapString
 };

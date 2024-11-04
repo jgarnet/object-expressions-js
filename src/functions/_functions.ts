@@ -6,13 +6,19 @@ import multiply from "./multiply";
 import divide from "./divide";
 import size from "./size";
 import pow from "./pow";
+import upper from "./upper";
+import lower from "./lower";
 
 const functions = new Map<string, ExpressionFunction>;
-functions.set("LEN", len);
+
 functions.set("ADD", add);
-functions.set("SUBTRACT", subtract);
-functions.set("MULTIPLY", multiply);
 functions.set("DIVIDE", divide);
-functions.set("SIZE", size);
+functions.set("LEN", len);
+functions.set("LOWER", lower);
+functions.set("MULTIPLY", multiply);
 functions.set("POW", pow);
+functions.set("SIZE", size);
+functions.set("SUBTRACT", subtract);
+functions.set("UPPER", upper);
+
 export default functions;
