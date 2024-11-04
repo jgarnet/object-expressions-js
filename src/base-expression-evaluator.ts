@@ -14,7 +14,7 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
      * Parses and evaluates an expression against an object to determine if all conditions apply.
      * @param initialContext The {@link ExpressionContext}.
      */
-    evaluate<T>(initialContext: Partial<ExpressionContext<T>>): boolean {
+    async evaluate<T>(initialContext: Partial<ExpressionContext<T>>): Promise<boolean> {
         const context = createContext(initialContext);
         const expression = context.expression;
         if (!expression || expression.trim() === '') {
@@ -30,7 +30,7 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
      * @param context The {@link ExpressionContext}.
      * @private
      */
-    private evaluateNode<T>(node: ExpressionNode, context: ExpressionContext<T>): boolean {
+    private async evaluateNode<T>(node: ExpressionNode, context: ExpressionContext<T>): Promise<boolean> {
         let result;
         if (context.cache.has(node.token)) {
             result = context.cache.get(node.token) as boolean;
@@ -52,9 +52,9 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
                     debug: context.debug,
                     nestLevel: context.nestLevel + 1
                 });
-                result = this.evaluate(newContext);
+                result = await this.evaluate(newContext);
             } else {
-                result = context.conditionEvaluator.evaluate(node.token, context);
+                result = await context.conditionEvaluator.evaluate(node.token, context);
                 context.cache.set(node.token, result);
             }
         }
@@ -65,12 +65,12 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
             if (node.next.relationship === 'AND') {
                 if (result) {
                     debug(consoleColors.blue + 'AND' + consoleColors.reset, context);
-                    result = this.evaluateNode(node.next.node, context);
+                    result = await this.evaluateNode(node.next.node, context);
                 }
             } else {
                 if (!result) {
                     debug(consoleColors.blue + 'OR' + consoleColors.reset, context);
-                    result = this.evaluateNode(node.next.node, context);
+                    result = await this.evaluateNode(node.next.node, context);
                 }
             }
         }

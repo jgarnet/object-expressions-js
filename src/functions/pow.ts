@@ -4,7 +4,7 @@ import ExpressionError from "../expression-error";
 import {parseNumber} from "../_utils";
 
 const pow: ExpressionFunction = {
-    evaluate<T>(context: ExpressionContext<T>, ...args: any[]): any {
+    async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {
         if (!args || args.length !== 2) {
             throw new ExpressionError(`POW() received invalid arguments in ${context.expression}`);
         }

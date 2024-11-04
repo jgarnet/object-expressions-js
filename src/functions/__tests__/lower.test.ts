@@ -3,20 +3,20 @@ import createContext from "../../create-context";
 import ExpressionError from "../../expression-error";
 import lower from "../lower";
 
-const testError = (arg: any, error: ExpressionError) => {
+const testError = async (arg: any, error: ExpressionError) => {
     // noinspection TypeScriptValidateTypes
-    expect(() => lower.evaluate(createContext({}), arg)).toThrowError(error);
+    await expect(() => lower.evaluate(createContext({}), arg)).rejects.toThrowError(error);
 };
 
 describe('lower tests', () => {
-    it('should return the length of a string', () => {
+    it('should return the length of a string', async () => {
         // https://youtrack.jetbrains.com/issue/WEB-36766
         // noinspection TypeScriptValidateTypes
-        expect(lower.evaluate(createContext({}), 'Test')).toEqual('test');
+        expect(await lower.evaluate(createContext({}), 'Test')).toEqual('test');
         // noinspection TypeScriptValidateTypes
-        expect(lower.evaluate(createContext({}), '"Test"')).toEqual('test');
+        expect(await lower.evaluate(createContext({}), '"Test"')).toEqual('test');
         // noinspection TypeScriptValidateTypes
-        expect(lower.evaluate(createContext({}), '"\"Test\""')).toEqual('"test"');
+        expect(await lower.evaluate(createContext({}), '"\"Test\""')).toEqual('"test"');
     });
     it('should throw ExpressionError when invalid arguments are received', () => {
         testError([], new ExpressionError('LOWER() received non-string argument in expression: undefined'));

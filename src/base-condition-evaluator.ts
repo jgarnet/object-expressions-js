@@ -5,14 +5,14 @@ import {consoleColors, debug, getField} from "./_utils";
 import SyntaxError from "./syntax-error";
 
 class BaseConditionEvaluator implements ConditionEvaluator {
-    evaluate<T>(token: string, context: ExpressionContext<T>): boolean {
+    async evaluate<T>(token: string, context: ExpressionContext<T>): Promise<boolean> {
         const tokens = this.getTokens(token, context);
         const [operandA, operator, operandB] = tokens;
         if (operandA.length === 0 || operator.length === 0 || operandB.length === 0) {
             throw new SyntaxError(`received invalid condition ${token}`);
         }
-        const leftSide = this.evaluateOperand(operandA, context);
-        const rightSide = this.evaluateOperand(operandB, context);
+        const leftSide = await this.evaluateOperand(operandA, context);
+        const rightSide = await this.evaluateOperand(operandB, context);
         const _operator = context.operators.get(operator) as ComparisonOperator;
         const result = _operator.evaluate(leftSide, rightSide, context);
         debug(consoleColors.blue + token + consoleColors.reset + ' = ' +
@@ -140,7 +140,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
      * @param context The {@link ExpressionContext}.
      * @private
      */
-    private evaluateOperand<T>(token: string, context: ExpressionContext<T>): any {
+    private async evaluateOperand<T>(token: string, context: ExpressionContext<T>): Promise<any> {
         if (token.startsWith('$')) {
             // the operand is a field or object reference -- return the result
             return getField(token, context);

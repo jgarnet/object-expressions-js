@@ -7,5 +7,6 @@ const object = JSON.parse(process.argv[3]);
 const { red, green, blue, reset } = consoleColors;
 
 console.log('Evaluating expression: ' + blue + expression + reset);
-const result = evaluate({ expression, object, debug: true });
-console.log(reset + 'Result: ' + (result ? green : red) + result + reset);
+evaluate({ expression, object, debug: true }).then(result => {
+    console.log(reset + 'Result: ' + (result ? green : red) + result + reset)
+});

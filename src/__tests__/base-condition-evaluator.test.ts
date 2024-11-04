@@ -8,7 +8,7 @@ import SyntaxError from "../syntax-error";
 
 const evaluator = new BaseConditionEvaluator();
 
-const testAssertion = (token: string, object: any, result: boolean) => {
+const testAssertion = async (token: string, object: any, result: boolean) => {
     // https://youtrack.jetbrains.com/issue/WEB-36766
     // noinspection TypeScriptValidateTypes
     const ctx: ExpressionContext<any> = createContext({
@@ -17,10 +17,10 @@ const testAssertion = (token: string, object: any, result: boolean) => {
         operators,
         functions: functions
     });
-    expect(evaluator.evaluate(token, ctx)).toEqual(result);
+    expect(await evaluator.evaluate(token, ctx)).toEqual(result);
 };
 
-const testError = (token: string, object: any, expectedError: Error) => {
+const testError = async (token: string, object: any, expectedError: Error) => {
     // noinspection TypeScriptValidateTypes
     const ctx: ExpressionContext<any> = createContext({
         expression: '',
@@ -28,7 +28,7 @@ const testError = (token: string, object: any, expectedError: Error) => {
         operators,
         functions: functions
     });
-    expect(() => evaluator.evaluate(token, ctx)).toThrowError(expectedError);
+    await expect(() => evaluator.evaluate(token, ctx)).rejects.toThrowError(expectedError);
 };
 
 describe('BaseConditionEvaluator tests', () => {

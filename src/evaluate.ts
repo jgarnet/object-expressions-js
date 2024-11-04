@@ -2,7 +2,7 @@ import ExpressionContext from "./types/expression-context";
 import createContext from "./create-context";
 import ExpressionError from "./expression-error";
 
-const evaluate = <T> (context: Partial<ExpressionContext<T>>): boolean => {
+const evaluate = <T> (context: Partial<ExpressionContext<T>>): Promise<boolean> => {
     try {
         const ctx = createContext(context);
         return ctx.expressionEvaluator.evaluate(ctx);

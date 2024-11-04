@@ -3,20 +3,20 @@ import createContext from "../../create-context";
 import ExpressionError from "../../expression-error";
 import upper from "../upper";
 
-const testError = (arg: any, error: ExpressionError) => {
+const testError = async (arg: any, error: ExpressionError) => {
     // noinspection TypeScriptValidateTypes
-    expect(() => upper.evaluate(createContext({}), arg)).toThrowError(error);
+    await expect(() => upper.evaluate(createContext({}), arg)).rejects.toThrowError(error);
 };
 
 describe('upper tests', () => {
-    it('should return the length of a string', () => {
+    it('should return the length of a string', async () => {
         // https://youtrack.jetbrains.com/issue/WEB-36766
         // noinspection TypeScriptValidateTypes
-        expect(upper.evaluate(createContext({}), 'Test')).toEqual('TEST');
+        expect(await upper.evaluate(createContext({}), 'Test')).toEqual('TEST');
         // noinspection TypeScriptValidateTypes
-        expect(upper.evaluate(createContext({}), '"Test"')).toEqual('TEST');
+        expect(await upper.evaluate(createContext({}), '"Test"')).toEqual('TEST');
         // noinspection TypeScriptValidateTypes
-        expect(upper.evaluate(createContext({}), '"\"Test\""')).toEqual('"TEST"');
+        expect(await upper.evaluate(createContext({}), '"\"Test\""')).toEqual('"TEST"');
     });
     it('should throw ExpressionError when invalid arguments are received', () => {
         testError([], new ExpressionError('UPPER() received non-string argument in expression: undefined'));

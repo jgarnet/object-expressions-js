@@ -2,14 +2,14 @@ import BaseExpressionEvaluator from "../base-expression-evaluator";
 import {describe, expect, it} from "@jest/globals";
 import SyntaxError from "../syntax-error";
 
-const testAssertion = (expression: string, object: any, outcome: boolean) => {
+const testAssertion = async (expression: string, object: any, outcome: boolean) => {
     const evaluator = new BaseExpressionEvaluator();
-    expect(evaluator.evaluate({ expression, object })).toEqual(outcome);
+    expect(await evaluator.evaluate({ expression, object })).toEqual(outcome);
 };
 
-const testError = (expression: string, expectedError: Error) => {
+const testError = async (expression: string, expectedError: Error) => {
     const evaluator = new BaseExpressionEvaluator();
-    expect(() => evaluator.evaluate({ expression, object: { A: 2, B: 3 } })).toThrowError(expectedError);
+    await expect(() => evaluator.evaluate({ expression, object: { A: 2, B: 3 } })).rejects.toThrowError(expectedError);
 };
 
 describe('BaseExpressionEvaluator Tests', () => {

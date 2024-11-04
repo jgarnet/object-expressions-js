@@ -4,7 +4,7 @@
 
 Evaluates expressions against objects to determine if all conditions are met.
 
-The [evaluate](./src/evaluate.ts) function accepts an [ExpressionContext](./src/types/expression-context.ts) and returns `true` if all conditions are met, or `false` otherwise.
+The [evaluate](./src/evaluate.ts) function accepts an [ExpressionContext](./src/types/expression-context.ts) and returns a Promise containing `true` if all conditions are met, or `false` otherwise.
 
 At a minimum, an `expression` and `object` are required for evaluation.
 
@@ -25,10 +25,12 @@ const order = {
     total: 10.70
 };
 
-const result = evaluate({
+evaluate({
   expression: '($type = ONLINE AND $status = SHIPPED) AND $total >= 10',
   object: order
-}); // result = true
+}).then(result => {
+    console.log(result); // true
+});
 ```
 ## Syntax and Rules
 
@@ -37,12 +39,14 @@ const result = evaluate({
 ```javascript
 import evaluate from 'object-expressions-js';
 
-const result = evaluate({
+evaluate({
   expression: '$a = 1',
   object: {
     a: 1
   }
-}); // result = true
+}).then(result => {
+    console.log(result); // true
+});
 ```
 
 A field may be evaluated on an object by referencing its path in the object, preceded by the `$` symbol. The following conventions are supported:
@@ -63,13 +67,15 @@ The object itself may be referenced using the `$` symbol:
 ```javascript
 import evaluate from 'object-expressions-js';
 
-const result = evaluate({
+evaluate({
   expression: '$firstName = John AND $lastName = Doe',
   object: {
     firstName: 'John',
     lastName: 'Doe'
   }
-}); // result = true
+}).then(result => {
+    console.log(result); // true
+});
 ```
 
 The allowed logical operators include:
@@ -94,13 +100,15 @@ If an expression contains imbalanced logical operators, a `SyntaxError` will be 
 ```javascript
 import evaluate from 'object-expressions-js';
 
-const result = evaluate({
+evaluate({
   expression: '($firstName = John OR $firstName = Jane) AND $lastName = Doe',
   object: {
     firstName: 'John',
     lastName: 'Doe'
   }
-}); // result = true
+}).then(result => {
+    console.log(result); // true
+});
 ```
 
 Groups are evaluated as child expressions and are represented using parentheses.
@@ -114,12 +122,14 @@ If an expression contains imbalanced groups, a `SyntaxError` will be thrown duri
 ```javascript
 import evaluate from 'object-expressions-js';
 
-const result = evaluate({
+evaluate({
   expression: '$a >= 1',
   object: {
     a: 5
   }
-}); // result = true
+}).then(result => {
+  console.log(result); // true
+});
 ```
 
 Conditions are represented via an operation containing a left-hand operand, a comparison operator, and a right-hand operand.
@@ -168,12 +178,14 @@ The following comparison operators are provided:
 ```javascript
 import evaluate from 'object-expressions-js';
 
-const result = evaluate({
+evaluate({
   expression: '$field = "Hello, World"',
   object: {
     field: 'Hello, World'
   }
-}); // result = true
+}).then(result => {
+  console.log(result); // true
+});
 ```
 
 Expressions may contain string values, denoted by double quotes `"`. If a string contains child quotes, they must be escaped with a back-slash. Text that contains whitespace must be represented in a string.
@@ -187,12 +199,14 @@ If an expression contains unclosed strings, a `SyntaxError` will be thrown durin
 ```javascript
 import evaluate from 'object-expressions-js';
 
-const result = evaluate({
+evaluate({
   expression: '$firstName LIKE /^[A-Z]{1}[a-z]+$/',
   object: {
     firstName: 'John'
   }
-}); // result = true
+}).then(result => {
+  console.log(result); // true
+});
 ```
 
 Regular expressions are supported &amp; must be wrapped in forward-slashes if they contain reserved symbols or keywords. If forward-slashes need to be used inside of a regular expression, they must be escaped using a back-slash.
@@ -206,12 +220,14 @@ If an expression contains unclosed regular expressions, a `SyntaxError` will be 
 ```javascript
 import evaluate from 'object-expressions-js';
 
-const result = evaluate({
+evaluate({
   expression: 'ADD(LEN($field), 4) = 8',
   object: {
       field: 'test'
   }
-}); // result = true
+}).then(result => {
+  console.log(result); // true
+});
 ```
 
 [Functions](./src/types/expression-function.ts) can be applied to a field's value during evaluation.

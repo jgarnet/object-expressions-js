@@ -5,7 +5,7 @@ import ExpressionContext from "./expression-context";
  * i.e. given {"a": 2}, 'a = 2' is true, while 'a = 1' is false.
  */
 type ConditionEvaluator = {
-    evaluate<T>(token: string, context: ExpressionContext<T>): boolean;
+    evaluate<T>(token: string, context: ExpressionContext<T>): Promise<boolean>;
 };
 
 export default ConditionEvaluator;

@@ -4,7 +4,7 @@ import {parseNumber} from "../_utils";
 import ExpressionError from "../expression-error";
 
 const add: ExpressionFunction = {
-    evaluate<T>(context: ExpressionContext<T>, ...args: any[]): any {
+    async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {
         if (args.length < 2) {
             throw new ExpressionError(`ADD() received invalid arguments in ${context.expression}`);
         }

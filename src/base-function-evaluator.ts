@@ -25,7 +25,7 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
      * @param token The token containing a function call.
      * @param context The {@link ExpressionContext}.
      */
-    evaluate<T, R>(token: string, context: ExpressionContext<T>): any {
+    async evaluate<T, R>(token: string, context: ExpressionContext<T>): Promise<any> {
         const firstParen = token.indexOf('(');
         const lastParen = token.lastIndexOf(')');
         const input = token.slice(firstParen + 1, lastParen);
@@ -33,13 +33,13 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
         const args = this.parseFunctionArgs(input, funcKey);
         for (let i = 0; i < args.length; i++) {
             if (this.isFunction(args[i], context)) {
-                args[i] = this.evaluate(args[i], context);
+                args[i] = await this.evaluate(args[i], context);
             } else if (typeof args[i] === 'string' && args[i].startsWith('$')) {
                 args[i] = getField(args[i], context);
             }
         }
         const func = context.functions.get(funcKey) as ExpressionFunction;
-        return func.evaluate(context, ...args);
+        return await func.evaluate(context, ...args);
     }
 
     /**
