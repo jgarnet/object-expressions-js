@@ -5,7 +5,8 @@ import {unwrapString} from "../_utils";
 const lessEquals: ComparisonOperator = {
     evaluate<T>(leftSide: any, rightSide: any, context: ExpressionContext<T>): boolean {
         return unwrapString(leftSide) <= unwrapString(rightSide);
-    }
+    },
+    precedence: 2
 };
 
 export default lessEquals;

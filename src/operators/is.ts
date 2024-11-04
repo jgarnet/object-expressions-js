@@ -16,7 +16,8 @@ const is: ComparisonOperator = {
                 return leftSide === false;
         }
         return false;
-    }
+    },
+    precedence: 1
 };
 
 export default is;

@@ -1,16 +1,18 @@
 import ExpressionContext from "./types/expression-context";
 import ExpressionError from "./expression-error";
 
+const isArray = require("lodash/isArray");
 const isBoolean = require("lodash/isBoolean");
+const isSet = require("lodash/isSet");
 
-const getField = <T>(field: string, context: ExpressionContext<T>): any => {
+const getField = <T>(field: string, context: ExpressionContext<T>, object?: any): any => {
     if (field === '$') {
-        return context.object;
+        return object ?? context.object;
     }
     if (field.startsWith('$')) {
         field = field.slice(1);
     }
-    return context.pathEvaluator.evaluate(context.object, field);
+    return context.pathEvaluator.evaluate(object ?? context.object, field);
 };
 
 const parseNumber = <T>(funcKey: string, token: string, context: ExpressionContext<T>) => {
@@ -25,6 +27,14 @@ const parseNumber = <T>(funcKey: string, token: string, context: ExpressionConte
         }
         return numericValue;
     }
+};
+
+const isNumber = (value: any): boolean => {
+    if (typeof value === 'object') {
+        return false;
+    }
+    const numericValue = Number(value);
+    return !Number.isNaN(numericValue) && !isBoolean(value);
 };
 
 const isWrapped = (value: string, startTag: string, endTag: string): boolean => {
@@ -74,10 +84,16 @@ const debug = <T>(text: string, context: ExpressionContext<T>) => {
     }
 };
 
+const isCollection = (value: any): boolean => {
+    return isArray(value) || isSet(value);
+};
+
 export {
     consoleColors,
     debug,
     getField,
+    isCollection,
+    isNumber,
     isWrapped,
     parseNumber,
     requireString,

@@ -37,6 +37,17 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         let inRegex = false;
         let bracketCount = 0;
         let parenCount = 0;
+        const operatorKeys = [...context.operators.keys()].sort((a, b) => {
+            const operatorA = context.operators.get(a) as ComparisonOperator;
+            const operatorB = context.operators.get(b) as ComparisonOperator;
+            if (operatorA.precedence > operatorB.precedence) {
+                // higher precedence should be prioritized
+                return -1;
+            } else if (operatorA.precedence < operatorB.precedence) {
+                return 1;
+            }
+            return 0;
+        });
         for (let i = 0; i < token.length; i++) {
             const char = token[i];
             switch (char) {
@@ -81,7 +92,8 @@ class BaseConditionEvaluator implements ConditionEvaluator {
             }
             if (!inString && !inRegex && bracketCount === 0 && parenCount === 0) {
                 const addOperator = (): boolean => {
-                    for (const [operatorStr, _operator] of context.operators) {
+                    for (const operatorStr of operatorKeys) {
+                        const _operator = context.operators.get(operatorStr) as ComparisonOperator;
                         if (this.isOperator(operatorStr, _operator, token, i)) {
                             operandA = buffer;
                             buffer = '';

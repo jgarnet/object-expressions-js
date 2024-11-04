@@ -9,8 +9,8 @@ const testAssertion = async (a: number, b: number, result: number) => {
 };
 
 describe('pow tests', () => {
-    it('should take the power of a base to an exponent', () => {
-        testAssertion(10, 2, 100);
-        testAssertion(2, 10, 1024);
+    it('should take the power of a base to an exponent', async () => {
+        await testAssertion(10, 2, 100);
+        await testAssertion(2, 10, 1024);
     });
 });

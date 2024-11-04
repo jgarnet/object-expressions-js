@@ -10,7 +10,11 @@ type ComparisonOperator = {
      * @param rightSide The right-hand side of an operation.
      * @param context The {@link ExpressionContext}.
      */
-    evaluate: <T> (leftSide: any, rightSide: any, context: ExpressionContext<T>) => boolean
+    evaluate: <T> (leftSide: any, rightSide: any, context: ExpressionContext<T>) => boolean,
+    /**
+     * Determines the precedence in which the operator is parsed relative to other operators.
+     */
+    precedence: number
 };
 
 export default ComparisonOperator;

@@ -31,89 +31,92 @@ const testError = async (token: string, object: any, expectedError: Error) => {
     await expect(() => evaluator.evaluate(token, ctx)).rejects.toThrowError(expectedError);
 };
 
-describe('BaseConditionEvaluator tests', () => {
-    it('should evaluate equality', () => {
+describe('BaseConditionEvaluator tests',  () => {
+    it('should evaluate equality', async () => {
         // numbers
-        testAssertion('$field = 1', { field: 1 }, true);
-        testAssertion('$field = 2', { field: 1 }, false);
+        await testAssertion('$field = 1', { field: 1 }, true);
+        await testAssertion('$field = 2', { field: 1 }, false);
         // strings
-        testAssertion('$field = value', { field: "value" }, true);
-        testAssertion('$field = "value"', { field: "value" }, true);
-        testAssertion('$field = "value 2"', { field: "value 2" }, true);
-        testAssertion('$field = "value \\"2\\""', { field: "value \"2\"" }, true);
-        testAssertion('$field = value', { field: "value 2" }, false);
-        testAssertion('$field = "value"', { field: "value 2" }, false);
-        testAssertion('$field = "value 2"', { field: "value 3" }, false);
-        testAssertion('$field = "value \\"2\\""', { field: "value \"3\"" }, false);
+        await testAssertion('$field = value', { field: "value" }, true);
+        await testAssertion('$field = "value"', { field: "value" }, true);
+        await testAssertion('$field = "value 2"', { field: "value 2" }, true);
+        await testAssertion('$field = "value \\"2\\""', { field: "value \"2\"" }, true);
+        await testAssertion('$field = value', { field: "value 2" }, false);
+        await testAssertion('$field = "value"', { field: "value 2" }, false);
+        await testAssertion('$field = "value 2"', { field: "value 3" }, false);
+        await testAssertion('$field = "value \\"2\\""', { field: "value \"3\"" }, false);
     });
-    it('should evaluate IS', () => {
+    it('should evaluate FILTER', async () => {
+        await testAssertion('SIZE(FILTER($, ($ = 1))) = 1', [1,2,3], true);
+    });
+    it('should evaluate IS', async () => {
         // boolean
-        testAssertion('$field IS TRUE', { field: true }, true);
-        testAssertion('$field IS FALSE', { field: true }, false);
-        testAssertion('$field is true', { field: true }, true);
-        testAssertion('$field is false', { field: true }, false);
-        testAssertion('$field is FALSE', { field: false }, true);
-        testAssertion('$field IS false', { field: false }, true);
-        testAssertion('$field IS true', { field: false }, false);
+        await testAssertion('$field IS TRUE', { field: true }, true);
+        await testAssertion('$field IS FALSE', { field: true }, false);
+        await testAssertion('$field is true', { field: true }, true);
+        await testAssertion('$field is false', { field: true }, false);
+        await testAssertion('$field is FALSE', { field: false }, true);
+        await testAssertion('$field IS false', { field: false }, true);
+        await testAssertion('$field IS true', { field: false }, false);
     });
-    it('should evaluate IN', () => {
-        testAssertion('$field IN "value with spaces",test', { field: 'value with spaces' }, true);
-        testAssertion('$field IN "value with spaces"', { field: 'value with spaces' }, true);
-        testAssertion('$field IN test', { field: 'value with spaces' }, false);
-        testAssertion('$field IN test', { field: 'value with spaces' }, false);
-        testAssertion('$a in $b', { a: 'test field', b: ['value', 'test field'] }, true);
-        testAssertion('"test field" in $b', { a: 'test field', b: ['value', 'test field'] }, true);
-        testAssertion('value in $b', { a: 'test field', b: ['value', 'test field'] }, true);
-        testAssertion('test in $b', { a: 'test field', b: ['value', 'test field'] }, false);
+    it('should evaluate IN', async () => {
+        await testAssertion('$field IN "value with spaces",test', { field: 'value with spaces' }, true);
+        await testAssertion('$field IN "value with spaces"', { field: 'value with spaces' }, true);
+        await testAssertion('$field IN test', { field: 'value with spaces' }, false);
+        await testAssertion('$field IN test', { field: 'value with spaces' }, false);
+        await testAssertion('$a in $b', { a: 'test field', b: ['value', 'test field'] }, true);
+        await testAssertion('"test field" in $b', { a: 'test field', b: ['value', 'test field'] }, true);
+        await testAssertion('value in $b', { a: 'test field', b: ['value', 'test field'] }, true);
+        await testAssertion('test in $b', { a: 'test field', b: ['value', 'test field'] }, false);
     });
-    it('should evaluate HAS', () => {
-        testAssertion('$ HAS field', { field: 1 }, true);
+    it('should evaluate HAS', async () => {
+        await testAssertion('$ HAS field', { field: 1 }, true);
     });
-    it('should evaluate SIZE', () => {
-        testAssertion('SIZE($) = 1', [1], true);
-        testAssertion('SIZE($items) = 2', { items: [1,2] }, true);
+    it('should evaluate SIZE', async () => {
+        await testAssertion('SIZE($) = 1', [1], true);
+        await testAssertion('SIZE($items) = 2', { items: [1,2] }, true);
     });
-    it('should evaluate POW', () => {
-        testAssertion('POW($a,$b) = $c', {a: 10, b: 2, c: 100}, true);
-        testAssertion('POW($a,2) = $c', {a: 10, b: 2, c: 100}, true);
-        testAssertion('POW(10,2) = $c', {a: 10, b: 2, c: 100}, true);
+    it('should evaluate POW', async () => {
+        await testAssertion('POW($a,$b) = $c', {a: 10, b: 2, c: 100}, true);
+        await testAssertion('POW($a,2) = $c', {a: 10, b: 2, c: 100}, true);
+        await testAssertion('POW(10,2) = $c', {a: 10, b: 2, c: 100}, true);
     });
-    it('should evaluate functions', () => {
-        testAssertion('LEN($field) = 4', { field: 'test' }, true);
-        testAssertion('LEN($field  ) = 4', { field: 'test' }, true);
-        testAssertion('LEN(  $field  ) = 4', { field: 'test' }, true);
-        testAssertion('LEN(  $field) = 4', { field: 'test' }, true);
-        testAssertion('LEN($field) = LEN($fieldB)', { field: 'a', fieldB: 'b' }, true);
-        testAssertion('ADD(2,$a,$b) = 12', { a: 4, b: 6 }, true);
-        testAssertion('ADD(LEN($field), 4) = 8', { field: 'test' }, true);
-        testAssertion('LEN($a) = LEN($b)', { a: 'test', b: '1234' }, true);
-        testAssertion("LEN($>) > 5", { '>': 'test string'}, true);
-        testAssertion("LEN($[ IS ]) > 5", { ' IS ': 'test string'}, true);
+    it('should evaluate functions', async () => {
+        await testAssertion('LEN($field) = 4', { field: 'test' }, true);
+        await testAssertion('LEN($field  ) = 4', { field: 'test' }, true);
+        await testAssertion('LEN(  $field  ) = 4', { field: 'test' }, true);
+        await testAssertion('LEN(  $field) = 4', { field: 'test' }, true);
+        await testAssertion('LEN($field) = LEN($fieldB)', { field: 'a', fieldB: 'b' }, true);
+        await testAssertion('ADD(2,$a,$b) = 12', { a: 4, b: 6 }, true);
+        await testAssertion('ADD(LEN($field), 4) = 8', { field: 'test' }, true);
+        await testAssertion('LEN($a) = LEN($b)', { a: 'test', b: '1234' }, true);
+        await testAssertion("LEN($>) > 5", { '>': 'test string'}, true);
+        await testAssertion("LEN($[ IS ]) > 5", { ' IS ': 'test string'}, true);
     });
-    it('should throw errors for invalid function syntax', () => {
-        testError('LEN($field,  ) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
-        testError('LEN($field,) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
-        testError('LEN($field,,5) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
-        testError('LEN(,$field) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
-        testError('LEN(  ,$field) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
+    it('should throw errors for invalid function syntax', async () => {
+        await testError('LEN($field,  ) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
+        await testError('LEN($field,) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
+        await testError('LEN($field,,5) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
+        await testError('LEN(,$field) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
+        await testError('LEN(  ,$field) = 4', {}, new SyntaxError('invalid function argument passed to LEN'));
     });
-    it('should evaluate symbols regardless of whitespace', () => {
-        testAssertion('$field=5', { field: 5 }, true);
+    it('should evaluate symbols regardless of whitespace', async () => {
+        await testAssertion('$field=5', { field: 5 }, true);
     });
-    it('should throw errors for invalid operators / conditions', () => {
-        testError('$A ~ 1', {}, new SyntaxError('received invalid condition $A ~ 1'));
-        testError('$A == 1', {}, new SyntaxError('received invalid condition $A == 1'));
-        testError('$A==1', {}, new SyntaxError('received invalid condition $A==1'));
-        testError('$A CONTAINS 1', {}, new SyntaxError('received invalid condition $A CONTAINS 1'));
+    it('should throw errors for invalid operators / conditions', async () => {
+        await testError('$A ~ 1', {}, new SyntaxError('received invalid condition $A ~ 1'));
+        await testError('$A == 1', {}, new SyntaxError('received invalid condition $A == 1'));
+        await testError('$A==1', {}, new SyntaxError('received invalid condition $A==1'));
+        await testError('$A CONTAINS 1', {}, new SyntaxError('received invalid condition $A CONTAINS 1'));
     });
-    it('should not evaluate functions inside strings', () => {
-        testAssertion('$field = "LEN($field)"', { field: 'LEN($field)' }, true);
-        testAssertion('LEN("LEN($FIELD)") = 11', { field: 'test' }, true);
-        testAssertion('LEN(/LEN($FIELD)/) = 13', { field: 'test' }, true);
-        testAssertion('LEN("TEST,") = 5', {}, true);
-        testAssertion('LEN(/TEST,/) = 7', {}, true);
+    it('should not evaluate functions inside strings', async () => {
+        await testAssertion('$field = "LEN($field)"', { field: 'LEN($field)' }, true);
+        await testAssertion('LEN("LEN($FIELD)") = 11', { field: 'test' }, true);
+        await testAssertion('LEN(/LEN($FIELD)/) = 13', { field: 'test' }, true);
+        await testAssertion('LEN("TEST,") = 5', {}, true);
+        await testAssertion('LEN(/TEST,/) = 7', {}, true);
     });
-    it('should not evaluate functions inside regex', () => {
-        testAssertion('$field = /LEN($field)/', { field: '/LEN($field)/' }, true);
+    it('should not evaluate functions inside regex', async () => {
+        await testAssertion('$field = /LEN($field)/', { field: '/LEN($field)/' }, true);
     });
 });

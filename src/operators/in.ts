@@ -13,7 +13,8 @@ const _in: ComparisonOperator = {
         }
         const values = isArray(rightSide) ? rightSide : rightSide.split(',').map((val: any) => unwrapString(val.trim()));
         return some(values, (val: any) => val == leftSide);
-    }
+    },
+    precedence: 1
 };
 
 export default _in;

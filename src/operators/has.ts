@@ -6,7 +6,8 @@ const _has = require("lodash/has");
 const has: ComparisonOperator = {
     evaluate<T>(leftSide: any, rightSide: any, context: ExpressionContext<T>): boolean {
         return _has(leftSide, unwrapString(rightSide));
-    }
+    },
+    precedence: 1
 };
 
 export default has;

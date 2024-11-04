@@ -18,10 +18,10 @@ describe('len tests', () => {
         // noinspection TypeScriptValidateTypes
         expect(await len.evaluate(createContext({}), '"\"Test\""')).toEqual(6);
     });
-    it('should throw ExpressionError when invalid arguments are received', () => {
-        testError([], new ExpressionError('LEN() received non-string argument in expression: undefined'));
-        testError({}, new ExpressionError('LEN() received non-string argument in expression: undefined'));
-        testError(null, new ExpressionError('LEN() received non-string argument in expression: undefined'));
-        testError(undefined, new ExpressionError('LEN() received non-string argument in expression: undefined'));
+    it('should throw ExpressionError when invalid arguments are received', async () => {
+        await testError([], new ExpressionError('LEN() received non-string argument in expression: undefined'));
+        await testError({}, new ExpressionError('LEN() received non-string argument in expression: undefined'));
+        await testError(null, new ExpressionError('LEN() received non-string argument in expression: undefined'));
+        await testError(undefined, new ExpressionError('LEN() received non-string argument in expression: undefined'));
     });
 });

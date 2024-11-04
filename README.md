@@ -282,6 +282,17 @@ Various functions are provided by default, but it is possible to overwrite or ex
 - `SIZE`
   - Returns the size of a collection.
   - `SIZE($)` `SIZE($items)`
+- `FILTER`
+  - Filters the items of a collection based on an expression.
+  - Accepts the following parameters:
+    - A collection or a reference to a collection field (i.e. `$collection`).
+    - The expression used to filter each item in the collection (i.e. `($ LIKE ^\\d+$)`).
+      - The expression must be wrapped in parentheses for parsing.
+    - An optional field path to extract from the resulting collection (i.e. `0`, `$field`, etc.).
+      - If referencing a field path, a string must be passed, denoted by double quotes.
+      - If a direct field reference is passed, its value will be evaluated and used.
+      - For example, `FILTER($items, ($cost >= 5), $name)` is *not* the same as `FILTER($items, ($cost >= 5), "$name")`.
+  - `FILTER($, ($ >= 4))` `FILTER($items, ($sku LIKE ^\\d+-\\w+$), "$[0].sku")`
 
 ### Precedence
 

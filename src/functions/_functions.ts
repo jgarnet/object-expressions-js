@@ -8,11 +8,13 @@ import size from "./size";
 import pow from "./pow";
 import upper from "./upper";
 import lower from "./lower";
+import filter from "./filter";
 
 const functions = new Map<string, ExpressionFunction>;
 
 functions.set("ADD", add);
 functions.set("DIVIDE", divide);
+functions.set("FILTER", filter);
 functions.set("LEN", len);
 functions.set("LOWER", lower);
 functions.set("MULTIPLY", multiply);

@@ -35,8 +35,8 @@ const testAssertion = (expression: string, expectedValue: ExpressionNode) => {
 };
 
 describe('BaseExpressionParser tests', () => {
-    it('should parse logical operators', () => {
-        testAssertion('$A > 10 AND $B < 5', {
+    it('should parse logical operators', async () => {
+        await testAssertion('$A > 10 AND $B < 5', {
             token: '$A > 10',
             next: {
                 node: {
@@ -45,7 +45,7 @@ describe('BaseExpressionParser tests', () => {
                 relationship: 'AND'
             }
         });
-        testAssertion('$A = 1 OR $B = 2', {
+        await testAssertion('$A = 1 OR $B = 2', {
             token: '$A = 1',
             next: {
                 node: {
@@ -54,11 +54,11 @@ describe('BaseExpressionParser tests', () => {
                 relationship: 'OR'
             }
         });
-        testAssertion('NOT $A = 1', {
+        await testAssertion('NOT $A = 1', {
             token: '$A = 1',
             negate: true
         });
-        testAssertion('$organWeight = 5 and $organName = Heart', {
+        await testAssertion('$organWeight = 5 and $organName = Heart', {
             token: '$organWeight = 5',
             next: {
                 node: {
@@ -68,8 +68,8 @@ describe('BaseExpressionParser tests', () => {
             }
         });
     });
-    it('should parse groups', () => {
-        testAssertion('$A = 1 AND ($B = 2 AND ($C = 3 OR $D = 1)) OR (($B = 1))', {
+    it('should parse groups', async () => {
+        await testAssertion('$A = 1 AND ($B = 2 AND ($C = 3 OR $D = 1)) OR (($B = 1))', {
             token: '$A = 1',
             next: {
                 node: {
@@ -85,8 +85,8 @@ describe('BaseExpressionParser tests', () => {
             }
         })
     });
-    it('should parse functions', () => {
-        testAssertion('LEN($A) = 4 AND $A = test', {
+    it('should parse functions', async () => {
+        await testAssertion('LEN($A) = 4 AND $A = test', {
             token: 'LEN($A) = 4',
             next: {
                 node: {
@@ -95,7 +95,7 @@ describe('BaseExpressionParser tests', () => {
                 relationship: 'AND'
             }
         });
-        testAssertion('LEN(LEN($A)) = 4 AND $A = test', {
+        await testAssertion('LEN(LEN($A)) = 4 AND $A = test', {
             token: 'LEN(LEN($A)) = 4',
             next: {
                 node: {
@@ -104,7 +104,7 @@ describe('BaseExpressionParser tests', () => {
                 relationship: 'AND'
             }
         });
-        testAssertion('LEN($A, LEN($B)) = 4 AND $A = test', {
+        await testAssertion('LEN($A, LEN($B)) = 4 AND $A = test', {
             token: 'LEN($A, LEN($B)) = 4',
             next: {
                 node: {
@@ -113,13 +113,13 @@ describe('BaseExpressionParser tests', () => {
                 relationship: 'AND'
             }
         });
-        testAssertion('$a = MULTIPLY($b, 2)', {
+        await testAssertion('$a = MULTIPLY($b, 2)', {
             token: '$a = MULTIPLY($b, 2)'
         });
-        testAssertion('MULTIPLY($b, 2) = $a', {
+        await testAssertion('MULTIPLY($b, 2) = $a', {
             token: 'MULTIPLY($b, 2) = $a'
         });
-        testAssertion('MULTIPLY($b, 2) = $a AND DIVIDE($c,2) = $d', {
+        await testAssertion('MULTIPLY($b, 2) = $a AND DIVIDE($c,2) = $d', {
             token: 'MULTIPLY($b, 2) = $a',
             next: {
                 node: {
@@ -128,7 +128,7 @@ describe('BaseExpressionParser tests', () => {
                 relationship: 'AND'
             }
         });
-        testAssertion('(MULTIPLY($b, 2) = $a) AND (DIVIDE($c,2) = $d)', {
+        await testAssertion('(MULTIPLY($b, 2) = $a) AND (DIVIDE($c,2) = $d)', {
             token: '(MULTIPLY($b, 2) = $a)',
             next: {
                 node: {
@@ -137,15 +137,15 @@ describe('BaseExpressionParser tests', () => {
                 relationship: 'AND'
             }
         });
-        testAssertion('LEN("EVAL($a)",$b)', {
+        await testAssertion('LEN("EVAL($a)",$b)', {
             token: 'LEN("EVAL($a)",$b)'
         });
-        testAssertion('LEN(/EVAL($a)/,$b)', {
+        await testAssertion('LEN(/EVAL($a)/,$b)', {
             token: 'LEN(/EVAL($a)/,$b)'
         });
     });
-    it('should parse tokens regardless of whitespace', () => {
-        testAssertion(`$A    =     1 AND $B
+    it('should parse tokens regardless of whitespace', async () => {
+        await testAssertion(`$A    =     1 AND $B
 = 5`, {
             token: '$A    =     1',
             next: {
@@ -155,7 +155,7 @@ describe('BaseExpressionParser tests', () => {
                 relationship: 'AND'
             }
         });
-        testAssertion('$A>2 AND $B=5', {
+        await testAssertion('$A>2 AND $B=5', {
             token: '$A>2',
             next: {
                 node: {
@@ -165,8 +165,8 @@ describe('BaseExpressionParser tests', () => {
             }
         });
     });
-    it('should preserve whitespace within quotes', () => {
-        testAssertion('$A = "    test   " AND     $B =     5', {
+    it('should preserve whitespace within quotes', async () => {
+        await testAssertion('$A = "    test   " AND     $B =     5', {
             token: '$A = "    test   "',
             next: {
                 node: {
@@ -176,8 +176,8 @@ describe('BaseExpressionParser tests', () => {
             }
         });
     });
-    it('should ignore keywords inside quotes', () => {
-        testAssertion('$field = "\\"AND 1 = 1" AND $fieldB = 2', {
+    it('should ignore keywords inside quotes', async () => {
+        await testAssertion('$field = "\\"AND 1 = 1" AND $fieldB = 2', {
             token: '$field = "\\"AND 1 = 1"',
             next: {
                 node: {
@@ -186,39 +186,39 @@ describe('BaseExpressionParser tests', () => {
                 relationship: 'AND'
             }
         });
-        testAssertion('$url = "/products/long-sleeve-shirt"', {
+        await testAssertion('$url = "/products/long-sleeve-shirt"', {
             token: '$url = "/products/long-sleeve-shirt"'
         });
     });
-    it('should ignore parentheses inside strings', () => {
-        testAssertion('$field = "(test"', { token: '$field = "(test"' });
-        testAssertion('$field = "test)"', { token: '$field = "test)"' });
-        testAssertion('$field = "(test)"', { token: '$field = "(test)"' });
-        testAssertion('$field = "(test) AND $field > 5"', { token: '$field = "(test) AND $field > 5"' });
+    it('should ignore parentheses inside strings', async () => {
+        await testAssertion('$field = "(test"', { token: '$field = "(test"' });
+        await testAssertion('$field = "test)"', { token: '$field = "test)"' });
+        await testAssertion('$field = "(test)"', { token: '$field = "(test)"' });
+        await testAssertion('$field = "(test) AND $field > 5"', { token: '$field = "(test) AND $field > 5"' });
     });
-    it('should parse regular expressions', () => {
-        testAssertion('$status LIKE /^[a-zA-Z\\(\\)]$/', { token: '$status LIKE /^[a-zA-Z\\(\\)]$/' });
-        testAssertion('$status LIKE /[a-zA-Z"]/', { token: '$status LIKE /[a-zA-Z"]/' });
-        testAssertion('$status LIKE /[a-zA-Z] AND [0-9]/', { token: '$status LIKE /[a-zA-Z] AND [0-9]/' });
-        testAssertion('$status LIKE /(SUCCESS|ERROR)/', { token: '$status LIKE /(SUCCESS|ERROR)/' });
-        testAssertion('$status LIKE /ADD()/', { token: '$status LIKE /ADD()/' });
-        testAssertion('$status LIKE /[a-zA-Z\\/]/', { token: '$status LIKE /[a-zA-Z\\/]/' });
+    it('should parse regular expressions', async () => {
+        await testAssertion('$status LIKE /^[a-zA-Z\\(\\)]$/', { token: '$status LIKE /^[a-zA-Z\\(\\)]$/' });
+        await testAssertion('$status LIKE /[a-zA-Z"]/', { token: '$status LIKE /[a-zA-Z"]/' });
+        await testAssertion('$status LIKE /[a-zA-Z] AND [0-9]/', { token: '$status LIKE /[a-zA-Z] AND [0-9]/' });
+        await testAssertion('$status LIKE /(SUCCESS|ERROR)/', { token: '$status LIKE /(SUCCESS|ERROR)/' });
+        await testAssertion('$status LIKE /ADD()/', { token: '$status LIKE /ADD()/' });
+        await testAssertion('$status LIKE /[a-zA-Z\\/]/', { token: '$status LIKE /[a-zA-Z\\/]/' });
     });
-    it('should throw SyntaxError when invalid syntax is encountered', () => {
-        testError('(invalid', new SyntaxError('expression contains an unclosed group'));
-        testError(')(', new SyntaxError('expression contains an unclosed group'));
-        testError('(invalid))', new SyntaxError('expression contains an unclosed group'));
-        testError('LEN(invalid', new SyntaxError('expression contains an unclosed function'));
-        testError('LEN(LEN(invalid)', new SyntaxError('expression contains an unclosed function'));
-        testError('$a = "invalid', new SyntaxError('expression contains an unclosed string'));
-        testError('$a = "invalid""', new SyntaxError('expression contains an unclosed string'));
-        testError('$a = MULTIPLY(()', new SyntaxError('expression contains an unclosed function'));
-        testError('$status LIKE /test//', new SyntaxError('expression contains an unclosed regular expression'));
-        testError('$status LIKE /test', new SyntaxError('expression contains an unclosed regular expression'));
-        testError('$status LIKE test/', new SyntaxError('expression contains an unclosed regular expression'));
-        testError('$[a = 2', new SyntaxError(`expression contains an unclosed field reference: $[a = 2`));
-        testError('] = 2', new SyntaxError(`expression contains an unclosed field reference: ] = 2`));
-        testError('$] = 2', new SyntaxError(`expression contains an unclosed field reference: $] = 2`));
-        testError('$][ = 2', new SyntaxError(`expression contains an unclosed field reference: $][ = 2`));
+    it('should throw SyntaxError when invalid syntax is encountered', async () => {
+        await testError('(invalid', new SyntaxError('expression contains an unclosed group'));
+        await testError(')(', new SyntaxError('expression contains an unclosed group'));
+        await testError('(invalid))', new SyntaxError('expression contains an unclosed group'));
+        await testError('LEN(invalid', new SyntaxError('expression contains an unclosed function'));
+        await testError('LEN(LEN(invalid)', new SyntaxError('expression contains an unclosed function'));
+        await testError('$a = "invalid', new SyntaxError('expression contains an unclosed string'));
+        await testError('$a = "invalid""', new SyntaxError('expression contains an unclosed string'));
+        await testError('$a = MULTIPLY(()', new SyntaxError('expression contains an unclosed function'));
+        await testError('$status LIKE /test//', new SyntaxError('expression contains an unclosed regular expression'));
+        await testError('$status LIKE /test', new SyntaxError('expression contains an unclosed regular expression'));
+        await testError('$status LIKE test/', new SyntaxError('expression contains an unclosed regular expression'));
+        await testError('$[a = 2', new SyntaxError(`expression contains an unclosed field reference: $[a = 2`));
+        await testError('] = 2', new SyntaxError(`expression contains an unclosed field reference: ] = 2`));
+        await testError('$] = 2', new SyntaxError(`expression contains an unclosed field reference: $] = 2`));
+        await testError('$][ = 2', new SyntaxError(`expression contains an unclosed field reference: $][ = 2`));
     });
 });

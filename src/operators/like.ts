@@ -15,7 +15,8 @@ const like: ComparisonOperator = {
             rightSide = unwrapString(rightSide);
         }
         return new RegExp(rightSide).test(`${leftSide}`);
-    }
+    },
+    precedence: 1
 };
 
 export default like;

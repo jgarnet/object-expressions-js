@@ -18,12 +18,12 @@ describe('upper tests', () => {
         // noinspection TypeScriptValidateTypes
         expect(await upper.evaluate(createContext({}), '"\"Test\""')).toEqual('"TEST"');
     });
-    it('should throw ExpressionError when invalid arguments are received', () => {
-        testError([], new ExpressionError('UPPER() received non-string argument in expression: undefined'));
-        testError({}, new ExpressionError('UPPER() received non-string argument in expression: undefined'));
-        testError(null, new ExpressionError('UPPER() received non-string argument in expression: undefined'));
-        testError(undefined, new ExpressionError('UPPER() received non-string argument in expression: undefined'));
-        testError(20, new ExpressionError('UPPER() received non-string argument in expression: undefined'));
-        testError(true, new ExpressionError('UPPER() received non-string argument in expression: undefined'));
+    it('should throw ExpressionError when invalid arguments are received', async () => {
+        await testError([], new ExpressionError('UPPER() received non-string argument in expression: undefined'));
+        await testError({}, new ExpressionError('UPPER() received non-string argument in expression: undefined'));
+        await testError(null, new ExpressionError('UPPER() received non-string argument in expression: undefined'));
+        await testError(undefined, new ExpressionError('UPPER() received non-string argument in expression: undefined'));
+        await testError(20, new ExpressionError('UPPER() received non-string argument in expression: undefined'));
+        await testError(true, new ExpressionError('UPPER() received non-string argument in expression: undefined'));
     });
 });
