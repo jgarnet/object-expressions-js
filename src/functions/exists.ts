@@ -4,19 +4,18 @@ import ExpressionError from "../expression-error";
 import {isCollection, isWrapped, requireString} from "../_utils";
 import createContext from "../create-context";
 
-const filter: ExpressionFunction = {
+const exists: ExpressionFunction = {
     async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {
         if (args.length < 2) {
-            throw new ExpressionError(`FILTER() requires a value and an expression to filter by; invalid arguments received in ${context.expression}`);
+            throw new ExpressionError(`EXISTS() requires a value and an expression to filter by; invalid arguments received in ${context.expression}`);
         }
         if (!isCollection(args[0])) {
-            throw new ExpressionError(`FILTER() requires the first argument to contain a collection; invalid argument received in ${context.expression}`);
+            throw new ExpressionError(`EXISTS() requires the first argument to contain a collection; invalid argument received in ${context.expression}`);
         }
-        requireString(context, 'FILTER', args[1]);
+        requireString(context, 'EXISTS', args[1]);
         if (!isWrapped(args[1], '(', ')')) {
-            throw new ExpressionError(`FILTER() requires expression argument to be wrapped in parentheses; invalid argument received in ${context.expression}`);
+            throw new ExpressionError(`EXISTS() requires expression argument to be wrapped in parentheses; invalid argument received in ${context.expression}`);
         }
-        const result = [];
         for (const value of args[0]) {
             // noinspection TypeScriptValidateTypes
             const newContext: ExpressionContext<T> = createContext({
@@ -34,11 +33,11 @@ const filter: ExpressionFunction = {
             });
             const matches = await context.expressionEvaluator.evaluate(newContext);
             if (matches) {
-                result.push(value);
+                return true;
             }
         }
-        return result;
+        return false;
     }
 };
 
-export default filter;
+export default exists;

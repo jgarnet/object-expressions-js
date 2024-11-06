@@ -136,6 +136,11 @@ Conditions are represented via an operation containing a left-hand operand, a co
 
 `$cost > 10` `$firstName LIKE ^J.+N$` `$fullName = "John Doe"`
 
+A condition may contain a single function call if the function returns a boolean value:
+
+- `EXISTS($items, ($ HAS $sku))`
+- If a non-boolean result is returned, an `ExpressionError` will be thrown during evaluation.
+
 If an expression contains imbalanced or invalid conditions (invalid number of operands, invalid comparison operators), a `SyntaxError` will be thrown during evaluation.
 
 #### Comparison Operators
@@ -245,25 +250,25 @@ Various functions are provided by default, but it is possible to overwrite or ex
   - Requires at least two arguments.
   - String arguments represent field paths which will be retrieved from the object being evaluated.
   - `ADD($fieldA,$fieldB.0.value)` `ADD($fieldA,2)` `ADD(2,2)`
-- `SUBTRACT`
-  - Calculates the difference of all arguments and returns the result.
-  - Requires at least two arguments.
-  - String arguments represent field paths which will be retrieved from the object being evaluated.
-  - `SUBTRACT($fieldA,$fieldB.0.value)` `SUBTRACT($fieldA,2)` `SUBTRACT(2,2)`
-- `MULTIPLY`
-  - Calculates the product of all arguments and returns the result.
-  - Requires at least two arguments.
-  - String arguments represent field paths which will be retrieved from the object being evaluated.
-  - `MULTIPLY($fieldA,$fieldB.0.value)` `MULTIPLY($fieldA,2)` `MULTIPLY(2,2)`
 - `DIVIDE`
   - Calculates the quotient of all arguments and returns the result.
   - Requires at least two arguments.
   - String arguments represent field paths which will be retrieved from the object being evaluated.
   - `DIVIDE($fieldA,$fieldB.0.value)` `DIVIDE($fieldA,2)` `DIVIDE(2,2)`
+- `MULTIPLY`
+  - Calculates the product of all arguments and returns the result.
+  - Requires at least two arguments.
+  - String arguments represent field paths which will be retrieved from the object being evaluated.
+  - `MULTIPLY($fieldA,$fieldB.0.value)` `MULTIPLY($fieldA,2)` `MULTIPLY(2,2)`
 - `POW`
   - Calculates and returns the result of a base raised to the power of an exponent.
   - Requires two numeric arguments.
   - `POW($a,2)` `POW(10,2)` `POW($a,$b)`
+- `SUBTRACT`
+  - Calculates the difference of all arguments and returns the result.
+  - Requires at least two arguments.
+  - String arguments represent field paths which will be retrieved from the object being evaluated.
+  - `SUBTRACT($fieldA,$fieldB.0.value)` `SUBTRACT($fieldA,2)` `SUBTRACT(2,2)`
 
 #### String Functions
 
@@ -279,20 +284,27 @@ Various functions are provided by default, but it is possible to overwrite or ex
 
 #### Collection Functions
 
-- `SIZE`
-  - Returns the size of a collection.
-  - `SIZE($)` `SIZE($items)`
+- `EXISTS`
+  - Returns `true` if any item in a collection matches an expression, or `false` otherwise.
+  - Accepts the following parameters:
+    - **value**: A collection or a reference to a collection field (i.e. `$collection`).
+    - **expression**: The expression used to filter each item in the collection (i.e. `($ LIKE ^\\d+$)`). The expression must be wrapped in parentheses for parsing.
+  - `EXISTS($, ($ >= 4))` `EXISTS($items, ($sku LIKE ^\\d+-\\w+$))`
 - `FILTER`
   - Filters the items of a collection based on an expression.
   - Accepts the following parameters:
-    - A collection or a reference to a collection field (i.e. `$collection`).
-    - The expression used to filter each item in the collection (i.e. `($ LIKE ^\\d+$)`).
-      - The expression must be wrapped in parentheses for parsing.
-    - An optional field path to extract from the resulting collection (i.e. `0`, `$field`, etc.).
-      - If referencing a field path, a string must be passed, denoted by double quotes.
-      - If a direct field reference is passed, its value will be evaluated and used.
-      - For example, `FILTER($items, ($cost >= 5), $name)` is *not* the same as `FILTER($items, ($cost >= 5), "$name")`.
-  - `FILTER($, ($ >= 4))` `FILTER($items, ($sku LIKE ^\\d+-\\w+$), "$[0].sku")`
+    - **value**: A collection or a reference to a collection field (i.e. `$collection`).
+    - **expression**: The expression used to filter each item in the collection (i.e. `($ LIKE ^\\d+$)`). The expression must be wrapped in parentheses for parsing.
+  - `FILTER($, ($ >= 4))` `FILTER($items, ($sku LIKE ^\\d+-\\w+$))`
+- `GET`
+  - Retrieves a value from a collection at a given path.
+  - Accepts the following parameters:
+    - **collection**: The collection.
+    - **path**: The path to the value in the collection.
+  - `GET($items, "$[0].sku")` `GET(FILTER($, ($ >= 2)), "$[0]")`
+- `SIZE`
+  - Returns the size of a collection.
+  - `SIZE($)` `SIZE($items)`
 
 ### Precedence
 

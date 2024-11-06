@@ -30,12 +30,6 @@ describe('filter tests', () => {
         await testAssertion([new Set([]), '($ = 2)'], []);
         await testAssertion([new Set([1,3,4,5]), '($ = 2)'], []);
     });
-    it('should retrieve a specified path from the filtered results', async () => {
-        await testAssertion([[1,2,3,4], '($ = 2)', '$[0]'], 2);
-        await testAssertion([[1,2,3,4], '($ = 2)', 0], 2);
-        await testAssertion([[1,2,3,4], '($ = 2)', '0'], 2);
-        await testAssertion([[{ a: 'test', b: 'test2', c: 'test3' }], '($a LIKE test[^\\d]*)', '$[0].a'], 'test');
-    });
     it('should throw error when invalid number of arguments is received', async () => {
         await testError([], new ExpressionError('FILTER() requires a value and an expression to filter by; invalid arguments received in exp'));
         await testError([[]], new ExpressionError('FILTER() requires a value and an expression to filter by; invalid arguments received in exp'));
@@ -48,10 +42,6 @@ describe('filter tests', () => {
         await testError([[], 1], new ExpressionError('FILTER() received non-string argument in expression: exp'));
         await testError([[], {}], new ExpressionError('FILTER() received non-string argument in expression: exp'));
         await testError([[], []], new ExpressionError('FILTER() received non-string argument in expression: exp'));
-    });
-    it('should throw error when invalid path is received', async () => {
-        await testError([[], '(expression)', {}], new ExpressionError('FILTER() received non-string argument in expression: exp'));
-        await testError([[], '(expression)', []], new ExpressionError('FILTER() received non-string argument in expression: exp'));
     });
     it('should throw error if expression is not wrapped in parentheses', async () => {
         await testError([[], 'expression'], new ExpressionError('FILTER() requires expression argument to be wrapped in parentheses; invalid argument received in exp'));

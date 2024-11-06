@@ -3,13 +3,26 @@ import ExpressionContext from "./types/expression-context";
 import ComparisonOperator from "./types/comparison-operator";
 import {consoleColors, debug, getField} from "./_utils";
 import SyntaxError from "./syntax-error";
+import ExpressionError from "./expression-error";
 
 class BaseConditionEvaluator implements ConditionEvaluator {
     async evaluate<T>(token: string, context: ExpressionContext<T>): Promise<boolean> {
         const tokens = this.getTokens(token, context);
         const [operandA, operator, operandB] = tokens;
+        if (this.isSingleFunctionCall(tokens, context)) {
+            // allow a single function call to be evaluated if boolean result is returned
+            const result = await context.functionEvaluator.evaluate(operandB, context);
+            if (result !== true && result !== false) {
+                throw new ExpressionError(`Cannot evaluate truthiness of ${result} in ${context.expression}`);
+            }
+            debug(consoleColors.blue + operandB + consoleColors.reset + ' = ' +
+                (result ? consoleColors.green : consoleColors.red) + result + consoleColors.reset,
+                context
+            );
+            return result as boolean;
+        }
         if (operandA.length === 0 || operator.length === 0 || operandB.length === 0) {
-            throw new SyntaxError(`received invalid condition ${token}`);
+            throw new SyntaxError(`Received invalid condition ${token}`);
         }
         const leftSide = await this.evaluateOperand(operandA, context);
         const rightSide = await this.evaluateOperand(operandB, context);
@@ -163,6 +176,16 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         }
         // the operand is some primitive or other value -- return as-is
         return token;
+    }
+
+    /**
+     * Determines if the condition is composed of a single function call.
+     * @param tokens The condition tokens (left-side operand, operator, right-side operand).
+     * @param context The {@link ExpressionContext}.
+     * @private
+     */
+    private isSingleFunctionCall<T>(tokens: string[], context: ExpressionContext<T>): boolean {
+        return tokens[0].length === 0 && tokens[1].length === 0 && context.functionEvaluator.isFunction(tokens[2], context);
     }
 }
 

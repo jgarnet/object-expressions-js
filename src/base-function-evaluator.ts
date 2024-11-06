@@ -11,10 +11,21 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
      * @param context The {@link ExpressionContext}.
      */
     isFunction<T>(token: string, context: ExpressionContext<T>): boolean {
-        const firstParen = token.indexOf('(');
-        const lastParen = token.lastIndexOf(')');
-        if (firstParen === -1 || lastParen === -1) {
+        if (!/^(?!<\s)\w+(?=\()/.test(token)) {
             return false;
+        }
+        const firstParen = token.indexOf('(');
+        let parenCount = 0;
+        for (let i = firstParen; i < token.length; i++) {
+            const char = token[i];
+            if (char === '(') {
+                parenCount++;
+            } else if (char === ')') {
+                parenCount--;
+                if (parenCount === 0 && i + 1 < token.length) {
+                    return false;
+                }
+            }
         }
         const possibleKey = token.slice(0, firstParen).trim().toUpperCase();
         return context.functions.has(possibleKey);

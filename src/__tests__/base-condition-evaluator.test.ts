@@ -5,6 +5,7 @@ import operators from "../operators/_operators";
 import functions from "../functions/_functions";
 import createContext from "../create-context";
 import SyntaxError from "../syntax-error";
+import ExpressionError from "../expression-error";
 
 const evaluator = new BaseConditionEvaluator();
 
@@ -104,10 +105,10 @@ describe('BaseConditionEvaluator tests',  () => {
         await testAssertion('$field=5', { field: 5 }, true);
     });
     it('should throw errors for invalid operators / conditions', async () => {
-        await testError('$A ~ 1', {}, new SyntaxError('received invalid condition $A ~ 1'));
-        await testError('$A == 1', {}, new SyntaxError('received invalid condition $A == 1'));
-        await testError('$A==1', {}, new SyntaxError('received invalid condition $A==1'));
-        await testError('$A CONTAINS 1', {}, new SyntaxError('received invalid condition $A CONTAINS 1'));
+        await testError('$A ~ 1', {}, new SyntaxError('Received invalid condition $A ~ 1'));
+        await testError('$A == 1', {}, new SyntaxError('Received invalid condition $A == 1'));
+        await testError('$A==1', {}, new SyntaxError('Received invalid condition $A==1'));
+        await testError('$A CONTAINS 1', {}, new SyntaxError('Received invalid condition $A CONTAINS 1'));
     });
     it('should not evaluate functions inside strings', async () => {
         await testAssertion('$field = "LEN($field)"', { field: 'LEN($field)' }, true);
@@ -115,8 +116,15 @@ describe('BaseConditionEvaluator tests',  () => {
         await testAssertion('LEN(/LEN($FIELD)/) = 13', { field: 'test' }, true);
         await testAssertion('LEN("TEST,") = 5', {}, true);
         await testAssertion('LEN(/TEST,/) = 7', {}, true);
+        await testError('"LEN($field)"', {}, new ExpressionError('Received invalid condition "LEN($field)"'));
     });
     it('should not evaluate functions inside regex', async () => {
         await testAssertion('$field = /LEN($field)/', { field: '/LEN($field)/' }, true);
+        await testError('/LEN($field)/', {}, new ExpressionError('Received invalid condition /LEN($field)/'));
+    });
+    it('should evaluate a single function if result is boolean', async () => {
+        await testAssertion('exists($, ($ = 1))', [2,3,1], true);
+        await testError('filter($, ($ = 1))', [3,2,1], new ExpressionError('Cannot evaluate truthiness of 1 in '));
+        await testError('exists($, ($ = 1)) exists($, ($ = 1))', [2,3,1], new ExpressionError('Received invalid condition exists($, ($ = 1)) exists($, ($ = 1))'));
     });
 });
