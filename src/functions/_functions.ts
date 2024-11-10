@@ -11,6 +11,7 @@ import lower from "./lower";
 import filter from "./filter";
 import exists from "./exists";
 import get from "./get";
+import last from "./last";
 
 const functions = new Map<string, ExpressionFunction>;
 
@@ -19,6 +20,7 @@ functions.set("DIVIDE", divide);
 functions.set("EXISTS", exists);
 functions.set("FILTER", filter);
 functions.set("GET", get);
+functions.set("LAST", last);
 functions.set("LEN", len);
 functions.set("LOWER", lower);
 functions.set("MULTIPLY", multiply);

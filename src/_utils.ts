@@ -88,6 +88,22 @@ const isCollection = (value: any): boolean => {
     return isArray(value) || isSet(value);
 };
 
+const requireCollection = <T>(context: ExpressionContext<T>, funcKey: string, ...values: any[]): void => {
+    for (const value of values) {
+        if (!isCollection(value)) {
+            throw new ExpressionError(`${funcKey}() received non-collection argument in expression: ${context.expression}`);
+        }
+    }
+};
+
+const requireArray = <T>(context: ExpressionContext<T>, funcKey: string, ...values: any[]): void => {
+    for (const value of values) {
+        if (!isArray(value)) {
+            throw new ExpressionError(`${funcKey}() received non-array argument in expression: ${context.expression}`);
+        }
+    }
+};
+
 export {
     consoleColors,
     debug,
@@ -96,6 +112,8 @@ export {
     isNumber,
     isWrapped,
     parseNumber,
+    requireArray,
+    requireCollection,
     requireString,
     unwrapValue,
     unwrapString

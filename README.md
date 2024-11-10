@@ -303,6 +303,9 @@ Various functions are provided by default, but it is possible to overwrite or ex
     - **collection**: The collection.
     - **path**: The path to the value in the collection.
   - `GET($items, "$0.sku")` `GET(FILTER($, ($ >= 2)), "$0")`
+- `LAST`
+  - Returns the last element in an array.
+  - `LAST($items)` `LAST($)`
 - `SIZE`
   - Returns the size of a collection.
   - `SIZE($)` `SIZE($items)`
