@@ -12,12 +12,12 @@ import filter from "./filter";
 import exists from "./exists";
 import get from "./get";
 import last from "./last";
-import compareDates from "./compare-dates";
+import dateCompare from "./date-compare";
 
 const functions = new Map<string, ExpressionFunction>;
 
 functions.set("ADD", add);
-functions.set("COMP_DT", compareDates);
+functions.set("DATECOMP", dateCompare);
 functions.set("DIVIDE", divide);
 functions.set("EXISTS", exists);
 functions.set("FILTER", filter);

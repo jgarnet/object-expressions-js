@@ -127,6 +127,22 @@ const extractSettings = <T> (context: ExpressionContext<T>, funcKey: string, ...
     return map;
 };
 
+/**
+ * Parses and returns the value of a setting from a function's arguments.
+ * Allows fields to be extracted and unwraps string values.
+ * @param context The {@link ExpressionContext}.
+ * @param settings The function settings Map.
+ * @param key The key of the target setting.
+ * @param object Optional object which fields can be extracted from.
+ */
+const parseSetting = <T> (context: ExpressionContext<T>, settings: Map<string, any>, key: string, object?: any): any => {
+    let value = settings.get(key);
+    if (typeof value === 'string' && value.startsWith('$')) {
+        value = getField(value, context, object);
+    }
+    return unwrapString(value);
+};
+
 export {
     consoleColors,
     debug,
@@ -136,6 +152,7 @@ export {
     isNumber,
     isWrapped,
     parseNumber,
+    parseSetting,
     requireArray,
     requireCollection,
     requireString,

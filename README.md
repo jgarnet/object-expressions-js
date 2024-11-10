@@ -310,6 +310,26 @@ Various functions are provided by default, but it is possible to overwrite or ex
   - Returns the size of a collection.
   - `SIZE($)` `SIZE($items)`
 
+#### Date Functions
+
+- `DATECOMP`
+  - Compares two dates and returns `true` or `false` based on the comparison result.
+  - Accepts the following parameters:
+    - **date a (required)**: The first date being compared.
+    - **date b (required)**: The second date being compared.
+    - The following arguments may be optionally passed as flags in any order:
+      - **format**: The format used to parse both dates. Defaults to ISO 8601.
+      - **formatA**: The format used to parse the first date. Defaults to ISO 8601.
+      - **formatB**: The format used to parse the second date. Defaults to ISO 8601.
+      - **timezone**: The timezone used to parse both dates. Defaults to UTC.
+      - **timezoneA**: The timezone used to parse the first date. Defaults to UTC.
+      - **timezoneB**: The timezone used to parse the second date. Defaults to UTC.
+      - **operator**: The comparison operator used to compare the dates. Defaults to `=`.
+        - Allowed values include `=`, `>`, `>=`, `<`, `<=`.
+      - **unit**: The unit of comparison. Defaults to `day`.
+        - Allowed values include `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`, `millisecond`.
+  - `DATECOMP($a, $b, timezone=America/New_York)` `DATECOMP($a, $b, operator=>=, unit=hour)`
+
 ### Precedence
 
 When evaluating an expression, the following tokens are parsed:
