@@ -111,7 +111,7 @@ const requireArray = <T>(context: ExpressionContext<T>, funcKey: string, ...valu
  * @param funcKey The function arguments are being extracted for.
  * @param args The arguments passed to the function.
  */
-const extractArgs = <T> (context: ExpressionContext<T>, funcKey: string, ...args: any[]): Map<string, any> => {
+const extractSettings = <T> (context: ExpressionContext<T>, funcKey: string, ...args: any[]): Map<string, any> => {
     const map = new Map<string, any>();
     for (const arg of args) {
         if (typeof arg === 'string' && /^[a-zA-Z_0-9]+=.+$/.test(arg)) {
@@ -130,7 +130,7 @@ const extractArgs = <T> (context: ExpressionContext<T>, funcKey: string, ...args
 export {
     consoleColors,
     debug,
-    extractArgs,
+    extractSettings,
     getField,
     isCollection,
     isNumber,

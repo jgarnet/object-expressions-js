@@ -18,6 +18,9 @@ import operators from "./operators/_operators";
 import PathEvaluator from "./types/path-evaluator";
 import SyntaxError from "./syntax-error";
 import * as utils from './_utils';
+const luxon = require("luxon");
+const Settings = luxon.Settings;
+Settings.throwOnInvalid = true;
 
 export {
     BaseConditionEvaluator,
