@@ -104,9 +104,33 @@ const requireArray = <T>(context: ExpressionContext<T>, funcKey: string, ...valu
     }
 };
 
+/**
+ * Allows function parameters to be defined using syntax FUNC(arg0=val0,arg1=val1,...)
+ * So that arguments can be optional and defined in any order.
+ * @param context The {@link ExpressionContext}.
+ * @param funcKey The function arguments are being extracted for.
+ * @param args The arguments passed to the function.
+ */
+const extractArgs = <T> (context: ExpressionContext<T>, funcKey: string, ...args: any[]): Map<string, any> => {
+    const map = new Map<string, any>();
+    for (const arg of args) {
+        if (typeof arg === 'string' && /^[a-zA-Z_0-9]+=.+$/.test(arg)) {
+            const splitIndex = arg.indexOf('=');
+            const key = arg.slice(0, splitIndex).trim();
+            if (map.has(key)) {
+                throw new ExpressionError(`${funcKey}() received duplicate argument ${key} in expression: ${context.expression}`);
+            }
+            const value = arg.slice(splitIndex + 1).trim();
+            map.set(key, value);
+        }
+    }
+    return map;
+};
+
 export {
     consoleColors,
     debug,
+    extractArgs,
     getField,
     isCollection,
     isNumber,
