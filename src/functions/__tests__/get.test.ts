@@ -29,6 +29,6 @@ describe('get tests', () => {
     it('should retrieve an item from a collection given a path', async () => {
         await testAssertion([[0,1], 1], 1);
         await testAssertion([[0,1], '1'], 1);
-        await testAssertion([[{ a: 1 }, { a: 2 }], '$[0].a'], 1);
+        await testAssertion([[{ a: 1 }, { a: 2 }], '$0.a'], 1);
     });
 });

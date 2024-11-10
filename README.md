@@ -50,17 +50,18 @@ evaluate({
 ```
 
 A field may be evaluated on an object by referencing its path in the object, preceded by the `$` symbol. The following conventions are supported:
-- $rootField `{"rootField": "value"}`
-- $nested.field `{"nested": {"field": "value"}}`
-- $collection.0.field `{"collection": [{"field": "value"}]}`
+- `$rootField` (root field access) `{"rootField": "value"}`
+- `$nested.field` (nested field access) `{"nested": {"field": "value"}}`
+- `$0` (collection access) `[{ "name": "John Doe" }]`
+- `$collection.0.field` (nested collection access) `{"collection": [{"field": "value"}]}`
 
 Field paths which contain whitespace or symbols must be enclosed in brackets:
-- $[field with whitespace] `{"field with whitespace": "value"}`
-- $[field with /)("] `{"field with /)(\"": "value"}`
+- `$[field with whitespace]` (fields with whitespace) `{"field with whitespace": "value"}`
+- `$[field with /)("]` (fields with special characters) `{"field with /)(\"": "value"}`
 
 The object itself may be referenced using the `$` symbol:
-- $ HAS field
-- SIZE($)
+- `$ HAS field`
+- `SIZE($)`
 
 ### Logical Operators
 
@@ -301,7 +302,7 @@ Various functions are provided by default, but it is possible to overwrite or ex
   - Accepts the following parameters:
     - **collection**: The collection.
     - **path**: The path to the value in the collection.
-  - `GET($items, "$[0].sku")` `GET(FILTER($, ($ >= 2)), "$[0]")`
+  - `GET($items, "$0.sku")` `GET(FILTER($, ($ >= 2)), "$0")`
 - `SIZE`
   - Returns the size of a collection.
   - `SIZE($)` `SIZE($items)`
