@@ -1,9 +1,14 @@
 import ExpressionContext from "./types/expression-context";
 import ExpressionError from "./expression-error";
+import {DateTime} from "luxon";
 
 const isArray = require("lodash/isArray");
 const isBoolean = require("lodash/isBoolean");
 const isSet = require("lodash/isSet");
+
+const luxon = require("luxon");
+const Settings = luxon.Settings;
+Settings.throwOnInvalid = true;
 
 const getField = <T>(field: string, context: ExpressionContext<T>, object?: any): any => {
     if (field === '$') {
@@ -143,7 +148,79 @@ const parseSetting = <T> (context: ExpressionContext<T>, settings: Map<string, a
     return unwrapString(value);
 };
 
+/**
+ * Parses a date value with support for timezone and format string.
+ * @param context The {@link ExpressionContext}.
+ * @param funcKey The key of the function parsing the date.
+ * @param date The date value, which may include a JS Date, Luxon DateTime, Object, or String.
+ * @param opts Optional options which may specify timezone or format string to be used during parsing.
+ */
+const parseDate = <T> (context: ExpressionContext<T>, funcKey: string, date: any, opts?: { zone?: string, format?: string }): DateTime => {
+    const zone = opts?.zone;
+    const format = opts?.format;
+    try {
+        if (date instanceof Date) {
+            return DateTime.fromJSDate(date, { zone });
+        }
+        if (date instanceof DateTime) {
+            return date.setZone(zone);
+        }
+        if (typeof date === 'object') {
+            return DateTime.fromObject(date, { zone });
+        }
+        if (typeof date === 'string') {
+            if (/^NOW([+-]?\d+([a-zA-Z]))*$/.test(date)) {
+                const now = DateTime.now().setZone(zone);
+                const intervalStr = date.slice(3);
+                if (intervalStr.length > 0) {
+                    return applyDateInterval(now, funcKey, intervalStr);
+                }
+                return now;
+            }
+            return format ? DateTime.fromFormat(date, format, { zone }) : DateTime.fromISO(date, { zone });
+        }
+        if (isNumber(date)) {
+            return DateTime.fromMillis(date, { zone });
+        }
+        throw new ExpressionError(`${funcKey}() received an unsupported Date value in expression: ${context.expression}`);
+    } catch (error) {
+        if (error instanceof ExpressionError) {
+            throw error;
+        }
+        const expressionError = new ExpressionError(`${funcKey}() failed to parse date ${date} in expression: ${context.expression}`);
+        expressionError.cause = error as Error;
+        throw expressionError;
+    }
+};
+
+/**
+ * Applies an interval to a DateTime instance.
+ * @param date The DateTime instance.
+ * @param funcKey The function this operation is being performed in.
+ * @param intervalStr The interval being applied to the date.
+ */
+const applyDateInterval = (date: DateTime, funcKey: string, intervalStr: string): DateTime => {
+    const interval = intervalStr.split(/[+-]\d+/);
+    const unit = intervalStr.split(/[a-zA-Z]/);
+    if (interval.length == 2 && unit.length == 2) {
+        switch (interval[1]) {
+            case 'Y':
+                return date.plus({ years: Number(unit[0]) });
+            case 'M':
+                return date.plus({ months: Number(unit[0]) });
+            case 'D':
+                return date.plus({ days: Number(unit[0]) });
+            case 'H':
+                return date.plus({ hours: Number(unit[0]) });
+            case 'm':
+                return date.plus({ minutes: Number(unit[0]) });
+        }
+    }
+    throw new ExpressionError(`${funcKey}() received invalid interval ${intervalStr}`);
+};
+
 export {
+    applyDateInterval,
     consoleColors,
     debug,
     extractSettings,
@@ -151,6 +228,7 @@ export {
     isCollection,
     isNumber,
     isWrapped,
+    parseDate,
     parseNumber,
     parseSetting,
     requireArray,

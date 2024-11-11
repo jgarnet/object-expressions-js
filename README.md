@@ -315,8 +315,8 @@ Various functions are provided by default, but it is possible to overwrite or ex
 - `DATECOMP`
   - Compares two dates and returns `true` or `false` based on the comparison result.
   - Accepts the following parameters:
-    - **date a (required)**: The first date being compared.
-    - **date b (required)**: The second date being compared.
+    - **dateA (required)**: The first date being compared.
+    - **dateB (required)**: The second date being compared.
     - The following arguments may be optionally passed as flags in any order:
       - **format**: The format used to parse both dates. Defaults to ISO 8601.
       - **formatA**: The format used to parse the first date. Defaults to ISO 8601.
@@ -328,7 +328,14 @@ Various functions are provided by default, but it is possible to overwrite or ex
         - Allowed values include `=`, `>`, `>=`, `<`, `<=`.
       - **unit**: The unit of comparison. Defaults to `day`.
         - Allowed values include `year`, `quarter`, `month`, `week`, `day`, `hour`, `minute`, `second`, `millisecond`.
-  - `DATECOMP($a, $b, timezone=America/New_York)` `DATECOMP($a, $b, operator=>=, unit=hour)`
+  - **dateA** and **dateB** may reference the current date by using the `NOW` value.
+    - Intervals are supported with the syntax `NOW[+-]\d+[YMmDH]`.
+      - `Y`: years
+      - `M`: months
+      - `D`: days
+      - `H`: hours
+      - `m`: minutes
+  - `DATECOMP($a, $b, timezone=America/New_York)` `DATECOMP($a, $b, operator=>=, unit=hour)` `DATECOMP($a, NOW+1M, operator=<)`
 
 ### Precedence
 

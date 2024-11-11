@@ -2,7 +2,7 @@ import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
 import {DateTime, DateTimeUnit} from "luxon";
 import ExpressionError from "../expression-error";
-import {extractSettings, parseSetting} from "../_utils";
+import {extractSettings, parseDate, parseSetting} from "../_utils";
 
 const dateCompare: ExpressionFunction = {
     async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {
@@ -18,51 +18,9 @@ const dateCompare: ExpressionFunction = {
         const zoneB = parseSetting(context, settings, 'timezoneB') ?? zone;
         const operator = parseSetting(context, settings, 'operator') ?? '=';
         const unit = parseSetting(context, settings, 'unit') ?? 'day';
-        const a = parse(context, args[0], zoneA, formatA);
-        const b = parse(context, args[1], zoneB, formatB);
+        const a = parseDate(context, 'DATECOMP', args[0], { zone: zoneA, format: formatA });
+        const b = parseDate(context, 'DATECOMP', args[1], { zone: zoneB, format: formatB });
         return compare(a, b, operator, unit, zoneA, context);
-    }
-};
-
-const parse = <T> (context: ExpressionContext<T>, date: any, zone: string, format?: string): DateTime => {
-    try {
-        if (date instanceof Date) {
-            return DateTime.fromJSDate(date, { zone });
-        }
-        if (date instanceof DateTime) {
-            return date.setZone(zone);
-        }
-        if (typeof date === 'string' && /^NOW([+-]?\d+([a-zA-Z]))*$/.test(date)) {
-            const now = DateTime.now().setZone(zone);
-            const intervalStr = date.slice(3);
-            const interval = intervalStr.split(/[+-]\d+/);
-            const unit = intervalStr.split(/[a-zA-Z]/);
-            if (interval.length == 2 && unit.length == 2) {
-                switch (interval[1]) {
-                    case 'Y':
-                        return now.plus({ years: Number(unit[0]) });
-                    case 'M':
-                        return now.plus({ months: Number(unit[0]) });
-                    case 'D':
-                        return now.plus({ days: Number(unit[0]) });
-                    case 'H':
-                        return now.plus({ hours: Number(unit[0]) });
-                    case 'm':
-                        return now.plus({ minutes: Number(unit[0]) });
-                    default:
-                        throw new ExpressionError(`DATECOMP() received invalid interval ${date} in expression: ${context.expression}`);
-                }
-            }
-            return now;
-        }
-        return format ? DateTime.fromFormat(date, format, { zone }) : DateTime.fromISO(date, { zone });
-    } catch (error) {
-        if (error instanceof ExpressionError) {
-            throw error;
-        }
-        const expressionError = new ExpressionError(`DATECOMP() failed to parse date ${date} in expression: ${context.expression}`);
-        expressionError.cause = error as Error;
-        throw expressionError;
     }
 };
 

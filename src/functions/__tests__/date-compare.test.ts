@@ -3,10 +3,6 @@ import createContext from "../../create-context";
 import dateCompare from "../date-compare";
 import {DateTime} from "luxon";
 
-const luxon = require("luxon");
-const Settings = luxon.Settings;
-Settings.throwOnInvalid = true;
-
 const testAssertion = async (args: any[], result: any) => {
     const ctx = createContext({});
     expect(await dateCompare.evaluate(ctx, ...args)).toEqual(result);
@@ -81,8 +77,8 @@ describe('dateCompare tests', () => {
         await testAssertion([DateTime.now().minus({ hours: 1 }), 'NOW-1H'], true);
         await testAssertion([DateTime.now().plus({ minutes: 1 }), 'NOW+1m'], true);
         await testAssertion([DateTime.now().minus({ minutes: 1 }), 'NOW-1m'], true);
-        await testError(['NOW+1f', 'NOW'], 'DATECOMP() received invalid interval NOW+1f in expression: exp');
-        await testError(['NOW+1d', 'NOW'], 'DATECOMP() received invalid interval NOW+1d in expression: exp');
+        await testError(['NOW+1f', 'NOW'], 'DATECOMP() received invalid interval +1f');
+        await testError(['NOW+1d', 'NOW'], 'DATECOMP() received invalid interval +1d');
     });
     it('should throw error when parsing error is encountered', async () => {
         await testError(['2024-01-01', '2024-01-01', 'format=invalid'], 'DATECOMP() failed to parse date 2024-01-01 in expression: exp');
