@@ -8,6 +8,7 @@ const evaluate = async <T> (context: Partial<ExpressionContext<T>>): Promise<boo
         return await ctx.expressionEvaluator.evaluate(ctx);
     } catch (error) {
         if (error instanceof ExpressionError) {
+            error.expression = context.expression;
             throw error;
         }
         const expressionError = new ExpressionError(`Encountered runtime error when evaluating expression: ${context.expression}`);
