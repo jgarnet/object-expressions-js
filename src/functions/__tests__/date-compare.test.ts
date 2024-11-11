@@ -1,6 +1,7 @@
 import {expect} from "@jest/globals";
 import createContext from "../../create-context";
 import dateCompare from "../date-compare";
+import {DateTime} from "luxon";
 
 const luxon = require("luxon");
 const Settings = luxon.Settings;
@@ -61,6 +62,27 @@ describe('dateCompare tests', () => {
         await testAssertion(['2024-01-01T04:00:00.000+04:00', '2024-01-01T00:00:00.000Z', 'unit=hour'], true);
         await testAssertion(['2024-01-01 04:00', '2024-01-01 00:00', 'unit=hour', 'format=yyyy-MM-dd HH:mm', 'timezoneA=UTC+4', 'timezoneB=UTC'], true);
         await testAssertion(['2024-01-01 00:00', '2024-01-01 00:00', 'unit=hour', 'format=yyyy-MM-dd HH:mm', 'timezoneA=UTC+4', 'timezoneB=UTC'], false);
+    });
+    it('should compare JS dates', async () => {
+        await testAssertion([new Date(), new Date()], true);
+    });
+    it('should compare luxon DateTimes', async () => {
+        await testAssertion([DateTime.now(), DateTime.now()], true);
+    });
+    it('should parse NOW and intervals', async () => {
+        await testAssertion([DateTime.now(), 'NOW'], true);
+        await testAssertion([DateTime.now().plus({ years: 1 }), 'NOW+1Y'], true);
+        await testAssertion([DateTime.now().minus({ years: 1 }), 'NOW-1Y'], true);
+        await testAssertion([DateTime.now().plus({ months: 1 }), 'NOW+1M'], true);
+        await testAssertion([DateTime.now().minus({ months: 1 }), 'NOW-1M'], true);
+        await testAssertion([DateTime.now().plus({ days: 1 }), 'NOW+1D'], true);
+        await testAssertion([DateTime.now().minus({ days: 1 }), 'NOW-1D'], true);
+        await testAssertion([DateTime.now().plus({ hours: 1 }), 'NOW+1H'], true);
+        await testAssertion([DateTime.now().minus({ hours: 1 }), 'NOW-1H'], true);
+        await testAssertion([DateTime.now().plus({ minutes: 1 }), 'NOW+1m'], true);
+        await testAssertion([DateTime.now().minus({ minutes: 1 }), 'NOW-1m'], true);
+        await testError(['NOW+1f', 'NOW'], 'DATECOMP() received invalid interval NOW+1f in expression: exp');
+        await testError(['NOW+1d', 'NOW'], 'DATECOMP() received invalid interval NOW+1d in expression: exp');
     });
     it('should throw error when parsing error is encountered', async () => {
         await testError(['2024-01-01', '2024-01-01', 'format=invalid'], 'DATECOMP() failed to parse date 2024-01-01 in expression: exp');

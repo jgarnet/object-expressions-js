@@ -24,10 +24,42 @@ const dateCompare: ExpressionFunction = {
     }
 };
 
-const parse = <T> (context: ExpressionContext<T>, date: string, zone: string, format?: string): DateTime => {
+const parse = <T> (context: ExpressionContext<T>, date: any, zone: string, format?: string): DateTime => {
     try {
+        if (date instanceof Date) {
+            return DateTime.fromJSDate(date, { zone });
+        }
+        if (date instanceof DateTime) {
+            return date.setZone(zone);
+        }
+        if (typeof date === 'string' && /^NOW([+-]?\d+([a-zA-Z]))*$/.test(date)) {
+            const now = DateTime.now().setZone(zone);
+            const intervalStr = date.slice(3);
+            const interval = intervalStr.split(/[+-]\d+/);
+            const unit = intervalStr.split(/[a-zA-Z]/);
+            if (interval.length == 2 && unit.length == 2) {
+                switch (interval[1]) {
+                    case 'Y':
+                        return now.plus({ years: Number(unit[0]) });
+                    case 'M':
+                        return now.plus({ months: Number(unit[0]) });
+                    case 'D':
+                        return now.plus({ days: Number(unit[0]) });
+                    case 'H':
+                        return now.plus({ hours: Number(unit[0]) });
+                    case 'm':
+                        return now.plus({ minutes: Number(unit[0]) });
+                    default:
+                        throw new ExpressionError(`DATECOMP() received invalid interval ${date} in expression: ${context.expression}`);
+                }
+            }
+            return now;
+        }
         return format ? DateTime.fromFormat(date, format, { zone }) : DateTime.fromISO(date, { zone });
     } catch (error) {
+        if (error instanceof ExpressionError) {
+            throw error;
+        }
         const expressionError = new ExpressionError(`DATECOMP() failed to parse date ${date} in expression: ${context.expression}`);
         expressionError.cause = error as Error;
         throw expressionError;
