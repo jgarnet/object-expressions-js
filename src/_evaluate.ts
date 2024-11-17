@@ -1,10 +1,10 @@
 import evaluate from "./index";
-import {consoleColors} from "./_utils";
+import {CONSOLE_COLORS} from "./_utils";
 
 const expression = process.argv[2];
 const object = JSON.parse(process.argv[3]);
 
-const { red, green, blue, reset } = consoleColors;
+const { red, green, blue, reset } = CONSOLE_COLORS;
 
 console.log('Evaluating expression: ' + blue + expression + reset);
 evaluate({ expression, object, debug: true }).then(result => {

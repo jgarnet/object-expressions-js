@@ -1,7 +1,7 @@
 import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
 import ComparisonOperator from "./types/comparison-operator";
-import {consoleColors, debug, getField} from "./_utils";
+import {CONSOLE_COLORS, debug, getField} from "./_utils";
 import SyntaxError from "./syntax-error";
 import ExpressionError from "./expression-error";
 
@@ -15,8 +15,8 @@ class BaseConditionEvaluator implements ConditionEvaluator {
             if (result !== true && result !== false) {
                 throw new ExpressionError(`Cannot evaluate truthiness of ${result} in ${context.expression}`);
             }
-            debug(consoleColors.blue + operandB + consoleColors.reset + ' = ' +
-                (result ? consoleColors.green : consoleColors.red) + result + consoleColors.reset,
+            debug(CONSOLE_COLORS.blue + operandB + CONSOLE_COLORS.reset + ' = ' +
+                (result ? CONSOLE_COLORS.green : CONSOLE_COLORS.red) + result + CONSOLE_COLORS.reset,
                 context
             );
             return result as boolean;
@@ -27,9 +27,9 @@ class BaseConditionEvaluator implements ConditionEvaluator {
         const leftSide = await this.evaluateOperand(operandA, context);
         const rightSide = await this.evaluateOperand(operandB, context);
         const _operator = context.operators.get(operator) as ComparisonOperator;
-        const result = _operator.evaluate(leftSide, rightSide, context);
-        debug(consoleColors.blue + token + consoleColors.reset + ' = ' +
-            (result ? consoleColors.green : consoleColors.red) + result + consoleColors.reset,
+        const result = await _operator.evaluate(leftSide, rightSide, context);
+        debug(CONSOLE_COLORS.blue + token + CONSOLE_COLORS.reset + ' = ' +
+            (result ? CONSOLE_COLORS.green : CONSOLE_COLORS.red) + result + CONSOLE_COLORS.reset,
             context
         );
         return result;

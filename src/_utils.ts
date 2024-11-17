@@ -3,12 +3,42 @@ import ExpressionError from "./expression-error";
 import {DateTime} from "luxon";
 
 const isArray = require("lodash/isArray");
-const isBoolean = require("lodash/isBoolean");
 const isSet = require("lodash/isSet");
 
 const luxon = require("luxon");
 const Settings = luxon.Settings;
 Settings.throwOnInvalid = true;
+
+const NUMBER_REGEX = /^-?\.?\d+(\.\d+)?$/;
+
+const comparePrimitives = <T> (a: any, b: any, context: ExpressionContext<T>): number => {
+    a = unwrapString(a);
+    b = unwrapString(b);
+    if (isNumber(a)) {
+        a = convertToNumber(a);
+    }
+    if (isNumber(b)) {
+        b = convertToNumber(b);
+    }
+    if (typeof a === 'number' && typeof b === 'number') {
+        if (a > b) {
+            return 1;
+        } else if (a < b) {
+            return -1;
+        }
+        return 0;
+    }
+    if (typeof a === 'string' && typeof b === 'string') {
+        const result = unwrapString(a).localeCompare(unwrapString(b));
+        if (result > 0) {
+            return 1;
+        } else if (result < 0) {
+            return -1;
+        }
+        return 0;
+    }
+    return -2;
+};
 
 const getField = <T>(field: string, context: ExpressionContext<T>, object?: any): any => {
     if (field === '$') {
@@ -21,29 +51,37 @@ const getField = <T>(field: string, context: ExpressionContext<T>, object?: any)
 };
 
 const parseNumber = <T>(funcKey: string, token: string, context: ExpressionContext<T>) => {
-    const numericValue = Number(token);
-    if (!Number.isNaN(numericValue) && !isBoolean(token)) {
-        return numericValue;
+    if (isNumber(token)) {
+        return convertToNumber(token);
     } else {
         const value = getField(token, context);
-        const numericValue = Number(value);
-        if (Number.isNaN(numericValue) || isBoolean(value)) {
+        if (!isNumber(value)) {
             throw new ExpressionError(`${funcKey}() received non-numeric value in ${context.expression}`);
         }
-        return numericValue;
+        return convertToNumber(value);
     }
+};
+
+const convertToNumber = (val: string | number): number => {
+    if (typeof val === 'string') {
+        return Number(val.replace(/,/g, ''));
+    }
+    return val;
 };
 
 const isNumber = (value: any): boolean => {
-    if (typeof value === 'object') {
-        return false;
+    if (typeof value === 'number') {
+        return true;
     }
-    const numericValue = Number(value);
-    return !Number.isNaN(numericValue) && !isBoolean(value);
+    if (typeof value === 'string') {
+        return NUMBER_REGEX.test(value.replace(/,/g, ''));
+    }
+    return false;
 };
 
-const isWrapped = (value: string, startTag: string, endTag: string): boolean => {
+const isWrapped = (value: any, startTag: string, endTag: string): boolean => {
     return (
+        typeof value === 'string' &&
         // value starts with start tag
         value.slice(0, startTag.length) === startTag &&
         // value ends with end tag
@@ -55,8 +93,8 @@ const unwrapValue = (value: string, startTag: string, endTag: string): string =>
     return value.slice(startTag.length, value.length - endTag.length);
 };
 
-const unwrapString = (value: any): string => {
-    if (typeof value === 'string' && isWrapped(value, '"', '"')) {
+const unwrapString = (value: any, skipCheck?: boolean): string => {
+    if (typeof value === 'string' && (skipCheck || isWrapped(value, '"', '"'))) {
         return unwrapValue(value, '"', '"').replace(/\\"/g, '"');
     }
     return value;
@@ -70,7 +108,7 @@ const requireString = <T>(context: ExpressionContext<T>, funcKey: string, ...val
     }
 };
 
-const consoleColors = {
+const CONSOLE_COLORS = {
     red: '\x1b[31m',
     green: '\x1b[32m',
     blue: '\x1b[34m',
@@ -221,13 +259,16 @@ const applyDateInterval = (date: DateTime, funcKey: string, intervalStr: string)
 
 export {
     applyDateInterval,
-    consoleColors,
+    comparePrimitives,
+    CONSOLE_COLORS,
+    convertToNumber,
     debug,
     extractSettings,
     getField,
     isCollection,
     isNumber,
     isWrapped,
+    NUMBER_REGEX,
     parseDate,
     parseNumber,
     parseSetting,

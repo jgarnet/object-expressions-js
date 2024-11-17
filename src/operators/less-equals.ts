@@ -1,10 +1,18 @@
 import ComparisonOperator from "../types/comparison-operator";
 import ExpressionContext from "../types/expression-context";
-import {unwrapString} from "../_utils";
+import {comparePrimitives} from "../_utils";
+const isNil = require("lodash/isNil");
+
+const VALUES = new Set([-1,0]);
 
 const lessEquals: ComparisonOperator = {
-    evaluate<T>(leftSide: any, rightSide: any, context: ExpressionContext<T>): boolean {
-        return unwrapString(leftSide) <= unwrapString(rightSide);
+    async evaluate<T>(leftSide: any, rightSide: any, context: ExpressionContext<T>): Promise<boolean> {
+        if (isNil(leftSide) && isNil(rightSide)) {
+            return true;
+        } else if (isNil(leftSide) || isNil(rightSide)) {
+            return false;
+        }
+        return VALUES.has(comparePrimitives(leftSide, rightSide, context));
     },
     precedence: 2
 };

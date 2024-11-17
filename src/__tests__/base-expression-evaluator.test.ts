@@ -186,4 +186,11 @@ Care"
     it('should evaluate expressions with regular expressions', async () => {
         await testAssertion('$url LIKE /\/products\/.*/', { url: '/products/long-sleeve-shirt' }, true);
     });
+    it('should evaluate expression containing IN operator with various argument types', async () => {
+        await testAssertion('$a in add(1,1),"2,3,4",5', { a: 5 }, true);
+        await testAssertion('$a in "1,2,3,4"', { a: 1 }, false);
+        await testAssertion('$a in "1"', { a: 1 }, true);
+        await testAssertion('$a in /1/,2,$[other field]', { a: 1 }, false);
+        await testAssertion('$a in /1/,2,$[other field]', { a: 1, 'other field': 1 }, true);
+    });
 });

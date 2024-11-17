@@ -3,7 +3,7 @@ import ExpressionContext from "../types/expression-context";
 import {isWrapped, unwrapString, unwrapValue} from "../_utils";
 
 const like: ComparisonOperator = {
-    evaluate<T>(leftSide: any, rightSide: any, context: ExpressionContext<T>): boolean {
+    async evaluate<T>(leftSide: any, rightSide: any, context: ExpressionContext<T>): Promise<boolean> {
         if (isWrapped(leftSide, '/', '/')) {
             leftSide = unwrapValue(leftSide, '/', '/');
         } else {

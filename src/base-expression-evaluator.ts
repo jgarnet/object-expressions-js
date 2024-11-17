@@ -1,6 +1,6 @@
 import ExpressionContext from "./types/expression-context";
 import ExpressionEvaluator from "./types/expression-evaluator";
-import {consoleColors, debug, isWrapped, unwrapValue} from "./_utils";
+import {CONSOLE_COLORS, debug, isWrapped, unwrapValue} from "./_utils";
 import createContext from "./create-context";
 import ExpressionNode from "./types/expression-node";
 import ExpressionError from "./expression-error";
@@ -60,12 +60,12 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
         if (node.next) {
             if (node.next.relationship === 'AND') {
                 if (result) {
-                    debug(consoleColors.blue + 'AND' + consoleColors.reset, context);
+                    debug(CONSOLE_COLORS.blue + 'AND' + CONSOLE_COLORS.reset, context);
                     result = await this.evaluateNode(node.next.node, context);
                 }
             } else {
                 if (!result) {
-                    debug(consoleColors.blue + 'OR' + consoleColors.reset, context);
+                    debug(CONSOLE_COLORS.blue + 'OR' + CONSOLE_COLORS.reset, context);
                     result = await this.evaluateNode(node.next.node, context);
                 }
             }
