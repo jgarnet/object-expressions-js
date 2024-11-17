@@ -9,27 +9,18 @@ const _in: ComparisonOperator = {
         const values = isCollection(rightSide) ? rightSide : split(rightSide);
         for (let val of values) {
             if (context.functionEvaluator.isFunction(val, context)) {
-                const result = await context.functionEvaluator.evaluate(val, context);
-                if (isNil(leftSide) && isNil(result)) {
-                    return true;
-                } else if (isNil(leftSide) || isNil(result)) {
-                    return false;
-                }
-                if (comparePrimitives(leftSide, result, context) === 0) {
-                    return true;
-                }
-            } else {
-                if (typeof (val as any) === 'string' && val.startsWith('$')) {
-                    val = getField(val, context);
-                }
-                if (isNil(leftSide) && isNil(val)) {
-                    return true;
-                } else if (isNil(leftSide) || isNil(val)) {
-                    return false;
-                }
-                if (comparePrimitives(leftSide, val, context) === 0) {
-                    return true;
-                }
+                val = await context.functionEvaluator.evaluate(val, context);
+            }
+            if (typeof (val as any) === 'string' && val.startsWith('$')) {
+                val = getField(val, context);
+            }
+            if (isNil(leftSide) && isNil(val)) {
+                return true;
+            } else if (isNil(leftSide) || isNil(val)) {
+                return false;
+            }
+            if (comparePrimitives(leftSide, val, context) === 0) {
+                return true;
             }
         }
         return false;
