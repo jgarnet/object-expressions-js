@@ -28,7 +28,10 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
             }
         }
         const possibleKey = token.slice(0, firstParen).trim().toUpperCase();
-        return context.functions.has(possibleKey);
+        if (!context.functions.has(possibleKey)) {
+            throw new ExpressionError(`Expression contains unknown function: ${possibleKey}`);
+        }
+        return true;
     }
 
     /**

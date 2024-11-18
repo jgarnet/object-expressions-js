@@ -1,9 +1,9 @@
-import TokenParser from "./types/token-parser";
+import FragmentParser from "./types/fragment-parser";
 import ExpressionToken from "./types/expression-token";
 import ExpressionDelimiter from "./types/expression-delimiter";
 
-class BaseTokenParser implements TokenParser {
-    parse(str: string, tokens: ExpressionToken[], delimiters: Set<ExpressionDelimiter>): string[] {
+class BaseFragmentParser implements FragmentParser {
+    parse(str: string, tokens: Set<ExpressionToken>, delimiters: Set<ExpressionDelimiter>): string[] {
         const tokenSymbols = new Set();
         const symbolMap = new Map();
         for (const token of tokens) {
@@ -50,6 +50,9 @@ class BaseTokenParser implements TokenParser {
                 } else {
                     tokenCount++;
                 }
+                if (tokenCount < 0) {
+                    throw new SyntaxError(`Expression contains imbalanced symbol: ${currentToken}`);
+                }
                 if (tokenCount === 0) {
                     currentToken = '';
                     if (token.delimiter) {
@@ -78,6 +81,9 @@ class BaseTokenParser implements TokenParser {
         if (buffer.trim().length > 0) {
             result.push(buffer.trim());
         }
+        if (tokenCount !== 0) {
+            throw new SyntaxError(`Expression contains imbalanced symbol: ${currentToken}`);
+        }
         return result;
     }
 
@@ -89,16 +95,13 @@ class BaseTokenParser implements TokenParser {
                 return delimiter;
             }
             if (delimiter.whitespace) {
-                if (i >= 0 && !/\s/.test(str[i-1])) {
+                if (i - 1 >= 0 && !/\s/.test(str[i - 1])) {
                     return null;
                 }
             }
-            if (i + delimiter.symbol.length < str.length) {
+            if (i + delimiter.symbol.length - 1 < str.length) {
                 if (str.slice(i, i + delimiter.symbol.length).toUpperCase() === delimiter.symbol) {
-                    if (i + delimiter.symbol.length === str.length - 1) {
-                        return null;
-                    }
-                    if (/\s/.test(str[i + delimiter.symbol.length])) {
+                    if (i + delimiter.symbol.length - 1 === str.length - 1 || /\s/.test(str[i + delimiter.symbol.length])) {
                         return delimiter;
                     }
                 }
@@ -108,4 +111,4 @@ class BaseTokenParser implements TokenParser {
     }
 }
 
-export default BaseTokenParser;
+export default BaseFragmentParser;

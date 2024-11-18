@@ -5,6 +5,7 @@ import ConditionEvaluator from "./condition-evaluator";
 import ExpressionParser from "./expression-parser";
 import FunctionEvaluator from "./function-evaluator";
 import ExpressionEvaluator from "./expression-evaluator";
+import FragmentParser from "./fragment-parser";
 
 /**
  * Stores data relevant for evaluating expressions.
@@ -36,6 +37,10 @@ type ExpressionContext<T> = {
      * Used to parse tokens within an expression.
      */
     expressionParser: ExpressionParser;
+    /**
+     * Used to parse fragments within an expression.
+     */
+    fragmentParser: FragmentParser;
     /**
      * Used to evaluate functions during condition evaluation.
      */
