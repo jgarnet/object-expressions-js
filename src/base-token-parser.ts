@@ -14,15 +14,12 @@ class BaseTokenParser implements TokenParser {
                 symbolMap.set(token.closeSymbol, token);
             }
         }
-        const delimiterSymbols = new Set<string>();
         const delimiterMap = new Map<string, ExpressionDelimiter>();
         for (const delimiter of delimiters) {
             if (delimiter.symbol.length > 1) {
                 const symbol = delimiter.symbol.charAt(0).toUpperCase();
-                delimiterSymbols.add(symbol);
                 delimiterMap.set(symbol, delimiter)
             } else {
-                delimiterSymbols.add(delimiter.symbol);
                 delimiterMap.set(delimiter.symbol, delimiter);
             }
         }
@@ -61,7 +58,7 @@ class BaseTokenParser implements TokenParser {
                     }
                 }
             } else {
-                const delimiter = this.checkDelimiter(str, i, delimiterSymbols, delimiterMap);
+                const delimiter = this.checkDelimiter(str, i, delimiterMap);
                 if (delimiter !== null && tokenCount === 0) {
                     if (buffer.trim().length > 0) {
                         result.push(buffer.trim());
@@ -84,7 +81,7 @@ class BaseTokenParser implements TokenParser {
         return result;
     }
 
-    private checkDelimiter(str: string, i: number, delimiterSymbols: Set<string>, delimiters: Map<string, ExpressionDelimiter>): ExpressionDelimiter | null {
+    private checkDelimiter(str: string, i: number, delimiters: Map<string, ExpressionDelimiter>): ExpressionDelimiter | null {
         const c = str[i].toUpperCase();
         if (delimiters.has(c)) {
             const delimiter = delimiters.get(c) as ExpressionDelimiter;
