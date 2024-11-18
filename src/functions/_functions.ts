@@ -13,6 +13,8 @@ import exists from "./exists";
 import get from "./get";
 import last from "./last";
 import dateCompare from "./date-compare";
+import max from "./max";
+import min from "./min";
 
 const functions = new Map<string, ExpressionFunction>;
 
@@ -25,6 +27,8 @@ functions.set("GET", get);
 functions.set("LAST", last);
 functions.set("LEN", len);
 functions.set("LOWER", lower);
+functions.set("MAX", max);
+functions.set("MIN", min);
 functions.set("MULTIPLY", multiply);
 functions.set("POW", pow);
 functions.set("SIZE", size);
