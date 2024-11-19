@@ -28,6 +28,7 @@ const exists: ExpressionFunction = {
                 functionEvaluator: context.functionEvaluator,
                 fragmentParser: context.fragmentParser,
                 operators: context.operators,
+                operatorDelimiters: context.operatorDelimiters,
                 functions: context.functions,
                 debug: context.debug,
                 nestLevel: context.nestLevel
