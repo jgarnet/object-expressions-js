@@ -8,25 +8,24 @@ import ExpressionError from "./expression-error";
 class BaseConditionEvaluator implements ConditionEvaluator {
     async evaluate<T>(token: string, context: ExpressionContext<T>): Promise<boolean> {
         const tokens = this.getTokens(token, context);
-        const [operandA, operator, operandB] = tokens;
         if (this.isSingleFunctionCall(tokens, context)) {
             // allow a single function call to be evaluated if boolean result is returned
-            const result = await context.functionEvaluator.evaluate(operandB, context);
+            const result = await context.functionEvaluator.evaluate(tokens[0], context);
             if (result !== true && result !== false) {
                 throw new ExpressionError(`Cannot evaluate truthiness of ${result} in ${context.expression}`);
             }
-            debug(CONSOLE_COLORS.blue + operandB + CONSOLE_COLORS.reset + ' = ' +
+            debug(CONSOLE_COLORS.blue + tokens[0] + CONSOLE_COLORS.reset + ' = ' +
                 (result ? CONSOLE_COLORS.green : CONSOLE_COLORS.red) + result + CONSOLE_COLORS.reset,
                 context
             );
             return result as boolean;
         }
-        if (operandA.length === 0 || operator.length === 0 || operandB.length === 0) {
+        if (tokens.length !== 3 || tokens[0].length === 0 || tokens[1].length === 0 || tokens[2].length === 0) {
             throw new SyntaxError(`Received invalid condition ${token}`);
         }
-        const leftSide = await this.evaluateOperand(operandA, context);
-        const rightSide = await this.evaluateOperand(operandB, context);
-        const _operator = context.operators.get(operator) as ComparisonOperator;
+        const leftSide = await this.evaluateOperand(tokens[0], context);
+        const rightSide = await this.evaluateOperand(tokens[2], context);
+        const _operator = context.operators.get(tokens[1]) as ComparisonOperator;
         const result = await _operator.evaluate(leftSide, rightSide, context);
         debug(CONSOLE_COLORS.blue + token + CONSOLE_COLORS.reset + ' = ' +
             (result ? CONSOLE_COLORS.green : CONSOLE_COLORS.red) + result + CONSOLE_COLORS.reset,
@@ -42,121 +41,16 @@ class BaseConditionEvaluator implements ConditionEvaluator {
      * @private
      */
     private getTokens<T>(token: string, context: ExpressionContext<T>): string[] {
-        let operandA = '';
-        let operator = '';
-        let operandB = '';
-        let buffer = '';
-        let inString = false;
-        let inRegex = false;
-        let bracketCount = 0;
-        let parenCount = 0;
-        const operatorKeys = [...context.operators.keys()].sort((a, b) => {
-            const operatorA = context.operators.get(a) as ComparisonOperator;
-            const operatorB = context.operators.get(b) as ComparisonOperator;
-            if (operatorA.precedence > operatorB.precedence) {
-                // higher precedence should be prioritized
-                return -1;
-            } else if (operatorA.precedence < operatorB.precedence) {
-                return 1;
-            }
-            return 0;
-        });
-        for (let i = 0; i < token.length; i++) {
-            const char = token[i];
-            switch (char) {
-                case '"':
-                    if (!inRegex && bracketCount === 0) {
-                        if (!inString) {
-                            inString = true;
-                        } else if (token[i - 1] !== '\\') {
-                            inString = false;
-                        }
-                    }
-                    break;
-                case '/':
-                    if (!inString && bracketCount === 0) {
-                        if (!inRegex) {
-                            inRegex = true;
-                        } else if (token[i - 1] !== '\\') {
-                            inRegex = false;
-                        }
-                    }
-                    break;
-                case '[':
-                    if (!inRegex && !inString) {
-                        bracketCount++;
-                    }
-                    break;
-                case ']':
-                    if (!inRegex && !inString) {
-                        bracketCount--;
-                    }
-                    break;
-                case '(':
-                    if (!inRegex && !inString && bracketCount === 0) {
-                        parenCount++;
-                    }
-                    break;
-                case ')':
-                    if (!inRegex && !inString && bracketCount === 0) {
-                        parenCount--;
-                    }
-                    break;
-            }
-            if (!inString && !inRegex && bracketCount === 0 && parenCount === 0) {
-                const addOperator = (): boolean => {
-                    for (const operatorStr of operatorKeys) {
-                        const _operator = context.operators.get(operatorStr) as ComparisonOperator;
-                        if (this.isOperator(operatorStr, _operator, token, i)) {
-                            operandA = buffer;
-                            buffer = '';
-                            operator = operatorStr;
-                            i += operatorStr.length - 1;
-                            return true;
-                        }
-                    }
-                    return false;
-                };
-                if (addOperator()) {
-                    continue;
-                }
-            }
-            buffer += char;
-        }
-        operandB = buffer;
-        return [operandA.trim(), operator.trim(), operandB.trim()];
-    }
-
-    /**
-     * Determine if the current fragment is a comparison operator when parsing a condition operation.
-     * @param operatorStr The string value of the operator being checked.
-     * @param operator The {@link ComparisonOperator} being checked.
-     * @param token The condition operation string.
-     * @param index The current index in the condition operation string.
-     * @private
-     */
-    private isOperator(operatorStr: string, operator: ComparisonOperator, token: string, index: number): boolean {
-        const char = token[index].toUpperCase();
-        const isSymbol = !/\w/.test(operatorStr);
-        // for non-symbol operators, if there is a non-whitespace preceding character, it is not an operator
-        if (!isSymbol && index > 0 && !/\s/.test(token[index - 1])) {
-            return false;
-        }
-        const matches = (
-            // the current character is the first character of the operator being checked
-            char === operatorStr[0] &&
-            // the current operator fits in the bounds of the token
-            index + operatorStr.length - 1 < token.length &&
-            // the current character *is* the start of the operator
-            token.slice(index, index + operatorStr.length).toUpperCase() === operatorStr
-        );
-        return matches && (
-            isSymbol ||
-            // non-symbol operators cannot have non-whitespace preceding characters
-            index + operatorStr.length + 1 < token.length ||
-            // non-symbol operators must be followed by whitespace
-            /\s/.test(token[index + operatorStr.length + 1])
-        );
+        return context.fragmentParser.parse(
+            token,
+            new Set([
+                { symbol: '(', closeSymbol: ')', escapable: true },
+                { symbol: '[', closeSymbol: ']', escapable: true },
+                { symbol: '"', escapable: true },
+                { symbol: '/', escapable: true }
+            ]),
+            context.operatorDelimiters
+            );
     }
 
     /**
@@ -185,7 +79,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
      * @private
      */
     private isSingleFunctionCall<T>(tokens: string[], context: ExpressionContext<T>): boolean {
-        return tokens[0].length === 0 && tokens[1].length === 0 && context.functionEvaluator.isFunction(tokens[2], context);
+        return tokens.length === 1 && context.functionEvaluator.isFunction(tokens[0], context);
     }
 }
 

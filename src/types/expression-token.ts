@@ -18,6 +18,10 @@ type ExpressionToken = {
      * Determines if characters after the token should be broken into a new fragment.
      */
     break?: boolean
+    /**
+     * Determines the precedence in which the token is parsed relative to other tokens.
+     */
+    precedence?: number;
 };
 
 export default ExpressionToken;

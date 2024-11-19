@@ -7,10 +7,18 @@ import BaseExpressionParser from "./base-expression-parser";
 import BaseFunctionEvaluator from "./base-function-evaluator";
 import BaseExpressionEvaluator from "./base-expression-evaluator";
 import BaseFragmentParser from "./base-fragment-parser";
+import ExpressionDelimiter from "./types/expression-delimiter";
 
 const createContext = <T> (context: Partial<ExpressionContext<T>>): ExpressionContext<T> => {
     const operators = context.operators ?? new Map(_operators);
     const functions = context.functions ?? new Map(_functions);
+    const operatorDelimiters= context.operatorDelimiters ?? new Set<ExpressionDelimiter>;
+    if (!context.operatorDelimiters) {
+        for (const operatorKey of operators.keys()) {
+            const isSymbol = !/\w/.test(operatorKey);
+            operatorDelimiters.add({ symbol: operatorKey, whitespace: !isSymbol, include: true, precedence: operators.get(operatorKey)?.precedence });
+        }
+    }
     return {
         expression: context.expression as string,
         object: context.object as T,
@@ -22,6 +30,7 @@ const createContext = <T> (context: Partial<ExpressionContext<T>>): ExpressionCo
         functionEvaluator: context.functionEvaluator ?? new BaseFunctionEvaluator(),
         cache: context.cache ?? new Map<string, boolean>,
         operators,
+        operatorDelimiters,
         functions,
         debug: context.debug ?? false,
         nestLevel: context.nestLevel ?? 0

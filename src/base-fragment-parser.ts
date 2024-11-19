@@ -8,20 +8,33 @@ class BaseFragmentParser implements FragmentParser {
         const delimiterMap = this.mapDelimiters(delimiters);
         let tokenCount = 0;
         let currentToken = '';
+        let currentSymbol = '';
         const result = [];
         let buffer = '';
         for (let i = 0; i < str.length; i++) {
             const c = str[i];
             if (tokenMap.has(c)) {
                 // check if the current character is the start of a token symbol / closeSymbol
-                const token = tokenMap.get(c) as ExpressionToken;
-                const isStart = this.isTokenSymbol(str, i, token.symbol);
-                const isClose = token.closeSymbol ? this.isTokenSymbol(str, i, token.closeSymbol) : false;
+                const _tokens = tokenMap.get(c) as ExpressionToken[];
+                let token = undefined;
+                let isStart = false;
+                let isClose = false;
+                for (const _token of _tokens) {
+                    if (this.isTokenSymbol(str, i, _token.symbol)) {
+                        token = _token;
+                        isStart = true;
+                        break;
+                    } else if (_token.closeSymbol && this.isTokenSymbol(str, i, _token.closeSymbol)) {
+                        token = _token;
+                        isClose = true;
+                    }
+                }
                 if (!isStart && !isClose) {
                     // this is not a token symbol -- append to buffer and continue
                     buffer += c;
                     continue;
                 }
+                token = token as ExpressionToken;
                 // this is a token symbol; append symbol to buffer
                 const originalIndex = i;
                 const symbol = isStart ? token.symbol : token.closeSymbol as string;
@@ -31,10 +44,11 @@ class BaseFragmentParser implements FragmentParser {
                 if (currentToken === '') {
                     // keep track of current token
                     currentToken = c;
-                } else if (currentToken !== c) {
+                    currentSymbol = symbol;
+                } else if (currentSymbol !== symbol) {
                     // determine if current character is the start of the closeSymbol for the current token
-                    const _token = tokenMap.get(currentToken) as ExpressionToken;
-                    if (!_token.closeSymbol || !this.isTokenSymbol(str, originalIndex, _token.closeSymbol)) {
+                    const _token = tokenMap.get(currentSymbol) as ExpressionToken[];
+                    if (!_token[0].closeSymbol || !this.isTokenSymbol(str, originalIndex, _token[0].closeSymbol)) {
                         // this indicates we are inside another token / group; simply append to buffer and continue
                         continue;
                     }
@@ -86,34 +100,69 @@ class BaseFragmentParser implements FragmentParser {
             result.push(buffer.trim());
         }
         if (tokenCount !== 0) {
-            const token = tokenMap.get(currentToken) as ExpressionToken;
-            if (token.closeSymbol) {
-                throw new SyntaxError(`Expression contains imbalanced symbol group: ${token.symbol}${token.closeSymbol}`);
+            const token = tokenMap.get(currentSymbol) as ExpressionToken[];
+            if (token[0].closeSymbol) {
+                throw new SyntaxError(`Expression contains imbalanced symbol group: ${token[0].symbol}${token[0].closeSymbol}`);
             }
-            throw new SyntaxError(`Expression contains imbalanced symbol: ${token.symbol}`);
+            throw new SyntaxError(`Expression contains imbalanced symbol: ${token[0].symbol}`);
         }
         return result;
     }
 
-    private mapTokens(tokens: Set<ExpressionToken>): Map<string, ExpressionToken> {
-        const map = new Map<string, ExpressionToken>;
+    private mapTokens(tokens: Set<ExpressionToken>): Map<string, ExpressionToken[]> {
+        const map = new Map<string, ExpressionToken[]>;
         for (const token of tokens) {
             const symbol = token.symbol.charAt(0).toUpperCase();
-            map.set(symbol, token);
+            this.registerToken(map, symbol, token);
+            this.registerToken(map, token.symbol, token);
             if (token.closeSymbol) {
                 const closeSymbol = token.closeSymbol.charAt(0).toUpperCase();
-                map.set(closeSymbol, token);
+                this.registerToken(map, closeSymbol, token);
+                this.registerToken(map, token.closeSymbol, token);
             }
+        }
+        for (const value of map.values()) {
+            this.sortPrecedence(value);
         }
         return map;
     }
 
-    private mapDelimiters(delimiters: Set<ExpressionDelimiter>): Map<string, ExpressionDelimiter> {
-        const map = new Map<string, ExpressionDelimiter>;
+    private registerToken(map: Map<string, ExpressionToken[]>, symbol: string, token: ExpressionToken): void {
+        if (map.has(symbol)) {
+            const values = map.get(symbol) as ExpressionToken[];
+            values.push(token);
+        } else {
+            map.set(symbol, [token]);
+        }
+    }
+
+    private mapDelimiters(delimiters: Set<ExpressionDelimiter>): Map<string, ExpressionDelimiter[]> {
+        const map = new Map<string, ExpressionDelimiter[]>;
         for (const delimiter of delimiters) {
-            map.set(delimiter.symbol.charAt(0).toUpperCase(), delimiter);
+            const symbol = delimiter.symbol.charAt(0).toUpperCase();
+            if (map.has(symbol)) {
+                const values = map.get(symbol) as ExpressionDelimiter[];
+                values.push(delimiter);
+            } else {
+                map.set(symbol, [delimiter]);
+            }
+        }
+        for (const value of map.values()) {
+            this.sortPrecedence(value);
         }
         return map;
+    }
+
+    private sortPrecedence(values: any[]): void {
+        values.sort((a, b) => {
+            if (a.precedence > b.precedence) {
+                // higher precedence should be prioritized
+                return -1;
+            } else if (a.precedence < b.precedence) {
+                return 1;
+            }
+            return 0;
+        });
     }
 
     /**
@@ -123,22 +172,24 @@ class BaseFragmentParser implements FragmentParser {
      * @param delimiters Map containing all {@link ExpressionDelimiter} values.
      * @private
      */
-    private checkDelimiter(str: string, i: number, delimiters: Map<string, ExpressionDelimiter>): ExpressionDelimiter | null {
+    private checkDelimiter(str: string, i: number, delimiters: Map<string, ExpressionDelimiter[]>): ExpressionDelimiter | null {
         const c = str[i].toUpperCase();
         if (delimiters.has(c)) {
-            const delimiter = delimiters.get(c) as ExpressionDelimiter;
-            if (delimiter.symbol.length === 1) {
-                return delimiter;
-            }
-            if (delimiter.whitespace) {
-                if (i - 1 >= 0 && !/\s/.test(str[i - 1])) {
-                    return null;
+            const _delimiters = delimiters.get(c) as ExpressionDelimiter[];
+            for (const delimiter of _delimiters) {
+                if (delimiter.symbol.length === 1) {
+                    return delimiter;
                 }
-            }
-            if (i + delimiter.symbol.length - 1 < str.length) {
-                if (str.slice(i, i + delimiter.symbol.length).toUpperCase() === delimiter.symbol) {
-                    if (i + delimiter.symbol.length - 1 === str.length - 1 || /\s/.test(str[i + delimiter.symbol.length])) {
-                        return delimiter;
+                if (delimiter.whitespace) {
+                    if (i - 1 >= 0 && !/\s/.test(str[i - 1])) {
+                        continue;
+                    }
+                }
+                if (i + delimiter.symbol.length - 1 < str.length) {
+                    if (str.slice(i, i + delimiter.symbol.length).toUpperCase() === delimiter.symbol) {
+                        if (i + delimiter.symbol.length - 1 === str.length - 1 || /\s/.test(str[i + delimiter.symbol.length])) {
+                            return delimiter;
+                        }
                     }
                 }
             }

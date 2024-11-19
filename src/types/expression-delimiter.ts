@@ -14,6 +14,10 @@ type ExpressionDelimiter = {
      * Determines if the delimiter should be included in the parsed fragments array.
      */
     include?: boolean;
+    /**
+     * Determines the precedence in which the delimiter is parsed relative to other delimiters.
+     */
+    precedence?: number;
 };
 
 export default ExpressionDelimiter;
