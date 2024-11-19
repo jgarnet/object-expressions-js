@@ -15,9 +15,9 @@ type ExpressionToken = {
      */
     escapable?: boolean,
     /**
-     * Determines if fragments before and after the token will be split when parsing tokens in a string.
+     * Determines if characters after the token should be broken into a new fragment.
      */
-    delimiter?: boolean
+    break?: boolean
 };
 
 export default ExpressionToken;

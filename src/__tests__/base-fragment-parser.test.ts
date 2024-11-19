@@ -18,7 +18,7 @@ describe('BaseFragmentParser tests', () => {
         expect(new BaseFragmentParser().parse(
             '($a[(test and test2)] = 5) and ($a = "test AND test") and $andrew = 4',
             new Set([
-                { symbol: '(', closeSymbol: ')', escapable: true, delimiter: true },
+                { symbol: '(', closeSymbol: ')', escapable: true, break: true },
                 { symbol: '[', closeSymbol: ']', escapable: true },
                 { symbol: '"', escapable: true },
                 { symbol: '/', escapable: true }
@@ -32,6 +32,18 @@ describe('BaseFragmentParser tests', () => {
             new Set([{ symbol: '(', closeSymbol: ')', escapable: true }]),
             new Set([{ symbol: 'AND', whitespace: true, include: true }])
         )).toEqual(['(FUNC($a,$b) = 2)', 'AND', 'FUNC($b,$c) = 4']);
+    });
+    it('should support multi character symbols', () => {
+        expect(new BaseFragmentParser().parse(
+            '<<group 1, test, test2>>,<<group2>>',
+            new Set([{ symbol: '<<', closeSymbol: '>>' }]),
+            new Set([{ symbol: ',' }])
+        )).toEqual(['<<group 1, test, test2>>', '<<group2>>']);
+        expect(new BaseFragmentParser().parse(
+            '<start>1,2,3</start>,<start>4, 5</start>',
+            new Set([{ symbol: '<start>', closeSymbol: '</start>' }]),
+            new Set([{ symbol: ',' }])
+        )).toEqual(['<start>1,2,3</start>', '<start>4, 5</start>']);
     });
     it('should throw SyntaxError when imbalanced symbols encountered', () => {
         expect(() => new BaseFragmentParser().parse(

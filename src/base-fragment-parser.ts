@@ -7,21 +7,18 @@ class BaseFragmentParser implements FragmentParser {
         const tokenSymbols = new Set();
         const symbolMap = new Map();
         for (const token of tokens) {
-            tokenSymbols.add(token.symbol);
-            symbolMap.set(token.symbol, token);
+            const symbol = token.symbol.charAt(0).toUpperCase();
+            tokenSymbols.add(symbol);
+            symbolMap.set(symbol, token);
             if (token.closeSymbol) {
-                tokenSymbols.add(token.closeSymbol);
-                symbolMap.set(token.closeSymbol, token);
+                const closeSymbol = token.closeSymbol.charAt(0).toUpperCase();
+                tokenSymbols.add(closeSymbol);
+                symbolMap.set(closeSymbol, token);
             }
         }
         const delimiterMap = new Map<string, ExpressionDelimiter>();
         for (const delimiter of delimiters) {
-            if (delimiter.symbol.length > 1) {
-                const symbol = delimiter.symbol.charAt(0).toUpperCase();
-                delimiterMap.set(symbol, delimiter)
-            } else {
-                delimiterMap.set(delimiter.symbol, delimiter);
-            }
+            delimiterMap.set(delimiter.symbol.charAt(0).toUpperCase(), delimiter);
         }
         let tokenCount = 0;
         let currentToken = '';
@@ -30,22 +27,35 @@ class BaseFragmentParser implements FragmentParser {
         for (let i = 0; i < str.length; i++) {
             const c = str[i];
             if (tokenSymbols.has(c)) {
-                buffer += c;
+                const token = symbolMap.get(c) as ExpressionToken;
+                const isStart = this.isTokenSymbol(str, i, token.symbol);
+                const isClose = token.closeSymbol ? this.isTokenSymbol(str, i, token.closeSymbol) : false;
+                if (!isStart && !isClose) {
+                    buffer += c;
+                    continue;
+                }
+                // append symbol to buffer
+                const originalIndex = i;
+                const symbol = isStart ? token.symbol : token.closeSymbol as string;
+                buffer += str.slice(i, Math.max(i + symbol.length, 1));
+                // adjust index to account for remaining symbol characters
+                i += symbol.length - 1;
                 if (currentToken === '') {
+                    // keep track of current token
                     currentToken = c;
                 } else if (currentToken !== c) {
-                    const token = symbolMap.get(currentToken) as ExpressionToken;
-                    if (!token.closeSymbol || token.closeSymbol !== c) {
+                    // determine if current character is the start of the closeSymbol for the current token
+                    const _token = symbolMap.get(currentToken) as ExpressionToken;
+                    if (!_token.closeSymbol || !this.isTokenSymbol(str, originalIndex, _token.closeSymbol)) {
                         continue;
                     }
                 }
-                const token = symbolMap.get(c) as ExpressionToken;
-                if (token.escapable && i - 1 >= 0 && str[i - 1] === '\\') {
+                if (token.escapable && originalIndex - 1 >= 0 && str[originalIndex - 1] === '\\') {
                     continue;
                 }
                 if (!token.closeSymbol) {
                     tokenCount = tokenCount === 1 ? 0 : 1;
-                } else if (c === token.closeSymbol) {
+                } else if (this.isTokenSymbol(str, originalIndex, token.closeSymbol)) {
                     tokenCount--;
                 } else {
                     tokenCount++;
@@ -55,7 +65,7 @@ class BaseFragmentParser implements FragmentParser {
                 }
                 if (tokenCount === 0) {
                     currentToken = '';
-                    if (token.delimiter) {
+                    if (token.break) {
                         result.push(buffer.trim());
                         buffer = '';
                     }
@@ -108,6 +118,13 @@ class BaseFragmentParser implements FragmentParser {
             }
         }
         return null;
+    }
+
+    private isTokenSymbol(str: string, i: number, symbol: string): boolean {
+        if (i + symbol.length - 1 > str.length - 1) {
+            return false;
+        }
+        return str.slice(i, i + symbol.length) === symbol;
     }
 }
 
