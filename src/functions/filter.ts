@@ -27,6 +27,7 @@ const filter: ExpressionFunction = {
                 conditionEvaluator: context.conditionEvaluator,
                 expressionParser: context.expressionParser,
                 functionEvaluator: context.functionEvaluator,
+                fragmentParser: context.fragmentParser,
                 operators: context.operators,
                 functions: context.functions,
                 debug: context.debug,

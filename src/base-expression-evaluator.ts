@@ -42,6 +42,7 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
                     conditionEvaluator: context.conditionEvaluator,
                     expressionParser: context.expressionParser,
                     functionEvaluator: context.functionEvaluator,
+                    fragmentParser: context.fragmentParser,
                     cache: context.cache,
                     operators: context.operators,
                     functions: context.functions,
