@@ -1,9 +1,9 @@
-import FragmentParser from "./types/fragment-parser";
+import FragmentParser, {FragmentParserOptions} from "./types/fragment-parser";
 import ExpressionToken from "./types/expression-token";
 import ExpressionDelimiter from "./types/expression-delimiter";
 
 class BaseFragmentParser implements FragmentParser {
-    parse(str: string, tokens: Set<ExpressionToken>, delimiters: Set<ExpressionDelimiter>): string[] {
+    parse(str: string, tokens: Set<ExpressionToken>, delimiters: Set<ExpressionDelimiter>, options?: FragmentParserOptions): string[] {
         const tokenMap = this.mapTokens(tokens);
         const delimiterMap = this.mapDelimiters(delimiters);
         let tokenCount = 0;
@@ -80,7 +80,7 @@ class BaseFragmentParser implements FragmentParser {
                 const delimiter = this.checkDelimiter(str, i, delimiterMap);
                 if (delimiter !== null && tokenCount === 0) {
                     // split values based on delimiter if we are not inside a token / group
-                    if (buffer.trim().length > 0) {
+                    if (buffer.trim().length > 0 || options?.allowEmpty) {
                         result.push(buffer.trim());
                     }
                     buffer = '';
@@ -95,7 +95,7 @@ class BaseFragmentParser implements FragmentParser {
                 }
             }
         }
-        if (buffer.trim().length > 0) {
+        if (buffer.trim().length > 0 || options?.allowEmpty) {
             // append remaining buffer to results
             result.push(buffer.trim());
         }

@@ -43,14 +43,9 @@ class BaseConditionEvaluator implements ConditionEvaluator {
     private getTokens<T>(token: string, context: ExpressionContext<T>): string[] {
         return context.fragmentParser.parse(
             token,
-            new Set([
-                { symbol: '(', closeSymbol: ')', escapable: true },
-                { symbol: '[', closeSymbol: ']', escapable: true },
-                { symbol: '"', escapable: true },
-                { symbol: '/', escapable: true }
-            ]),
+            context.standardTokens,
             context.operatorDelimiters
-            );
+        );
     }
 
     /**

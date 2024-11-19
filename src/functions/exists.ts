@@ -29,6 +29,7 @@ const exists: ExpressionFunction = {
                 fragmentParser: context.fragmentParser,
                 operators: context.operators,
                 operatorDelimiters: context.operatorDelimiters,
+                standardTokens: context.standardTokens,
                 functions: context.functions,
                 debug: context.debug,
                 nestLevel: context.nestLevel

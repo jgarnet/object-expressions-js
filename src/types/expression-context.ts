@@ -7,6 +7,7 @@ import FunctionEvaluator from "./function-evaluator";
 import ExpressionEvaluator from "./expression-evaluator";
 import FragmentParser from "./fragment-parser";
 import ExpressionDelimiter from "./expression-delimiter";
+import ExpressionToken from "./expression-token";
 
 /**
  * Stores data relevant for evaluating expressions.
@@ -55,6 +56,7 @@ type ExpressionContext<T> = {
      */
     operators: Map<string, ComparisonOperator>;
     operatorDelimiters: Set<ExpressionDelimiter>;
+    standardTokens: Set<ExpressionToken>;
     /**
      * Stores all functions, mapping their name and {@link ExpressionFunction} implementation.
      */

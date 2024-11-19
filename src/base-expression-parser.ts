@@ -8,12 +8,7 @@ class BaseExpressionParser implements ExpressionParser {
         const expression = context.expression;
         const tokens = context.fragmentParser.parse(
             expression,
-            new Set([
-                { symbol: '(', closeSymbol: ')', escapable: true },
-                { symbol: '[', closeSymbol: ']', escapable: true },
-                { symbol: '"', escapable: true },
-                { symbol: '/', escapable: true }
-            ]),
+            context.standardTokens,
             new Set([
                 { symbol: 'AND', whitespace: true, include: true },
                 { symbol: 'OR', whitespace: true, include: true },
