@@ -7,7 +7,6 @@ class BaseFragmentParser implements FragmentParser {
         const tokenMap = this.mapTokens(tokens);
         const delimiterMap = this.mapDelimiters(delimiters);
         let tokenCount = 0;
-        let currentToken = '';
         let currentSymbol = '';
         const result = [];
         let buffer = '';
@@ -41,9 +40,8 @@ class BaseFragmentParser implements FragmentParser {
                 buffer += str.slice(i, Math.max(i + symbol.length, 1));
                 // adjust index to account for remaining symbol characters
                 i += symbol.length - 1;
-                if (currentToken === '') {
-                    // keep track of current token
-                    currentToken = c;
+                if (currentSymbol === '') {
+                    // keep track of current token symbol
                     currentSymbol = symbol;
                 } else if (currentSymbol !== symbol) {
                     // determine if current character is the start of the closeSymbol for the current token
@@ -70,7 +68,7 @@ class BaseFragmentParser implements FragmentParser {
                     throw new SyntaxError(`Expression contains imbalanced symbol: ${symbol}`);
                 }
                 if (tokenCount === 0) {
-                    currentToken = '';
+                    currentSymbol = '';
                     if (token.break) {
                         result.push(buffer.trim());
                         buffer = '';
