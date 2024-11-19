@@ -50,36 +50,54 @@ describe('BaseFragmentParser tests', () => {
             ')(',
             new Set([{ symbol: '(', closeSymbol: ')', escapable: true }]),
             new Set([{ symbol: 'AND', whitespace: true, include: true }])
-        )).toThrow('Expression contains imbalanced symbol: )');
+        )).toThrow('Expression contains imbalanced symbol group: ()');
         expect(() => new BaseFragmentParser().parse(
             ')',
             new Set([{ symbol: '(', closeSymbol: ')', escapable: true }]),
             new Set([{ symbol: 'AND', whitespace: true, include: true }])
-        )).toThrow('Expression contains imbalanced symbol: )');
+        )).toThrow('Expression contains imbalanced symbol group: ()');
         expect(() => new BaseFragmentParser().parse(
             '))',
             new Set([{ symbol: '(', closeSymbol: ')', escapable: true }]),
             new Set([{ symbol: 'AND', whitespace: true, include: true }])
-        )).toThrow('Expression contains imbalanced symbol: )');
+        )).toThrow('Expression contains imbalanced symbol group: ()');
         expect(() => new BaseFragmentParser().parse(
             '(',
             new Set([{ symbol: '(', closeSymbol: ')', escapable: true }]),
             new Set([{ symbol: 'AND', whitespace: true, include: true }])
-        )).toThrow('Expression contains imbalanced symbol: (');
+        )).toThrow('Expression contains imbalanced symbol group: ()');
         expect(() => new BaseFragmentParser().parse(
             '((',
             new Set([{ symbol: '(', closeSymbol: ')', escapable: true }]),
             new Set([{ symbol: 'AND', whitespace: true, include: true }])
-        )).toThrow('Expression contains imbalanced symbol: (');
+        )).toThrow('Expression contains imbalanced symbol group: ()');
         expect(() => new BaseFragmentParser().parse(
             '(()',
             new Set([{ symbol: '(', closeSymbol: ')', escapable: true }]),
             new Set([{ symbol: 'AND', whitespace: true, include: true }])
-        )).toThrow('Expression contains imbalanced symbol: (');
+        )).toThrow('Expression contains imbalanced symbol group: ()');
         expect(() => new BaseFragmentParser().parse(
             '"',
             new Set([{ symbol: '(', closeSymbol: ')', escapable: true }, { symbol: '"' }]),
             new Set([{ symbol: 'AND', whitespace: true, include: true }])
         )).toThrow('Expression contains imbalanced symbol: "');
+        expect(() => new BaseFragmentParser().parse(
+            '<start>',
+            new Set([{ symbol: '<start>', closeSymbol: '</start>', escapable: true }]),
+            new Set([{ symbol: 'AND', whitespace: true, include: true }])
+        )).toThrow('Expression contains imbalanced symbol group: <start></start>');
+        expect(() => new BaseFragmentParser().parse(
+            '</start><start>',
+            new Set([{ symbol: '<start>', closeSymbol: '</start>', escapable: true }]),
+            new Set([{ symbol: 'AND', whitespace: true, include: true }])
+        )).toThrow('Expression contains imbalanced symbol group: <start></start>');
+        expect(() => new BaseFragmentParser().parse(
+            '"</start><start>"',
+            new Set([
+                { symbol: '<start>', closeSymbol: '</start>', escapable: true },
+                { symbol: '"' }
+            ]),
+            new Set([{ symbol: 'AND', whitespace: true, include: true }])
+        )).not.toThrow();
     });
 });
