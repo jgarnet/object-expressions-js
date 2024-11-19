@@ -363,6 +363,9 @@ The [ExpressionContext](./src/types/expression-context.ts) can be configured to 
   - Evaluates an expression (containing conditions, logical operators, and child groups) against an object.
 - [ExpressionParser](./src/types/expression-parser.ts)
   - Parses all tokens (conditions, logical operators, child groups) from an expression, and returns an [ExpressionNode](./src/types/expression-node.ts) chain.
+- [FragmentParser](./src/types/fragment-parser.ts)
+  - Parses all fragments from a string (supports delimiters, symbols, and symbol groups). 
+  - Used when parsing expressions, evaluating conditions, and evaluating functions.
 - [FunctionEvaluator](./src/types/function-evaluator.ts)
   - Evaluates a function within a condition.
 - [PathEvaluator](./src/types/path-evaluator.ts)

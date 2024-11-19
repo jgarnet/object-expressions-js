@@ -55,7 +55,16 @@ type ExpressionContext<T> = {
      * Stores all comparison operators, mapping their symbol and their associated {@link ComparisonOperator} implementation.
      */
     operators: Map<string, ComparisonOperator>;
+    /**
+     * Used when parsing comparison operators inside condition strings.
+     * Each operator should be represented using a {@link ExpressionDelimiter}.
+     * If this is not supplied, this field will be auto-generated based on the operators Map.
+     */
     operatorDelimiters: Set<ExpressionDelimiter>;
+    /**
+     * Contains all standard tokens representing symbols and symbol groups when parsing fragments.
+     * Default values include (), [], ", /.
+     */
     standardTokens: Set<ExpressionToken>;
     /**
      * Stores all functions, mapping their name and {@link ExpressionFunction} implementation.
