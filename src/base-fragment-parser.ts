@@ -26,6 +26,7 @@ class BaseFragmentParser implements FragmentParser {
                     } else if (_token.closeSymbol && this.isTokenSymbol(str, i, _token.closeSymbol)) {
                         token = _token;
                         isClose = true;
+                        break;
                     }
                 }
                 if (!isStart && !isClose) {
@@ -75,28 +76,25 @@ class BaseFragmentParser implements FragmentParser {
                     }
                 }
             } else {
-                const delimiter = this.checkDelimiter(str, i, delimiterMap);
+                let delimiter = this.checkDelimiter(str, i, delimiterMap);
                 if (delimiter !== null && tokenCount === 0) {
+                    delimiter = delimiter as ExpressionDelimiter;
                     // split values based on delimiter if we are not inside a token / group
-                    if (buffer.trim().length > 0 || options?.allowEmpty) {
-                        result.push(buffer.trim());
-                    }
+                    this.addFragment(result, buffer, options);
                     buffer = '';
-                    if ((delimiter as ExpressionDelimiter).include) {
-                        result.push((delimiter as ExpressionDelimiter).symbol);
-                        if ((delimiter as ExpressionDelimiter).symbol.length > 1) {
-                            i += (delimiter as ExpressionDelimiter).symbol.length - 1;
+                    if (delimiter.include) {
+                        result.push(delimiter.symbol);
+                        if (delimiter.symbol.length > 1) {
+                            i += delimiter.symbol.length - 1;
                         }
                     }
                 } else {
+                    // neither a token group nor a delimiter; append character to buffer
                     buffer += c;
                 }
             }
         }
-        if (buffer.trim().length > 0 || options?.allowEmpty) {
-            // append remaining buffer to results
-            result.push(buffer.trim());
-        }
+        this.addFragment(result, buffer, options);
         if (tokenCount !== 0) {
             const token = tokenMap.get(currentSymbol) as ExpressionToken[];
             if (token[0].closeSymbol) {
@@ -105,6 +103,13 @@ class BaseFragmentParser implements FragmentParser {
             throw new SyntaxError(`Expression contains imbalanced symbol: ${token[0].symbol}`);
         }
         return result;
+    }
+
+    private addFragment(results: string[], fragment: string, options?: FragmentParserOptions): void {
+        if (fragment.trim().length > 0 || options?.allowEmpty) {
+            // append remaining buffer to results
+            results.push(fragment.trim());
+        }
     }
 
     private mapTokens(tokens: Set<ExpressionToken>): Map<string, ExpressionToken[]> {

@@ -9,16 +9,7 @@ class BaseConditionEvaluator implements ConditionEvaluator {
     async evaluate<T>(token: string, context: ExpressionContext<T>): Promise<boolean> {
         const tokens = this.getTokens(token, context);
         if (this.isSingleFunctionCall(tokens, context)) {
-            // allow a single function call to be evaluated if boolean result is returned
-            const result = await context.functionEvaluator.evaluate(tokens[0], context);
-            if (result !== true && result !== false) {
-                throw new ExpressionError(`Cannot evaluate truthiness of ${result} in ${context.expression}`);
-            }
-            debug(CONSOLE_COLORS.blue + tokens[0] + CONSOLE_COLORS.reset + ' = ' +
-                (result ? CONSOLE_COLORS.green : CONSOLE_COLORS.red) + result + CONSOLE_COLORS.reset,
-                context
-            );
-            return result as boolean;
+            return this.evaluateSingleFunction(tokens[0], context);
         }
         if (tokens.length !== 3 || tokens[0].length === 0 || tokens[1].length === 0 || tokens[2].length === 0) {
             throw new SyntaxError(`Received invalid condition ${token}`);
@@ -75,6 +66,26 @@ class BaseConditionEvaluator implements ConditionEvaluator {
      */
     private isSingleFunctionCall<T>(tokens: string[], context: ExpressionContext<T>): boolean {
         return tokens.length === 1 && context.functionEvaluator.isFunction(tokens[0], context);
+    }
+
+    /**
+     * Evaluates a single function call and returns the result.
+     * If the function result is a non-boolean value, an {@link ExpressionError} will be thrown.
+     * @param token The token containing the function call.
+     * @param context The {@link ExpressionContext}.
+     * @private
+     */
+    private async evaluateSingleFunction<T>(token: string, context: ExpressionContext<T>): Promise<boolean> {
+        // allow a single function call to be evaluated if boolean result is returned
+        const result = await context.functionEvaluator.evaluate(token, context);
+        if (result !== true && result !== false) {
+            throw new ExpressionError(`Cannot evaluate truthiness of ${result} in ${context.expression}`);
+        }
+        debug(CONSOLE_COLORS.blue + token + CONSOLE_COLORS.reset + ' = ' +
+            (result ? CONSOLE_COLORS.green : CONSOLE_COLORS.red) + result + CONSOLE_COLORS.reset,
+            context
+        );
+        return result as boolean;
     }
 }
 
