@@ -17,7 +17,12 @@ const createContext = <T> (context: Partial<ExpressionContext<T>>): ExpressionCo
     if (!context.operatorDelimiters) {
         for (const operatorKey of operators.keys()) {
             const isSymbol = !/\w/.test(operatorKey);
-            operatorDelimiters.add({ symbol: operatorKey, whitespace: !isSymbol, include: true, precedence: operators.get(operatorKey)?.precedence });
+            operatorDelimiters.add({
+                symbol: operatorKey,
+                whitespace: !isSymbol,
+                include: true,
+                precedence: operators.get(operatorKey)?.precedence
+            });
         }
     }
     const standardTokens = context.standardTokens ?? new Set<ExpressionToken>;
