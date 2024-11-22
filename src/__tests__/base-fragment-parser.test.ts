@@ -45,6 +45,16 @@ describe('BaseFragmentParser tests', () => {
             new Set([{ symbol: ',' }])
         )).toEqual(['<start>1,2,3</start>', '<start>4, 5</start>']);
     });
+    it('should ignore escaped symbols only if inside current symbol group', () => {
+        expect(new BaseFragmentParser().parse(
+            '\\(test()) (\\)[\\]]) test',
+            new Set([
+                { symbol: '(', closeSymbol: ')', break: true, escapable: true },
+                { symbol: '[', closeSymbol: ']', break: true, escapable: true  }
+            ]),
+            new Set()
+        )).toEqual(['\\(test())', '(\\)[\\]])', 'test']);
+    });
     it('should throw SyntaxError when imbalanced symbols encountered', () => {
         expect(() => new BaseFragmentParser().parse(
             ')(',

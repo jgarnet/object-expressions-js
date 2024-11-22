@@ -41,6 +41,12 @@ class BaseFragmentParser implements FragmentParser {
                 buffer += str.slice(i, Math.max(i + symbol.length, 1));
                 // adjust index to account for remaining symbol characters
                 i += symbol.length - 1;
+                if (token.escapable && originalIndex - 1 >= 0 && str[originalIndex - 1] === '\\') {
+                    // ignore escaped symbols only if currentSymbol matches
+                    if (currentSymbol === token.symbol || token.closeSymbol && currentSymbol === token.closeSymbol) {
+                        continue;
+                    }
+                }
                 if (currentSymbol === '') {
                     // keep track of current token symbol
                     currentSymbol = symbol;
@@ -51,9 +57,6 @@ class BaseFragmentParser implements FragmentParser {
                         // this indicates we are inside another token / group; simply append to buffer and continue
                         continue;
                     }
-                }
-                if (token.escapable && originalIndex - 1 >= 0 && str[originalIndex - 1] === '\\') {
-                    continue;
                 }
                 if (!token.closeSymbol) {
                     tokenCount = tokenCount === 1 ? 0 : 1;
