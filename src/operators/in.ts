@@ -6,7 +6,7 @@ const isNil = require("lodash/isNil");
 
 const _in: ComparisonOperator = {
     async evaluate<T>(leftSide: any, rightSide: any, context: ExpressionContext<T>): Promise<boolean> {
-        const values = isCollection(rightSide) ? rightSide : split(rightSide);
+        const values = isCollection(rightSide) ? rightSide : split(rightSide, context);
         for (let val of values) {
             if (context.functionEvaluator.isFunction(val, context)) {
                 val = await context.functionEvaluator.evaluate(val, context);
@@ -28,72 +28,14 @@ const _in: ComparisonOperator = {
     precedence: 1
 };
 
-const split = (token: string): string[] => {
-    let parenCount = 0;
-    let bracketCount = 0;
-    let inRegex = false;
-    let inString = false;
-    let buffer = '';
-    const values = [];
-    for (let i = 0; i < token.length; i++) {
-        const c = token[i];
-        switch (c) {
-            case '(':
-                buffer += c;
-                if (bracketCount === 0 && !inRegex && !inString) {
-                    parenCount++;
-                }
-                break;
-            case ')':
-                buffer += c;
-                if (parenCount > 0) {
-                    parenCount--;
-                }
-                break;
-            case '[':
-                buffer += c;
-                if (parenCount === 0 && !inRegex && !inString) {
-                    bracketCount++;
-                }
-                break;
-            case ']':
-                buffer += c;
-                if (bracketCount > 0) {
-                    bracketCount--;
-                }
-                break;
-            case '/':
-                buffer += c;
-                if (!inRegex) {
-                    inRegex = true;
-                } else if (token[i - 1] !== '\\') {
-                    inRegex = false;
-                }
-                break;
-            case '"':
-                buffer += c;
-                if (!inString) {
-                    inString = true;
-                } else if (token[i - 1] !== '\\') {
-                    inString = false;
-                }
-                break;
-            case ',':
-                if (inString || inRegex || bracketCount > 0 || parenCount > 0) {
-                    buffer += c;
-                } else {
-                    values.push(buffer.trim());
-                    buffer = '';
-                }
-                break;
-            default:
-                buffer += c;
-        }
-    }
-    if (buffer.trim().length > 0) {
-        values.push(buffer);
-    }
-    return values;
+const split = <T> (token: string, context: ExpressionContext<T>): string[] => {
+    return context.fragmentParser.parse(
+        token,
+        context.standardTokens,
+        new Set([
+            { symbol: ',' }
+        ])
+    );
 };
 
 export default _in;
