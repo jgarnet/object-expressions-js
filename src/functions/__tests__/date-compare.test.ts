@@ -80,6 +80,11 @@ describe('dateCompare tests', () => {
         await testError(['NOW+1f', 'NOW'], 'DATECOMP() received invalid interval +1f');
         await testError(['NOW+1d', 'NOW'], 'DATECOMP() received invalid interval +1d');
     });
+    it('should compare dates if values are wrapped in quotes', async () => {
+        await testAssertion([DateTime.fromISO('2000-01-02'), '"01-02-2000"', 'formatB="MM-dd-yyyy"'], true);
+        await testAssertion([DateTime.fromISO('2000-01-02'), '01-02-2000', 'formatB="MM-dd-yyyy"'], true);
+        await testAssertion([DateTime.fromISO('2000-01-02'), '01-02-2000', 'formatB=MM-dd-yyyy'], true);
+    });
     it('should throw error when parsing error is encountered', async () => {
         await testError(['2024-01-01', '2024-01-01', 'format=invalid'], 'DATECOMP() failed to parse date 2024-01-01 in expression: exp');
         await testError(['2024-01', '2024-01-01', 'format=yyyy-MM-dd'], 'DATECOMP() failed to parse date 2024-01 in expression: exp');

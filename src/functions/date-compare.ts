@@ -2,7 +2,7 @@ import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
 import {DateTime, DateTimeUnit} from "luxon";
 import ExpressionError from "../expression-error";
-import {extractSettings, parseDate, parseSetting} from "../_utils";
+import {extractSettings, parseDate, parseSetting, unwrapString} from "../_utils";
 
 const dateCompare: ExpressionFunction = {
     async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {
@@ -18,8 +18,8 @@ const dateCompare: ExpressionFunction = {
         const zoneB = parseSetting(context, settings, 'timezoneB') ?? zone;
         const operator = parseSetting(context, settings, 'operator') ?? '=';
         const unit = parseSetting(context, settings, 'unit') ?? 'day';
-        const a = parseDate(context, 'DATECOMP', args[0], { zone: zoneA, format: formatA });
-        const b = parseDate(context, 'DATECOMP', args[1], { zone: zoneB, format: formatB });
+        const a = parseDate(context, 'DATECOMP', unwrapString(args[0]), { zone: zoneA, format: formatA });
+        const b = parseDate(context, 'DATECOMP', unwrapString(args[1]), { zone: zoneB, format: formatB });
         return compare(a, b, operator, unit, zoneA, context);
     }
 };
