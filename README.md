@@ -306,6 +306,12 @@ Various functions are provided by default, but it is possible to overwrite or ex
 - `LAST`
   - Returns the last element in an array.
   - `LAST($items)` `LAST($)`
+- `MAX`
+  - Returns the element with the largest value in a collection (or group of collections).
+  - `MAX($a,$b,1,2,3)` `MAX($c)`
+- `MIN`
+  - Returns the element with the smallest value in a collection (or group of collections).
+  - `MIN($a,$b,1,2,3)` `MIN($c)`
 - `SIZE`
   - Returns the size of a collection.
   - `SIZE($)` `SIZE($items)`
@@ -336,6 +342,20 @@ Various functions are provided by default, but it is possible to overwrite or ex
       - `H`: hours
       - `m`: minutes
   - `DATECOMP($a, $b, timezone=America/New_York)` `DATECOMP($a, $b, operator=>=, unit=hour)` `DATECOMP($a, NOW+1M, operator=<)`
+- `DATEIVL`
+  - Adds an interval to a date and returns the result.
+  - Accepts the following parameters:
+    - **date (required)**: The date which an interval will be applied to.
+    - **interval (required)**: The interval which will be applied to a date.
+      - Interval syntax follows `[+-]\d+[YMmDH]`.
+      - `Y`: years
+      - `M`: months
+      - `D`: days
+      - `H`: hours
+      - `m`: minutes
+    - **timezone**: The timezone used to parse the date. Defaults to UTC.
+    - **format**: The format used to parse the date. Defaults to ISO 8601.
+  - `DATEIVL($dateCreated, "+10D")` `DATEIVL($endDate, "-1Y")`
 
 ### Precedence
 
