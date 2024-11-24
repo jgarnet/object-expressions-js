@@ -15,11 +15,13 @@ import last from "./last";
 import dateCompare from "./date-compare";
 import max from "./max";
 import min from "./min";
+import dateInterval from "./date-interval";
 
 const functions = new Map<string, ExpressionFunction>;
 
 functions.set("ADD", add);
 functions.set("DATECOMP", dateCompare);
+functions.set("DATEIVL", dateInterval);
 functions.set("DIVIDE", divide);
 functions.set("EXISTS", exists);
 functions.set("FILTER", filter);
