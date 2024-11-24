@@ -2,7 +2,7 @@
 
 ## Overview
 
-Evaluates expressions against objects to determine if all conditions are met.
+Evaluates if each condition (in relation to an object) contained in an expression is true, allowing business rules to be defined using expressions.
 
 The [evaluate](./src/evaluate.ts) function accepts an [ExpressionContext](./src/types/expression-context.ts) and returns a Promise containing `true` if all conditions are met, or `false` otherwise.
 
