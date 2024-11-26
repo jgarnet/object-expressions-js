@@ -1,5 +1,5 @@
 import evaluate from "./index";
-import {CONSOLE_COLORS} from "./_utils";
+import {CONSOLE_COLORS} from "./utils";
 
 const expression = process.argv[2];
 const object = JSON.parse(process.argv[3]);

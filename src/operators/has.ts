@@ -1,6 +1,6 @@
 import ComparisonOperator from "../types/comparison-operator";
 import ExpressionContext from "../types/expression-context";
-import {unwrapString} from "../_utils";
+import {unwrapString} from "../utils";
 const _has = require("lodash/has");
 
 const has: ComparisonOperator = {

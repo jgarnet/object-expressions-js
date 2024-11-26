@@ -1,7 +1,7 @@
 import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
 import ExpressionError from "../expression-error";
-import {getField, isNumber, requireString} from "../_utils";
+import {getField, isNumber, requireString} from "../utils";
 
 const isNil = require("lodash/isNil");
 

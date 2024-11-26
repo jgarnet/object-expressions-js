@@ -1,6 +1,6 @@
 import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
-import {requireArray} from "../_utils";
+import {requireArray} from "../utils";
 
 const last: ExpressionFunction = {
     async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {

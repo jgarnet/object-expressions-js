@@ -1,6 +1,6 @@
 import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
-import {requireString, unwrapString} from "../_utils";
+import {requireString, unwrapString} from "../utils";
 
 const len: ExpressionFunction = {
     async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {

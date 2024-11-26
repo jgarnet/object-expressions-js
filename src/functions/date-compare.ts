@@ -2,7 +2,7 @@ import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
 import {DateTime, DateTimeUnit} from "luxon";
 import ExpressionError from "../expression-error";
-import {extractSettings, parseDate, parseSetting, unwrapString} from "../_utils";
+import {extractSettings, parseDate, parseSetting, unwrapString} from "../utils";
 
 const dateCompare: ExpressionFunction = {
     async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {

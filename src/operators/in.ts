@@ -1,6 +1,6 @@
 import ComparisonOperator from "../types/comparison-operator";
 import ExpressionContext from "../types/expression-context";
-import {comparePrimitives, getField, isCollection} from "../_utils";
+import {comparePrimitives, getField, isCollection} from "../utils";
 
 const isNil = require("lodash/isNil");
 

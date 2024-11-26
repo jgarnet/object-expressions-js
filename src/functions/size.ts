@@ -1,6 +1,6 @@
 import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
-import {requireCollection} from "../_utils";
+import {requireCollection} from "../utils";
 
 const _size = require("lodash/size");
 

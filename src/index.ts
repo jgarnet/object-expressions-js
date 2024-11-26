@@ -22,7 +22,7 @@ import FunctionEvaluator from "./types/function-evaluator";
 import operators from "./operators/_operators";
 import PathEvaluator from "./types/path-evaluator";
 import SyntaxError from "./syntax-error";
-import * as utils from './_utils';
+import * as utils from './utils';
 
 export {
     BaseConditionEvaluator,

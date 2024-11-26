@@ -1,6 +1,6 @@
 import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
-import {parseNumber} from "../_utils";
+import {parseNumber} from "../utils";
 import ExpressionError from "../expression-error";
 
 const add: ExpressionFunction = {

@@ -1,6 +1,6 @@
 import ComparisonOperator from "../types/comparison-operator";
 import ExpressionContext from "../types/expression-context";
-import {isWrapped, unwrapString, unwrapValue} from "../_utils";
+import {isWrapped, unwrapString, unwrapValue} from "../utils";
 
 const like: ComparisonOperator = {
     async evaluate<T>(leftSide: any, rightSide: any, context: ExpressionContext<T>): Promise<boolean> {

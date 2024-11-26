@@ -1,6 +1,6 @@
 import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
-import {comparePrimitives, isCollection} from "../_utils";
+import {comparePrimitives, isCollection} from "../utils";
 
 const max: ExpressionFunction = {
     async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {

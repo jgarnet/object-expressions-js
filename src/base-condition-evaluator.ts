@@ -1,7 +1,7 @@
 import ConditionEvaluator from "./types/condition-evaluator";
 import ExpressionContext from "./types/expression-context";
 import ComparisonOperator from "./types/comparison-operator";
-import {CONSOLE_COLORS, debug, getField} from "./_utils";
+import {CONSOLE_COLORS, debug, getField} from "./utils";
 import SyntaxError from "./syntax-error";
 import ExpressionError from "./expression-error";
 

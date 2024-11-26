@@ -1,7 +1,7 @@
 import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
 import ExpressionError from "../expression-error";
-import {applyDateInterval, extractSettings, parseDate, parseSetting, unwrapString} from "../_utils";
+import {applyDateInterval, extractSettings, parseDate, parseSetting, unwrapString} from "../utils";
 
 const dateInterval: ExpressionFunction = {
     async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {

@@ -1,7 +1,7 @@
 import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
 import ExpressionError from "../expression-error";
-import {isCollection, isWrapped, requireString} from "../_utils";
+import {isCollection, isWrapped, requireString} from "../utils";
 import createContext from "../create-context";
 
 const filter: ExpressionFunction = {

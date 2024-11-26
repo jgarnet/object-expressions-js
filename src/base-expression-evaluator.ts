@@ -1,6 +1,6 @@
 import ExpressionContext from "./types/expression-context";
 import ExpressionEvaluator from "./types/expression-evaluator";
-import {CONSOLE_COLORS, debug, isWrapped, unwrapValue} from "./_utils";
+import {CONSOLE_COLORS, debug, isWrapped, unwrapValue} from "./utils";
 import createContext from "./create-context";
 import ExpressionNode from "./types/expression-node";
 import ExpressionError from "./expression-error";

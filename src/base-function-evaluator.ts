@@ -1,7 +1,7 @@
 import FunctionEvaluator from "./types/function-evaluator";
 import ExpressionContext from "./types/expression-context";
 import ExpressionFunction from "./types/expression-function";
-import {getField} from "./_utils";
+import {getField} from "./utils";
 import ExpressionError from "./expression-error";
 
 class BaseFunctionEvaluator implements FunctionEvaluator {

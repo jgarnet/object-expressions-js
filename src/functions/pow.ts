@@ -1,7 +1,7 @@
 import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
 import ExpressionError from "../expression-error";
-import {parseNumber} from "../_utils";
+import {parseNumber} from "../utils";
 
 const pow: ExpressionFunction = {
     async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {
