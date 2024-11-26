@@ -1,6 +1,6 @@
 import ExpressionFunction from "../types/expression-function";
 import ExpressionContext from "../types/expression-context";
-import {parseNumber} from "../utils";
+import {convertToNumber, requireNumber} from "../utils";
 import ExpressionError from "../expression-error";
 
 const multiply: ExpressionFunction = {
@@ -8,10 +8,11 @@ const multiply: ExpressionFunction = {
         if (args.length < 2) {
             throw new ExpressionError(`MULTIPLY() received invalid arguments in ${context.expression}`);
         }
-        let result = parseNumber('MULTIPLY', args[0], context);
+        requireNumber(context, 'MULTIPLY', ...args);
+        let result = convertToNumber(args[0]);
         for (let i = 1; i < args.length; i++) {
             const arg = args[i];
-            result *= parseNumber('MULTIPLY', arg, context);
+            result *= convertToNumber(arg);
         }
         return result;
     }

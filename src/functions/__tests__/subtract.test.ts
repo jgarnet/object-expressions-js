@@ -16,15 +16,15 @@ describe('subtract tests', () => {
     it('should subtract field values', async () => {
         // noinspection TypeScriptValidateTypes
         const context = createContext({ expression: '', object: { a: 2, b: 4, c: 6 } });
-        expect(await subtract.evaluate(context, 'a', 'b')).toEqual(-2);
-        expect(await subtract.evaluate(context, 'a', 'b', 'c')).toEqual(-8);
+        expect(await subtract.evaluate(context, '2', '4')).toEqual(-2);
+        expect(await subtract.evaluate(context, 2, '4', 6)).toEqual(-8);
     });
     it('should subtract mixed values', async () => {
         // noinspection TypeScriptValidateTypes
         const context = createContext({ expression: '', object: { a: 2, b: 4, c: 6 } });
-        expect(await subtract.evaluate(context, 'a', 2)).toEqual(0);
-        expect(await subtract.evaluate(context, 2, 'a')).toEqual(0);
-        expect(await subtract.evaluate(context, 2, 'a', 'b')).toEqual(-4);
+        expect(await subtract.evaluate(context, 2, 2)).toEqual(0);
+        expect(await subtract.evaluate(context, 2, 2)).toEqual(0);
+        expect(await subtract.evaluate(context, 2, '2', '4')).toEqual(-4);
     });
     it('should throw error if invalid number of arguments received', async () => {
         // noinspection TypeScriptValidateTypes
@@ -35,9 +35,9 @@ describe('subtract tests', () => {
     it('should throw error if invalid argument received', async () => {
         // noinspection TypeScriptValidateTypes
         const context = createContext({ expression: 'exp', object: { a: undefined, b: 'test', c: {}, d: true } });
-        await expect(() => subtract.evaluate(context, 2, 'a')).rejects.toThrowError(new ExpressionError('SUBTRACT() received non-numeric value in exp'));
-        await expect(() => subtract.evaluate(context, 2, 'b')).rejects.toThrowError(new ExpressionError('SUBTRACT() received non-numeric value in exp'));
-        await expect(() => subtract.evaluate(context, 2, 'c')).rejects.toThrowError(new ExpressionError('SUBTRACT() received non-numeric value in exp'));
-        await expect(() => subtract.evaluate(context, 2, 'd')).rejects.toThrowError(new ExpressionError('SUBTRACT() received non-numeric value in exp'));
+        await expect(() => subtract.evaluate(context, 2, undefined)).rejects.toThrowError(new ExpressionError('SUBTRACT() received non-numeric argument in expression: exp'));
+        await expect(() => subtract.evaluate(context, 2, 'test')).rejects.toThrowError(new ExpressionError('SUBTRACT() received non-numeric argument in expression: exp'));
+        await expect(() => subtract.evaluate(context, 2, {})).rejects.toThrowError(new ExpressionError('SUBTRACT() received non-numeric argument in expression: exp'));
+        await expect(() => subtract.evaluate(context, 2, true)).rejects.toThrowError(new ExpressionError('SUBTRACT() received non-numeric argument in expression: exp'));
     });
 });

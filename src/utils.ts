@@ -11,6 +11,14 @@ Settings.throwOnInvalid = true;
 
 const NUMBER_REGEX = /^-?\.?\d+(\.\d+)?$/;
 
+/**
+ * Compares equality of two values.
+ * Returns 1 if a > b, 0 if a = b, -1 if a < b.
+ * If a and b cannot be compared, -2 is returned.
+ * @param a The first value.
+ * @param b The second value.
+ * @param context The {@link ExpressionContext}.
+ */
 const comparePrimitives = <T> (a: any, b: any, context: ExpressionContext<T>): number => {
     a = unwrapString(a);
     b = unwrapString(b);
@@ -40,6 +48,12 @@ const comparePrimitives = <T> (a: any, b: any, context: ExpressionContext<T>): n
     return -2;
 };
 
+/**
+ * Retrieves a field from the {@link ExpressionContext} or a supplied Object given a path.
+ * @param field The field path.
+ * @param context The {@link ExpressionContext}.
+ * @param object Optional Object to retrieve the field from.
+ */
 const getField = <T>(field: string, context: ExpressionContext<T>, object?: any): any => {
     if (field === '$') {
         return object ?? context.object;
@@ -50,18 +64,11 @@ const getField = <T>(field: string, context: ExpressionContext<T>, object?: any)
     return context.pathEvaluator.evaluate(object ?? context.object, field);
 };
 
-const parseNumber = <T>(funcKey: string, token: string, context: ExpressionContext<T>) => {
-    if (isNumber(token)) {
-        return convertToNumber(token);
-    } else {
-        const value = getField(token, context);
-        if (!isNumber(value)) {
-            throw new ExpressionError(`${funcKey}() received non-numeric value in ${context.expression}`);
-        }
-        return convertToNumber(value);
-    }
-};
-
+/**
+ * Converts a string to its number value, if applicable.
+ * If the value is a number, it will be returned as-is.
+ * @param val The value.
+ */
 const convertToNumber = (val: string | number): number => {
     if (typeof val === 'string') {
         return Number(val.replace(/,/g, ''));
@@ -69,6 +76,11 @@ const convertToNumber = (val: string | number): number => {
     return val;
 };
 
+/**
+ * Determines if a value is a number.
+ * Valid values include integers, decimals, positive, negative, and numbers with comma separators.
+ * @param value The value being tested.
+ */
 const isNumber = (value: any): boolean => {
     if (typeof value === 'number') {
         return true;
@@ -79,6 +91,12 @@ const isNumber = (value: any): boolean => {
     return false;
 };
 
+/**
+ * Determines if a string value is wrapped within a start and end tag.
+ * @param value The value being tested.
+ * @param startTag The start tag to check.
+ * @param endTag The end tag to check.
+ */
 const isWrapped = (value: any, startTag: string, endTag: string): boolean => {
     return (
         typeof value === 'string' &&
@@ -89,10 +107,23 @@ const isWrapped = (value: any, startTag: string, endTag: string): boolean => {
     );
 };
 
+/**
+ * Unwraps a string given a start tag and end tag.
+ * @param value The string being unwrapped.
+ * @param startTag The start tag wrapping the string.
+ * @param endTag The end tag wrapping the string.
+ */
 const unwrapValue = (value: string, startTag: string, endTag: string): string => {
     return value.slice(startTag.length, value.length - endTag.length);
 };
 
+/**
+ * If the value is a string and is wrapped in quotes, it will be unwrapped.
+ * Escaped quotes within the string will also have all backslashes removed.
+ * If the value is not a wrapped string, it will be returned as-is.
+ * @param value The value.
+ * @param skipCheck Optional boolean flag which will skip checking if the value is wrapped in quotes.
+ */
 const unwrapString = (value: any, skipCheck?: boolean): string => {
     if (typeof value === 'string' && (skipCheck || isWrapped(value, '"', '"'))) {
         return unwrapValue(value, '"', '"').replace(/\\"/g, '"');
@@ -100,10 +131,30 @@ const unwrapString = (value: any, skipCheck?: boolean): string => {
     return value;
 };
 
+/**
+ * Requires all values to be strings.
+ * @param context The {@link ExpressionContext}.
+ * @param funcKey The function key which is being invoked.
+ * @param values The values being tested.
+ */
 const requireString = <T>(context: ExpressionContext<T>, funcKey: string, ...values: any[]): void => {
     for (const value of values) {
         if (typeof value !== 'string') {
             throw new ExpressionError(`${funcKey}() received non-string argument in expression: ${context.expression}`);
+        }
+    }
+};
+
+/**
+ * Requires all values to be numbers.
+ * @param context The {@link ExpressionContext}.
+ * @param funcKey The function key which is being invoked.
+ * @param values The values being tested.
+ */
+const requireNumber = <T>(context: ExpressionContext<T>, funcKey: string, ...values: any[]): void => {
+    for (const value of values) {
+        if (!isNumber(value)) {
+            throw new ExpressionError(`${funcKey}() received non-numeric argument in expression: ${context.expression}`);
         }
     }
 };
@@ -115,6 +166,11 @@ const CONSOLE_COLORS = {
     reset: '\x1b[0m'
 };
 
+/**
+ * Prints debug output if debug mode is enabled.
+ * @param text The text being printed.
+ * @param context The {@link ExpressionContext}.
+ */
 const debug = <T>(text: string, context: ExpressionContext<T>) => {
     if (context.debug) {
         let output = '';
@@ -127,10 +183,20 @@ const debug = <T>(text: string, context: ExpressionContext<T>) => {
     }
 };
 
+/**
+ * Determines if a value is a collection (array or set).
+ * @param value The value being tested.
+ */
 const isCollection = (value: any): boolean => {
     return isArray(value) || isSet(value);
 };
 
+/**
+ * Requires all values to be collections.
+ * @param context The {@link ExpressionContext}.
+ * @param funcKey The function key which is being invoked.
+ * @param values The values being tested.
+ */
 const requireCollection = <T>(context: ExpressionContext<T>, funcKey: string, ...values: any[]): void => {
     for (const value of values) {
         if (!isCollection(value)) {
@@ -139,6 +205,12 @@ const requireCollection = <T>(context: ExpressionContext<T>, funcKey: string, ..
     }
 };
 
+/**
+ * Requires all values to be arrays.
+ * @param context The {@link ExpressionContext}.
+ * @param funcKey The function key which is being invoked.
+ * @param values The values being tested.
+ */
 const requireArray = <T>(context: ExpressionContext<T>, funcKey: string, ...values: any[]): void => {
     for (const value of values) {
         if (!isArray(value)) {
@@ -270,11 +342,11 @@ export {
     isWrapped,
     NUMBER_REGEX,
     parseDate,
-    parseNumber,
     parseSetting,
     requireArray,
     requireCollection,
     requireString,
+    requireNumber,
     unwrapValue,
     unwrapString
 };

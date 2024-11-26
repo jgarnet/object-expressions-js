@@ -16,15 +16,15 @@ describe('multiply tests', () => {
     it('should multiply field values', async () => {
         // noinspection TypeScriptValidateTypes
         const context = createContext({ expression: '', object: { a: 2, b: 4, c: 6 } });
-        expect(await multiply.evaluate(context, 'a', 'b')).toEqual(8);
-        expect(await multiply.evaluate(context, 'a', 'b', 'c')).toEqual(48);
+        expect(await multiply.evaluate(context, '2', 4)).toEqual(8);
+        expect(await multiply.evaluate(context, 2, '4', '6')).toEqual(48);
     });
     it('should multiply mixed values', async () => {
         // noinspection TypeScriptValidateTypes
         const context = createContext({ expression: '', object: { a: 2, b: 4, c: 6 } });
-        expect(await multiply.evaluate(context, 'a', 2)).toEqual(4);
-        expect(await multiply.evaluate(context, 2, 'a')).toEqual(4);
-        expect(await multiply.evaluate(context, 2, 'a', 'b')).toEqual(16);
+        expect(await multiply.evaluate(context, '2', 2)).toEqual(4);
+        expect(await multiply.evaluate(context, 2, 2)).toEqual(4);
+        expect(await multiply.evaluate(context, 2, '2', '4')).toEqual(16);
     });
     it('should throw error if invalid number of arguments received', async () => {
         // noinspection TypeScriptValidateTypes
@@ -35,9 +35,9 @@ describe('multiply tests', () => {
     it('should throw error if invalid argument received', async () => {
         // noinspection TypeScriptValidateTypes
         const context = createContext({ expression: 'exp', object: { a: undefined, b: 'test', c: {}, d: true } });
-        await expect(() => multiply.evaluate(context, 2, 'a')).rejects.toThrowError(new ExpressionError('MULTIPLY() received non-numeric value in exp'));
-        await expect(() => multiply.evaluate(context, 2, 'b')).rejects.toThrowError(new ExpressionError('MULTIPLY() received non-numeric value in exp'));
-        await expect(() => multiply.evaluate(context, 2, 'c')).rejects.toThrowError(new ExpressionError('MULTIPLY() received non-numeric value in exp'));
-        await expect(() => multiply.evaluate(context, 2, 'd')).rejects.toThrowError(new ExpressionError('MULTIPLY() received non-numeric value in exp'));
+        await expect(() => multiply.evaluate(context, 2, undefined)).rejects.toThrowError(new ExpressionError('MULTIPLY() received non-numeric argument in expression: exp'));
+        await expect(() => multiply.evaluate(context, 2, 'test')).rejects.toThrowError(new ExpressionError('MULTIPLY() received non-numeric argument in expression: exp'));
+        await expect(() => multiply.evaluate(context, 2, {})).rejects.toThrowError(new ExpressionError('MULTIPLY() received non-numeric argument in expression: exp'));
+        await expect(() => multiply.evaluate(context, 2, true)).rejects.toThrowError(new ExpressionError('MULTIPLY() received non-numeric argument in expression: exp'));
     });
 });
