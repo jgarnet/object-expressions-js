@@ -16,6 +16,7 @@ import dateCompare from "./date-compare";
 import max from "./max";
 import min from "./min";
 import dateInterval from "./date-interval";
+import mod from "./mod";
 
 const functions = new Map<string, ExpressionFunction>;
 
@@ -31,6 +32,7 @@ functions.set("LEN", len);
 functions.set("LOWER", lower);
 functions.set("MAX", max);
 functions.set("MIN", min);
+functions.set("MOD", mod);
 functions.set("MULTIPLY", multiply);
 functions.set("POW", pow);
 functions.set("SIZE", size);

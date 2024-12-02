@@ -256,6 +256,10 @@ Various functions are provided by default, but it is possible to overwrite or ex
   - Requires at least two arguments.
   - String arguments represent field paths which will be retrieved from the object being evaluated.
   - `DIVIDE($fieldA,$fieldB.0.value)` `DIVIDE($fieldA,2)` `DIVIDE(2,2)`
+- `MOD`
+  - Returns the remainder between two numbers.
+  - Requires two numeric arguments.
+  - `MOD($a, $b)` `MOD(4, 2)` `MOD($a, 2)`
 - `MULTIPLY`
   - Calculates the product of all arguments and returns the result.
   - Requires at least two arguments.
