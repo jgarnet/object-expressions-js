@@ -196,7 +196,7 @@ evaluate({
 
 Expressions may contain string values, denoted by single quotes `'` or double quotes `"`. If a string contains child quotes of the same symbol (i.e. nested double quotes or nested single quotes), they must be escaped with a back-slash. Text that contains whitespace must be represented in a string.
 
-`$firstName = John` `$name = "John Doe"` `$relationshipStatus = "It's \"Complicated\""` `$name = 'John Doe'` `$relationshipStatus = 'It\'s complicated\''`
+`$firstName = John` `$name = "John Doe"` `$relationshipStatus = "It's \"Complicated\""` `$name = 'John Doe'` `$relationshipStatus = 'It\'s "complicated"'`
 
 If an expression contains unclosed strings, a `SyntaxError` will be thrown during evaluation.
 
