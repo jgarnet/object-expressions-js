@@ -30,6 +30,7 @@ const createContext = <T> (context: Partial<ExpressionContext<T>>): ExpressionCo
         standardTokens.add({ symbol: '(', closeSymbol: ')', escapable: true });
         standardTokens.add({ symbol: '[', closeSymbol: ']', escapable: true });
         standardTokens.add({ symbol: '"', escapable: true });
+        standardTokens.add({ symbol: '\'', escapable: true });
         standardTokens.add({ symbol: '/', escapable: true });
     }
     return {

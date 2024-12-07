@@ -5,12 +5,12 @@ import last from "../last";
 
 const testAssertion = async (args: any[], result: any) => {
     const ctx = createContext({});
-    expect(await last.evaluate(ctx, ...args)).toEqual(result);
+    expect(await last.evaluate({ context: ctx, args })).toEqual(result);
 };
 
 const testError = async (args: any[], error: ExpressionError) => {
     // noinspection TypeScriptValidateTypes
-    await expect(() => last.evaluate(createContext({ expression: 'exp' }), ...args)).rejects.toThrowError(error);
+    await expect(() => last.evaluate({ context: createContext({ expression: 'exp' }), args })).rejects.toThrowError(error);
 };
 
 describe('last tests', () => {

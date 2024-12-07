@@ -5,18 +5,18 @@ import upper from "../upper";
 
 const testError = async (arg: any, error: ExpressionError) => {
     // noinspection TypeScriptValidateTypes
-    await expect(() => upper.evaluate(createContext({}), arg)).rejects.toThrowError(error);
+    await expect(() => upper.evaluate({ context: createContext({}), args: [arg] })).rejects.toThrowError(error);
 };
 
 describe('upper tests', () => {
     it('should return the length of a string', async () => {
         // https://youtrack.jetbrains.com/issue/WEB-36766
         // noinspection TypeScriptValidateTypes
-        expect(await upper.evaluate(createContext({}), 'Test')).toEqual('TEST');
+        expect(await upper.evaluate({ context: createContext({}), args: ['Test'] })).toEqual('TEST');
         // noinspection TypeScriptValidateTypes
-        expect(await upper.evaluate(createContext({}), '"Test"')).toEqual('TEST');
+        expect(await upper.evaluate({ context: createContext({}), args: ['"Test"'] })).toEqual('TEST');
         // noinspection TypeScriptValidateTypes
-        expect(await upper.evaluate(createContext({}), '"\"Test\""')).toEqual('"TEST"');
+        expect(await upper.evaluate({ context: createContext({}), args: ['"\"Test\""'] })).toEqual('"TEST"');
     });
     it('should throw ExpressionError when invalid arguments are received', async () => {
         await testError([], new ExpressionError('UPPER() received non-string argument in expression: undefined'));

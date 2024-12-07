@@ -5,12 +5,12 @@ import size from "../size";
 
 const testAssertion = async (args: any[], result: any) => {
     const ctx = createContext({});
-    expect(await size.evaluate(ctx, ...args)).toEqual(result);
+    expect(await size.evaluate({ context: ctx, args })).toEqual(result);
 };
 
 const testError = async (args: any[], error: ExpressionError) => {
     // noinspection TypeScriptValidateTypes
-    await expect(() => size.evaluate(createContext({ expression: 'exp' }), ...args)).rejects.toThrowError(error);
+    await expect(() => size.evaluate({ context: createContext({ expression: 'exp' }), args })).rejects.toThrowError(error);
 };
 
 describe('size tests', () => {

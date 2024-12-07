@@ -5,12 +5,12 @@ import filter from "../filter";
 
 const testAssertion = async (args: any[], result: any) => {
     const ctx = createContext({});
-    expect(await filter.evaluate(ctx, ...args)).toEqual(result);
+    expect(await filter.evaluate({ context: ctx, args })).toEqual(result);
 };
 
 const testError = async (args: any[], error: ExpressionError) => {
     // noinspection TypeScriptValidateTypes
-    await expect(() => filter.evaluate(createContext({ expression: 'exp' }), ...args)).rejects.toThrowError(error);
+    await expect(() => filter.evaluate({ context: createContext({ expression: 'exp' }), args })).rejects.toThrowError(error);
 };
 
 describe('filter tests', () => {

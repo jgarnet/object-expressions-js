@@ -1,9 +1,10 @@
 import ExpressionFunction from "../types/expression-function";
-import ExpressionContext from "../types/expression-context";
 import {requireArray} from "../utils";
+import FunctionContext from "../types/function-context";
 
 const last: ExpressionFunction = {
-    async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {
+    async evaluate<T>(ctx: FunctionContext<T>): Promise<any> {
+        const { args, context } = ctx;
         requireArray(context, 'LAST', args[0]);
         const collection = args[0];
         return collection[collection.length - 1];

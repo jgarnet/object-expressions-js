@@ -1,12 +1,13 @@
 import ExpressionFunction from "../types/expression-function";
-import ExpressionContext from "../types/expression-context";
 import ExpressionError from "../expression-error";
 import {getField, isNumber, requireString} from "../utils";
+import FunctionContext from "../types/function-context";
 
 const isNil = require("lodash/isNil");
 
 const get: ExpressionFunction = {
-    async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {
+    async evaluate<T>(ctx: FunctionContext<T>): Promise<any> {
+        const { args, context } = ctx;
         if (args.length < 2) {
             throw new ExpressionError(`GET() requires a collection and an object path; invalid arguments received in ${context.expression}`);
         }

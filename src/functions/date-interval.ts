@@ -1,10 +1,11 @@
 import ExpressionFunction from "../types/expression-function";
-import ExpressionContext from "../types/expression-context";
 import ExpressionError from "../expression-error";
 import {applyDateInterval, extractSettings, parseDate, parseSetting, unwrapString} from "../utils";
+import FunctionContext from "../types/function-context";
 
 const dateInterval: ExpressionFunction = {
-    async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {
+    async evaluate<T>(ctx: FunctionContext<T>): Promise<any> {
+        const { args, context } = ctx;
         if (args.length < 2) {
             throw new ExpressionError(`DATEIVL() requires a date and an interval; invalid arguments received in expression: ${context.expression}`);
         }

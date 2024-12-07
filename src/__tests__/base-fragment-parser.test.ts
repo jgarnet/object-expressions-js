@@ -14,6 +14,19 @@ describe('BaseFragmentParser tests', () => {
             new Set([{ symbol: ',' }]))
         ).toEqual(['TST(1,2,3)', '"test, 1234"', '12', '((test))', '$[some,field]', '/test=,,/', '(\\),)', '123']);
     });
+    it('should support single and double quote strings', () => {
+        expect(new BaseFragmentParser().parse(
+            `'test',"test2",'"test3',"'test4"`,
+            new Set([
+                { symbol: '(', closeSymbol: ')', escapable: true },
+                { symbol: '[', closeSymbol: ']', escapable: true },
+                { symbol: '"', escapable: true },
+                { symbol: '\'', escapable: true },
+                { symbol: '/', escapable: true }
+            ]),
+            new Set([{ symbol: ',' }]))
+        ).toEqual([`'test'`, `"test2"`, `'"test3'`, `"'test4"`]);
+    });
     it('should parse tokens who act as delimiters', () => {
         expect(new BaseFragmentParser().parse(
             '($a[(test and test2)] = 5) and ($a = "test AND test") and $andrew = 4',

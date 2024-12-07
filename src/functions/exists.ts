@@ -3,9 +3,11 @@ import ExpressionContext from "../types/expression-context";
 import ExpressionError from "../expression-error";
 import {isCollection, isWrapped, requireString} from "../utils";
 import createContext from "../create-context";
+import FunctionContext from "../types/function-context";
 
 const exists: ExpressionFunction = {
-    async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {
+    async evaluate<T>(ctx: FunctionContext<T>): Promise<any> {
+        const { args, context } = ctx;
         if (args.length < 2) {
             throw new ExpressionError(`EXISTS() requires a value and an expression to filter by; invalid arguments received in ${context.expression}`);
         }

@@ -4,12 +4,12 @@ import {DateTime} from "luxon";
 
 const testAssertion = async (args: any[], result: any) => {
     const ctx = createContext({});
-    expect(await dateInterval.evaluate(ctx, ...args)).toEqual(result);
+    expect(await dateInterval.evaluate({ context: ctx, args })).toEqual(result);
 };
 
 const testError = async (args: any[], error: string) => {
     // noinspection TypeScriptValidateTypes
-    await expect(() => dateInterval.evaluate(createContext({ expression: 'exp' }), ...args)).rejects.toThrow(error);
+    await expect(() => dateInterval.evaluate({ context: createContext({ expression: 'exp' }), args })).rejects.toThrow(error);
 };
 
 describe('dateInterval tests', () => {

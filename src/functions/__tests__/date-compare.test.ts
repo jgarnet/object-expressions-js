@@ -5,12 +5,12 @@ import {DateTime} from "luxon";
 
 const testAssertion = async (args: any[], result: any) => {
     const ctx = createContext({});
-    expect(await dateCompare.evaluate(ctx, ...args)).toEqual(result);
+    expect(await dateCompare.evaluate({ context: ctx, args })).toEqual(result);
 };
 
 const testError = async (args: any[], error: string) => {
     // noinspection TypeScriptValidateTypes
-    await expect(() => dateCompare.evaluate(createContext({ expression: 'exp' }), ...args)).rejects.toThrow(error);
+    await expect(() => dateCompare.evaluate({ context: createContext({ expression: 'exp' }), args })).rejects.toThrow(error);
 };
 
 describe('dateCompare tests', () => {

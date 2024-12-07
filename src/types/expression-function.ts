@@ -1,10 +1,10 @@
-import ExpressionContext from "./expression-context";
+import FunctionContext from "./function-context";
 
 /**
  * Allows function operations to be executed when evaluating conditions against an object.
  */
 type ExpressionFunction = {
-    evaluate: <T> (context: ExpressionContext<T>, ...args: any[]) => Promise<any>;
+    evaluate: <T> (ctx: FunctionContext<T>) => Promise<any>;
 };
 
 export default ExpressionFunction;

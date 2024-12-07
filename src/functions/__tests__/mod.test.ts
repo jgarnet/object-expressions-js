@@ -5,7 +5,7 @@ import mod from "../mod";
 const testAssertion = async (a: number, b: number, result: number) => {
     // https://youtrack.jetbrains.com/issue/WEB-36766
     // noinspection TypeScriptValidateTypes
-    expect(await mod.evaluate(createContext({}), a, b)).toEqual(result);
+    expect(await mod.evaluate({ context: createContext({}), args: [a, b] })).toEqual(result);
 };
 
 describe('mod tests', () => {

@@ -1,9 +1,10 @@
 import ExpressionFunction from "../types/expression-function";
-import ExpressionContext from "../types/expression-context";
 import {comparePrimitives, isCollection} from "../utils";
+import FunctionContext from "../types/function-context";
 
 const min: ExpressionFunction = {
-    async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {
+    async evaluate<T>(ctx: FunctionContext<T>): Promise<any> {
+        const { args, context } = ctx;
         const allItems = [];
         for (const arg of args) {
             if (isCollection(arg)) {

@@ -56,7 +56,7 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
             }
         }
         const func = context.functions.get(funcKey) as ExpressionFunction;
-        return await func.evaluate(context, ...args);
+        return await func.evaluate({ context, args });
     }
 
     /**

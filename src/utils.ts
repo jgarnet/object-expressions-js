@@ -122,11 +122,14 @@ const unwrapValue = (value: string, startTag: string, endTag: string): string =>
  * Escaped quotes within the string will also have all backslashes removed.
  * If the value is not a wrapped string, it will be returned as-is.
  * @param value The value.
- * @param skipCheck Optional boolean flag which will skip checking if the value is wrapped in quotes.
  */
-const unwrapString = (value: any, skipCheck?: boolean): string => {
-    if (typeof value === 'string' && (skipCheck || isWrapped(value, '"', '"'))) {
-        return unwrapValue(value, '"', '"').replace(/\\"/g, '"');
+const unwrapString = (value: any): string => {
+    if (typeof value === 'string') {
+        if (isWrapped(value, '"', '"')) {
+            return unwrapValue(value, '"', '"').replace(/\\"/g, '"');
+        } else if (isWrapped(value, '\'', '\'')) {
+            return unwrapValue(value, '\'', '\'').replace(/\\'/g, '\'');
+        }
     }
     return value;
 };

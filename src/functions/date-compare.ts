@@ -3,9 +3,11 @@ import ExpressionContext from "../types/expression-context";
 import {DateTime, DateTimeUnit} from "luxon";
 import ExpressionError from "../expression-error";
 import {extractSettings, parseDate, parseSetting, unwrapString} from "../utils";
+import FunctionContext from "../types/function-context";
 
 const dateCompare: ExpressionFunction = {
-    async evaluate<T>(context: ExpressionContext<T>, ...args: any[]): Promise<any> {
+    async evaluate<T>(ctx: FunctionContext<T>): Promise<any> {
+        const { args, context } = ctx;
         if (args.length < 2) {
             throw new ExpressionError(`DATECOMP() requires two dates for comparison; invalid arguments received in expression: ${context.expression}`);
         }

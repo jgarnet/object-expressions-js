@@ -18,6 +18,7 @@ import ExpressionToken from "./types/expression-token";
 import FragmentParser from "./types/fragment-parser";
 import {FragmentParserOptions} from "./types/fragment-parser";
 import functions from "./functions/_functions";
+import FunctionContext from "./types/function-context";
 import FunctionEvaluator from "./types/function-evaluator";
 import operators from "./operators/_operators";
 import PathEvaluator from "./types/path-evaluator";
@@ -45,6 +46,7 @@ export {
     FragmentParser,
     FragmentParserOptions,
     functions,
+    FunctionContext,
     FunctionEvaluator,
     operators,
     PathEvaluator,

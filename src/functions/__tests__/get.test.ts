@@ -5,12 +5,12 @@ import ExpressionError from "../../expression-error";
 
 const testAssertion = async (args: any[], result: any) => {
     const ctx = createContext({});
-    expect(await get.evaluate(ctx, ...args)).toEqual(result);
+    expect(await get.evaluate({ context: ctx, args })).toEqual(result);
 };
 
 const testError = async (args: any[], error: ExpressionError) => {
     // noinspection TypeScriptValidateTypes
-    await expect(() => get.evaluate(createContext({ expression: 'exp' }), ...args)).rejects.toThrowError(error);
+    await expect(() => get.evaluate({ context: createContext({ expression: 'exp' }), args })).rejects.toThrowError(error);
 };
 
 describe('get tests', () => {
