@@ -215,7 +215,7 @@ evaluate({
 });
 ```
 
-Regular expressions are supported &amp; must be wrapped in forward-slashes if they contain reserved symbols or keywords. If forward-slashes need to be used inside of a regular expression, they must be escaped using a back-slash.
+Regular expressions are supported &amp; must be wrapped in forward-slashes if they contain reserved symbols or keywords. If forward-slashes need to be used inside a regular expression, they must be escaped using a back-slash.
 
 `$url LIKE /\/products\/.*/` `$status LIKE /PROCESSED AND SHIPPED/` `$status LIKE /(SUCCESS|ERROR)/`
 
