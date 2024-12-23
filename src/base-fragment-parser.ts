@@ -183,13 +183,13 @@ class BaseFragmentParser implements FragmentParser {
         if (delimiters.has(c)) {
             const _delimiters = delimiters.get(c) as ExpressionDelimiter[];
             for (const delimiter of _delimiters) {
-                if (delimiter.symbol.length === 1) {
-                    return delimiter;
-                }
                 if (delimiter.whitespace) {
                     if (i - 1 >= 0 && !/\s/.test(str[i - 1])) {
                         continue;
                     }
+                }
+                if (delimiter.symbol.length === 1) {
+                    return delimiter;
                 }
                 if (i + delimiter.symbol.length - 1 < str.length) {
                     if (str.slice(i, i + delimiter.symbol.length).toUpperCase() === delimiter.symbol) {
