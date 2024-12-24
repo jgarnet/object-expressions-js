@@ -1,6 +1,6 @@
 {
   "name": "object-expressions-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Evaluates if each condition (in relation to an object) contained in an expression is true, allowing business rules to be defined using expressions.",
   "author": "jgarnett",
   "license": "MIT",
@@ -15,6 +15,10 @@
     "domain",
     "language"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jgarnet/object-expressions-js.git"
+  },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
