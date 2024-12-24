@@ -1,5 +1,5 @@
 {
-  "name": "expression-evaluator",
+  "name": "object-expressions-js",
   "version": "1.0.0",
   "description": "Evaluates if each condition (in relation to an object) contained in an expression is true, allowing business rules to be defined using expressions.",
   "author": "jgarnett",
