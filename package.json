@@ -25,7 +25,8 @@
     "build": "tsup --dts --minify --clean --format cjs src/index.ts",
     "test": "jest",
     "dev": "tsup --outDir build --clean src/dev-evaluate.ts",
-    "evaluate": "sh ./scripts/evaluate.sh"
+    "evaluate": "sh ./scripts/evaluate.sh",
+    "publish:npm": "sh ./scripts/publish-npm.sh"
   },
   "devDependencies": {
     "@types/jest": "^29.5.13",
