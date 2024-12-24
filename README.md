@@ -150,6 +150,19 @@ If an expression contains imbalanced or invalid conditions (invalid number of op
 
 Various comparison operators are provided by default, but it is possible to overwrite or extend the provided [operators](./src/operators/operators.ts) via the [ExpressionContext](src/context/expression-context.ts).
 
+For example, additional operators may be added to the `operators` map:
+
+```javascript
+import { operators } from "obj-expressions-js";
+import myOperator from "./my-operator";
+
+const customOperators = new Map(operators);
+// NOTE: operator keys are required to be in uppercase
+customOperators.set("~=", myOperator);
+
+export default customOperators;
+```
+
 The following comparison operators are provided:
 - `=`
   - Determines if a field's value is equal to a primitive value.
@@ -243,6 +256,19 @@ Functions can evaluate other functions as arguments.
 If an expression contains an unclosed function or invalid function argument, an `ExpressionError` will be thrown during evaluation.
 
 Various functions are provided by default, but it is possible to overwrite or extend the provided [functions](./src/functions/functions.ts) via the [ExpressionContext](src/context/expression-context.ts).
+
+For example, additional functions may be added to the `functions` map:
+
+```javascript
+import { functions } from "obj-expressions-js";
+import myFunc from "./my-func";
+
+const customFunctions = new Map(functions);
+// NOTE: function keys are required to be in uppercase
+customFunctions.set("MYFUNC", myFunc);
+
+export default customFunctions;
+```
 
 #### Math Functions
 
@@ -369,6 +395,23 @@ When evaluating an expression, the following tokens are parsed:
 - Logical Operators
 
 Each token is evaluated from left to right. If a token contains a group, all tokens within the group will be evaluated before moving to the next token.
+
+## Fragment Parsing
+
+[FragmentParser](./src/parsers/fragment/fragment-parser.ts) is used to parse the expression string to identify all fragments (conditions, function calls, logical operators, comparison operators, etc.) before evaluation.
+
+[FragmentParser](./src/parsers/fragment/fragment-parser.ts) uses [ExpressionToken](./src/parsers/fragment/expression-token.ts) to represent symbols and symbol groups (such as quotes, parentheses, brackets, etc.) and keep track of symbol counts when tokens are nested.
+
+[FragmentParser](./src/parsers/fragment/fragment-parser.ts) uses [ExpressionDelimiter](./src/parsers/fragment/expression-delimiter.ts) to represent delimiters which are responsible for splitting two fragments, such as logical operators (A `AND` B, A `OR` B, `NOT` A), comma separated values, etc.
+
+By default, the [create-context](./src/context/create-context.ts) (which is internally called when using [evaluate](./src/evaluate.ts)) function specifies a default set of [ExpressionToken](./src/parsers/fragment/expression-token.ts):
+
+- Groups (parentheses)
+- Strings (double quotes and single quotes)
+- Regular Expressions (forward slashes)
+- Field Paths (square brackets)
+
+Additionally, all [ComparisonOperator](./src/operators/comparison-operator.ts) definitions on the [ExpressionContext](./src/context/expression-context.ts) will be registered as [ExpressionDelimiter](./src/parsers/fragment/expression-delimiter.ts) by default.
 
 ## Error Handling
 
