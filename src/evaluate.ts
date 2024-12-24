@@ -1,6 +1,6 @@
-import ExpressionContext from "./types/expression-context";
-import createContext from "./create-context";
-import ExpressionError from "./expression-error";
+import ExpressionContext from "./context/expression-context";
+import createContext from "./context/create-context";
+import ExpressionError from "./errors/expression-error";
 
 const evaluate = async <T> (context: Partial<ExpressionContext<T>>): Promise<boolean> => {
     try {

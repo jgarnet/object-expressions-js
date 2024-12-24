@@ -4,7 +4,7 @@
 
 Evaluates if each condition (in relation to an object) contained in an expression is true, allowing business rules to be defined using expressions.
 
-The [evaluate](./src/evaluate.ts) function accepts an [ExpressionContext](./src/types/expression-context.ts) and returns a Promise containing `true` if all conditions are met, or `false` otherwise.
+The [evaluate](./src/evaluate.ts) function accepts an [ExpressionContext](src/context/expression-context.ts) and returns a Promise containing `true` if all conditions are met, or `false` otherwise.
 
 At a minimum, an `expression` and `object` are required for evaluation.
 
@@ -146,9 +146,9 @@ If an expression contains imbalanced or invalid conditions (invalid number of op
 
 #### Comparison Operators
 
-[Comparison Operators](./src/types/comparison-operator.ts) are used to evaluate conditions against an object during evaluation.
+[Comparison Operators](src/operators/comparison-operator.ts) are used to evaluate conditions against an object during evaluation.
 
-Various comparison operators are provided by default, but it is possible to overwrite or extend the provided [operators](./src/operators/_operators.ts) via the [ExpressionContext](./src/types/expression-context.ts).
+Various comparison operators are provided by default, but it is possible to overwrite or extend the provided [operators](./src/operators/operators.ts) via the [ExpressionContext](src/context/expression-context.ts).
 
 The following comparison operators are provided:
 - `=`
@@ -236,13 +236,13 @@ evaluate({
 });
 ```
 
-[Functions](./src/types/expression-function.ts) can be applied to a field's value during evaluation.
+[Functions](src/functions/expression-function.ts) can be applied to a field's value during evaluation.
 
 Functions can evaluate other functions as arguments.
 
 If an expression contains an unclosed function or invalid function argument, an `ExpressionError` will be thrown during evaluation.
 
-Various functions are provided by default, but it is possible to overwrite or extend the provided [functions](./src/functions/_functions.ts) via the [ExpressionContext](./src/types/expression-context.ts).
+Various functions are provided by default, but it is possible to overwrite or extend the provided [functions](./src/functions/functions.ts) via the [ExpressionContext](src/context/expression-context.ts).
 
 #### Math Functions
 
@@ -380,17 +380,17 @@ During evaluation, an `ExpressionError` will be thrown if errors occur. Errors w
 
 ## Custom Implementations
 
-The [ExpressionContext](./src/types/expression-context.ts) can be configured to provide alternative implementations for the following classes:
-- [ConditionEvaluator](./src/types/condition-evaluator.ts)
+The [ExpressionContext](src/context/expression-context.ts) can be configured to provide alternative implementations for the following classes:
+- [ConditionEvaluator](src/evaluators/condition/condition-evaluator.ts)
   - Evaluates a condition (containing a comparison operation) against an object.
-- [ExpressionEvaluator](./src/types/expression-evaluator.ts)
+- [ExpressionEvaluator](src/evaluators/expression/expression-evaluator.ts)
   - Evaluates an expression (containing conditions, logical operators, and child groups) against an object.
-- [ExpressionParser](./src/types/expression-parser.ts)
-  - Parses all tokens (conditions, logical operators, child groups) from an expression, and returns an [ExpressionNode](./src/types/expression-node.ts) chain.
-- [FragmentParser](./src/types/fragment-parser.ts)
+- [ExpressionParser](src/parsers/expression/expression-parser.ts)
+  - Parses all tokens (conditions, logical operators, child groups) from an expression, and returns an [ExpressionNode](src/evaluators/expression/expression-node.ts) chain.
+- [FragmentParser](src/parsers/fragment/fragment-parser.ts)
   - Parses all fragments from a string (supports delimiters, symbols, and symbol groups). 
   - Used when parsing expressions, evaluating conditions, and evaluating functions.
-- [FunctionEvaluator](./src/types/function-evaluator.ts)
+- [FunctionEvaluator](src/evaluators/function/function-evaluator.ts)
   - Evaluates a function within a condition.
-- [PathEvaluator](./src/types/path-evaluator.ts)
+- [PathEvaluator](src/evaluators/path/path-evaluator.ts)
   - Retrieves values from an object given a path.

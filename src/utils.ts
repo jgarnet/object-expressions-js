@@ -1,5 +1,5 @@
-import ExpressionContext from "./types/expression-context";
-import ExpressionError from "./expression-error";
+import ExpressionContext from "./context/expression-context";
+import ExpressionError from "./errors/expression-error";
 import {DateTime} from "luxon";
 
 const isArray = require("lodash/isArray");
