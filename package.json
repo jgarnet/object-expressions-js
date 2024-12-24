@@ -9,7 +9,11 @@
     "engine",
     "logic",
     "condition",
-    "expression"
+    "expression",
+    "object",
+    "expressions",
+    "domain",
+    "language"
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
