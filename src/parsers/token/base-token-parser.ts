@@ -1,9 +1,9 @@
-import FragmentParser, {FragmentParserOptions} from "./fragment-parser";
-import ExpressionToken from "./expression-token";
-import ExpressionDelimiter from "./expression-delimiter";
+import TokenParser, {TokenParserOptions} from "./token-parser";
+import SymbolToken from "./symbol-token";
+import DelimiterToken from "./delimiter-token";
 
-class BaseFragmentParser implements FragmentParser {
-    parse(str: string, tokens: Set<ExpressionToken>, delimiters: Set<ExpressionDelimiter>, options?: FragmentParserOptions): string[] {
+class BaseTokenParser implements TokenParser {
+    parse(str: string, tokens: Set<SymbolToken>, delimiters: Set<DelimiterToken>, options?: TokenParserOptions): string[] {
         const tokenMap = this.mapTokens(tokens);
         const delimiterMap = this.mapDelimiters(delimiters);
         let tokenCount = 0;
@@ -14,7 +14,7 @@ class BaseFragmentParser implements FragmentParser {
             const c = str[i];
             if (tokenMap.has(c)) {
                 // check if the current character is the start of a token symbol / closeSymbol
-                const _tokens = tokenMap.get(c) as ExpressionToken[];
+                const _tokens = tokenMap.get(c) as SymbolToken[];
                 let token = undefined;
                 let isStart = false;
                 let isClose = false;
@@ -34,7 +34,7 @@ class BaseFragmentParser implements FragmentParser {
                     buffer += c;
                     continue;
                 }
-                token = token as ExpressionToken;
+                token = token as SymbolToken;
                 // this is a token symbol; append symbol to buffer
                 const originalIndex = i;
                 const symbol = isStart ? token.symbol : token.closeSymbol as string;
@@ -52,7 +52,7 @@ class BaseFragmentParser implements FragmentParser {
                     currentSymbol = symbol;
                 } else if (currentSymbol !== symbol) {
                     // determine if current character is the start of the closeSymbol for the current token
-                    const _token = tokenMap.get(currentSymbol) as ExpressionToken[];
+                    const _token = tokenMap.get(currentSymbol) as SymbolToken[];
                     if (!_token[0].closeSymbol || !this.isTokenSymbol(str, originalIndex, _token[0].closeSymbol)) {
                         // this indicates we are inside another token / group; simply append to buffer and continue
                         continue;
@@ -81,9 +81,9 @@ class BaseFragmentParser implements FragmentParser {
             } else {
                 let delimiter = this.checkDelimiter(str, i, delimiterMap);
                 if (delimiter !== null && tokenCount === 0) {
-                    delimiter = delimiter as ExpressionDelimiter;
+                    delimiter = delimiter as DelimiterToken;
                     // split values based on delimiter if we are not inside a token / group
-                    this.addFragment(result, buffer, options);
+                    this.addToken(result, buffer, options);
                     buffer = '';
                     if (delimiter.include) {
                         result.push(delimiter.symbol);
@@ -97,9 +97,9 @@ class BaseFragmentParser implements FragmentParser {
                 }
             }
         }
-        this.addFragment(result, buffer, options);
+        this.addToken(result, buffer, options);
         if (tokenCount !== 0) {
-            const token = tokenMap.get(currentSymbol) as ExpressionToken[];
+            const token = tokenMap.get(currentSymbol) as SymbolToken[];
             if (token[0].closeSymbol) {
                 throw new SyntaxError(`Expression contains imbalanced symbol group: ${token[0].symbol}${token[0].closeSymbol}`);
             }
@@ -108,15 +108,15 @@ class BaseFragmentParser implements FragmentParser {
         return result;
     }
 
-    private addFragment(results: string[], fragment: string, options?: FragmentParserOptions): void {
-        if (fragment.trim().length > 0 || options?.allowEmpty) {
+    private addToken(results: string[], token: string, options?: TokenParserOptions): void {
+        if (token.trim().length > 0 || options?.allowEmpty) {
             // append remaining buffer to results
-            results.push(fragment.trim());
+            results.push(token.trim());
         }
     }
 
-    private mapTokens(tokens: Set<ExpressionToken>): Map<string, ExpressionToken[]> {
-        const map = new Map<string, ExpressionToken[]>;
+    private mapTokens(tokens: Set<SymbolToken>): Map<string, SymbolToken[]> {
+        const map = new Map<string, SymbolToken[]>;
         for (const token of tokens) {
             const symbol = token.symbol.charAt(0).toUpperCase();
             this.registerToken(map, symbol, token);
@@ -133,21 +133,21 @@ class BaseFragmentParser implements FragmentParser {
         return map;
     }
 
-    private registerToken(map: Map<string, ExpressionToken[]>, symbol: string, token: ExpressionToken): void {
+    private registerToken(map: Map<string, SymbolToken[]>, symbol: string, token: SymbolToken): void {
         if (map.has(symbol)) {
-            const values = map.get(symbol) as ExpressionToken[];
+            const values = map.get(symbol) as SymbolToken[];
             values.push(token);
         } else {
             map.set(symbol, [token]);
         }
     }
 
-    private mapDelimiters(delimiters: Set<ExpressionDelimiter>): Map<string, ExpressionDelimiter[]> {
-        const map = new Map<string, ExpressionDelimiter[]>;
+    private mapDelimiters(delimiters: Set<DelimiterToken>): Map<string, DelimiterToken[]> {
+        const map = new Map<string, DelimiterToken[]>;
         for (const delimiter of delimiters) {
             const symbol = delimiter.symbol.charAt(0).toUpperCase();
             if (map.has(symbol)) {
-                const values = map.get(symbol) as ExpressionDelimiter[];
+                const values = map.get(symbol) as DelimiterToken[];
                 values.push(delimiter);
             } else {
                 map.set(symbol, [delimiter]);
@@ -172,16 +172,16 @@ class BaseFragmentParser implements FragmentParser {
     }
 
     /**
-     * Determines if the current character is a delimiter, and returns {@link ExpressionDelimiter} if so.
-     * @param str The fragment string.
-     * @param i The current index in the fragment string.
-     * @param delimiters Map containing all {@link ExpressionDelimiter} values.
+     * Determines if the current character is a delimiter, and returns {@link DelimiterToken} if so.
+     * @param str The token string.
+     * @param i The current index in the token string.
+     * @param delimiters Map containing all {@link DelimiterToken} values.
      * @private
      */
-    private checkDelimiter(str: string, i: number, delimiters: Map<string, ExpressionDelimiter[]>): ExpressionDelimiter | null {
+    private checkDelimiter(str: string, i: number, delimiters: Map<string, DelimiterToken[]>): DelimiterToken | null {
         const c = str[i].toUpperCase();
         if (delimiters.has(c)) {
-            const _delimiters = delimiters.get(c) as ExpressionDelimiter[];
+            const _delimiters = delimiters.get(c) as DelimiterToken[];
             for (const delimiter of _delimiters) {
                 if (delimiter.whitespace) {
                     if (i - 1 >= 0 && !/\s/.test(str[i - 1])) {
@@ -211,4 +211,4 @@ class BaseFragmentParser implements FragmentParser {
     }
 }
 
-export default BaseFragmentParser;
+export default BaseTokenParser;

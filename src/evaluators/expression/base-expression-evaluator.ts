@@ -2,7 +2,7 @@ import ExpressionContext from "../../context/expression-context";
 import ExpressionEvaluator from "./expression-evaluator";
 import {CONSOLE_COLORS, debug, isWrapped, unwrapValue} from "../../utils";
 import createContext from "../../context/create-context";
-import ExpressionNode from "./expression-node";
+import ExpressionNode from "../../parsers/expression/expression-node";
 import ExpressionError from "../../errors/expression-error";
 
 class BaseExpressionEvaluator implements ExpressionEvaluator {
@@ -42,11 +42,11 @@ class BaseExpressionEvaluator implements ExpressionEvaluator {
                     conditionEvaluator: context.conditionEvaluator,
                     expressionParser: context.expressionParser,
                     functionEvaluator: context.functionEvaluator,
-                    fragmentParser: context.fragmentParser,
+                    tokenParser: context.tokenParser,
                     cache: context.cache,
                     operators: context.operators,
                     operatorDelimiters: context.operatorDelimiters,
-                    standardTokens: context.standardTokens,
+                    standardSymbols: context.standardSymbols,
                     functions: context.functions,
                     debug: context.debug,
                     nestLevel: context.nestLevel + 1

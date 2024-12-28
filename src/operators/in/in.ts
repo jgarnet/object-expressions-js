@@ -29,9 +29,9 @@ const _in: ComparisonOperator = {
 };
 
 const split = <T> (token: string, context: ExpressionContext<T>): string[] => {
-    return context.fragmentParser.parse(
+    return context.tokenParser.parse(
         token,
-        context.standardTokens,
+        context.standardSymbols,
         new Set([
             { symbol: ',' }
         ])

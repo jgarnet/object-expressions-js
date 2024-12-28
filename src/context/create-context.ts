@@ -6,14 +6,14 @@ import BaseConditionEvaluator from "../evaluators/condition/base-condition-evalu
 import BaseExpressionParser from "../parsers/expression/base-expression-parser";
 import BaseFunctionEvaluator from "../evaluators/function/base-function-evaluator";
 import BaseExpressionEvaluator from "../evaluators/expression/base-expression-evaluator";
-import BaseFragmentParser from "../parsers/fragment/base-fragment-parser";
-import ExpressionDelimiter from "../parsers/fragment/expression-delimiter";
-import ExpressionToken from "../parsers/fragment/expression-token";
+import BaseTokenParser from "../parsers/token/base-token-parser";
+import DelimiterToken from "../parsers/token/delimiter-token";
+import SymbolToken from "../parsers/token/symbol-token";
 
 const createContext = <T> (context: Partial<ExpressionContext<T>>): ExpressionContext<T> => {
     const operators = context.operators ?? new Map(_operators);
     const functions = context.functions ?? new Map(_functions);
-    const operatorDelimiters= context.operatorDelimiters ?? new Set<ExpressionDelimiter>;
+    const operatorDelimiters= context.operatorDelimiters ?? new Set<DelimiterToken>;
     if (!context.operatorDelimiters) {
         for (const operatorKey of operators.keys()) {
             const isSymbol = !/\w/.test(operatorKey);
@@ -25,8 +25,8 @@ const createContext = <T> (context: Partial<ExpressionContext<T>>): ExpressionCo
             });
         }
     }
-    const standardTokens = context.standardTokens ?? new Set<ExpressionToken>;
-    if (!context.standardTokens) {
+    const standardTokens = context.standardSymbols ?? new Set<SymbolToken>;
+    if (!context.standardSymbols) {
         standardTokens.add({ symbol: '(', closeSymbol: ')', escapable: true });
         standardTokens.add({ symbol: '[', closeSymbol: ']', escapable: true });
         standardTokens.add({ symbol: '"', escapable: true });
@@ -40,12 +40,12 @@ const createContext = <T> (context: Partial<ExpressionContext<T>>): ExpressionCo
         pathEvaluator: context.pathEvaluator ?? new BasePathEvaluator(),
         conditionEvaluator: context.conditionEvaluator ?? new BaseConditionEvaluator(),
         expressionParser: context.expressionParser ?? new BaseExpressionParser(),
-        fragmentParser: context.fragmentParser ?? new BaseFragmentParser(),
+        tokenParser: context.tokenParser ?? new BaseTokenParser(),
         functionEvaluator: context.functionEvaluator ?? new BaseFunctionEvaluator(),
         cache: context.cache ?? new Map<string, boolean>,
         operators,
         operatorDelimiters,
-        standardTokens,
+        standardSymbols: standardTokens,
         functions,
         debug: context.debug ?? false,
         nestLevel: context.nestLevel ?? 0

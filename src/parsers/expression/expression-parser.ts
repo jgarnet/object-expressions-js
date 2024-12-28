@@ -1,5 +1,5 @@
 import ExpressionContext from "../../context/expression-context";
-import ExpressionNode from "../../evaluators/expression/expression-node";
+import ExpressionNode from "./expression-node";
 
 /**
  * Parses all tokens (groups, conditions, functions, etc.) within an expression.

@@ -1,7 +1,7 @@
 /**
- * Represents a delimiter which splits fragments when parsing fragments from a string.
+ * Represents a delimiter which splits other tokens during parsing.
  */
-type ExpressionDelimiter = {
+type DelimiterToken = {
     /**
      * The symbol which represents the delimiter.
      */
@@ -11,7 +11,7 @@ type ExpressionDelimiter = {
      */
     whitespace?: boolean,
     /**
-     * Determines if the delimiter should be included in the parsed fragments array.
+     * Determines if the delimiter should be included in the parsed tokens array.
      */
     include?: boolean;
     /**
@@ -20,4 +20,4 @@ type ExpressionDelimiter = {
     precedence?: number;
 };
 
-export default ExpressionDelimiter;
+export default DelimiterToken;

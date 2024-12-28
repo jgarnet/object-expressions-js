@@ -389,29 +389,29 @@ export default customFunctions;
 
 ### Precedence
 
-When evaluating an expression, the following fragments are parsed:
+When evaluating an expression, the following tokens are parsed:
 - Groups
 - Conditions
 - Logical Operators
 
-Each fragment is evaluated from left to right. If a fragment contains a group, all fragments within the group will be evaluated before moving to the next fragment.
+Each token is evaluated from left to right. If a token contains a group, all tokens within the group will be evaluated before moving to the next token.
 
-## Fragment Parsing
+## Token Parsing
 
-[FragmentParser](./src/parsers/fragment/fragment-parser.ts) is used to parse the expression string to identify all fragments (conditions, function calls, logical operators, comparison operators, etc.) before evaluation.
+[TokenParser](src/parsers/token/token-parser.ts) is used to parse the expression string to identify all tokens (conditions, function calls, logical operators, comparison operators, etc.) before evaluation.
 
-[FragmentParser](./src/parsers/fragment/fragment-parser.ts) uses [ExpressionToken](./src/parsers/fragment/expression-token.ts) to represent symbols and symbol groups (such as quotes, parentheses, brackets, etc.) and keep track of symbol counts when tokens are nested.
+[TokenParser](src/parsers/token/token-parser.ts) uses [SymbolToken](src/parsers/token/symbol-token.ts) to represent symbols and symbol groups (such as quotes, parentheses, brackets, etc.) and keep track of symbol counts when tokens are nested.
 
-[FragmentParser](./src/parsers/fragment/fragment-parser.ts) uses [ExpressionDelimiter](./src/parsers/fragment/expression-delimiter.ts) to represent delimiters which are responsible for splitting two fragments, such as logical operators (A `AND` B, A `OR` B, `NOT` A), comma separated values, etc.
+[TokenParser](src/parsers/token/token-parser.ts) uses [DelimiterToken](src/parsers/token/delimiter-token.ts) to represent delimiters which are responsible for splitting two tokens, such as logical operators (A `AND` B, A `OR` B, `NOT` A), comma separated values, etc.
 
-By default, the [create-context](./src/context/create-context.ts) (which is internally called when using [evaluate](./src/evaluate.ts)) function specifies a default set of [ExpressionToken](./src/parsers/fragment/expression-token.ts):
+By default, the [create-context](./src/context/create-context.ts) (which is internally called when using [evaluate](./src/evaluate.ts)) function specifies a default set of [SymbolToken](src/parsers/token/symbol-token.ts):
 
 - Groups (parentheses)
 - Strings (double quotes and single quotes)
 - Regular Expressions (forward slashes)
 - Field Paths (square brackets)
 
-Additionally, all [ComparisonOperator](./src/operators/comparison-operator.ts) definitions on the [ExpressionContext](./src/context/expression-context.ts) will be registered as [ExpressionDelimiter](./src/parsers/fragment/expression-delimiter.ts) by default.
+Additionally, all [ComparisonOperator](./src/operators/comparison-operator.ts) definitions on the [ExpressionContext](./src/context/expression-context.ts) will be registered as [DelimiterToken](src/parsers/token/delimiter-token.ts) by default.
 
 ## Error Handling
 
@@ -429,9 +429,9 @@ The [ExpressionContext](src/context/expression-context.ts) can be configured to 
 - [ExpressionEvaluator](src/evaluators/expression/expression-evaluator.ts)
   - Evaluates an expression (containing conditions, logical operators, and child groups) against an object.
 - [ExpressionParser](src/parsers/expression/expression-parser.ts)
-  - Parses all tokens (conditions, logical operators, child groups) from an expression, and returns an [ExpressionNode](src/evaluators/expression/expression-node.ts) chain.
-- [FragmentParser](src/parsers/fragment/fragment-parser.ts)
-  - Parses all fragments from a string (supports delimiters, symbols, and symbol groups). 
+  - Parses all tokens (conditions, logical operators, child groups) from an expression, and returns an [ExpressionNode](src/parsers/expression/expression-node.ts) chain.
+- [TokenParser](src/parsers/token/token-parser.ts)
+  - Parses all tokens from a string (supports delimiters, symbols, and symbol groups). 
   - Used when parsing expressions, evaluating conditions, and evaluating functions.
 - [FunctionEvaluator](src/evaluators/function/function-evaluator.ts)
   - Evaluates a function within a condition.

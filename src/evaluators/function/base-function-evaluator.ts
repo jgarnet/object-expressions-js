@@ -66,9 +66,9 @@ class BaseFunctionEvaluator implements FunctionEvaluator {
      * @private
      */
     private parseFunctionArgs<T>(token: string, context: ExpressionContext<T>): string[] {
-        return context.fragmentParser.parse(
+        return context.tokenParser.parse(
             token,
-            context.standardTokens,
+            context.standardSymbols,
             new Set([
                 { symbol: ',' }
             ]),

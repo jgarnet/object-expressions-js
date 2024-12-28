@@ -29,10 +29,10 @@ const filter: ExpressionFunction = {
                 conditionEvaluator: context.conditionEvaluator,
                 expressionParser: context.expressionParser,
                 functionEvaluator: context.functionEvaluator,
-                fragmentParser: context.fragmentParser,
+                tokenParser: context.tokenParser,
                 operators: context.operators,
                 operatorDelimiters: context.operatorDelimiters,
-                standardTokens: context.standardTokens,
+                standardSymbols: context.standardSymbols,
                 functions: context.functions,
                 debug: context.debug,
                 nestLevel: context.nestLevel

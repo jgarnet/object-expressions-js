@@ -5,9 +5,9 @@ import ConditionEvaluator from "../evaluators/condition/condition-evaluator";
 import ExpressionParser from "../parsers/expression/expression-parser";
 import FunctionEvaluator from "../evaluators/function/function-evaluator";
 import ExpressionEvaluator from "../evaluators/expression/expression-evaluator";
-import FragmentParser from "../parsers/fragment/fragment-parser";
-import ExpressionDelimiter from "../parsers/fragment/expression-delimiter";
-import ExpressionToken from "../parsers/fragment/expression-token";
+import TokenParser from "../parsers/token/token-parser";
+import DelimiterToken from "../parsers/token/delimiter-token";
+import SymbolToken from "../parsers/token/symbol-token";
 
 /**
  * Stores data relevant for evaluating expressions.
@@ -40,9 +40,9 @@ type ExpressionContext<T> = {
      */
     expressionParser: ExpressionParser;
     /**
-     * Used to parse fragments within an expression.
+     * Used to parse tokens within an expression.
      */
-    fragmentParser: FragmentParser;
+    tokenParser: TokenParser;
     /**
      * Used to evaluate functions during condition evaluation.
      */
@@ -57,15 +57,15 @@ type ExpressionContext<T> = {
     operators: Map<string, ComparisonOperator>;
     /**
      * Used when parsing comparison operators inside condition strings.
-     * Each operator should be represented using a {@link ExpressionDelimiter}.
+     * Each operator should be represented using a {@link DelimiterToken}.
      * If this is not supplied, this field will be auto-generated based on the operators Map.
      */
-    operatorDelimiters: Set<ExpressionDelimiter>;
+    operatorDelimiters: Set<DelimiterToken>;
     /**
-     * Contains all standard tokens representing symbols and symbol groups when parsing fragments.
+     * Contains all standard tokens representing symbols and symbol groups when parsing tokens.
      * Default values include (), [], ", /.
      */
-    standardTokens: Set<ExpressionToken>;
+    standardSymbols: Set<SymbolToken>;
     /**
      * Stores all functions, mapping their name and {@link ExpressionFunction} implementation.
      */

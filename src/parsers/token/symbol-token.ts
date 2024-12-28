@@ -1,7 +1,7 @@
 /**
- * Represents symbol(s) that wrap fragments inside a string.
+ * Represents symbol(s) that wrap tokens inside a string.
  */
-type ExpressionToken = {
+type SymbolToken = {
     /**
      * The symbol (or start symbol) that represents the token.
      */
@@ -15,7 +15,7 @@ type ExpressionToken = {
      */
     escapable?: boolean,
     /**
-     * Determines if characters after the token should be broken into a new fragment.
+     * Determines if characters after the token should be broken into a new token.
      */
     break?: boolean
     /**
@@ -24,4 +24,4 @@ type ExpressionToken = {
     precedence?: number;
 };
 
-export default ExpressionToken;
+export default SymbolToken;

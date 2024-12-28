@@ -32,9 +32,9 @@ class BaseConditionEvaluator implements ConditionEvaluator {
      * @private
      */
     private getTokens<T>(token: string, context: ExpressionContext<T>): string[] {
-        return context.fragmentParser.parse(
+        return context.tokenParser.parse(
             token,
-            context.standardTokens,
+            context.standardSymbols,
             context.operatorDelimiters
         );
     }

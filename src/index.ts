@@ -1,7 +1,7 @@
 import BaseConditionEvaluator from "./evaluators/condition/base-condition-evaluator";
 import BaseExpressionEvaluator from "./evaluators/expression/base-expression-evaluator";
 import BaseExpressionParser from "./parsers/expression/base-expression-parser";
-import BaseFragmentParser from "./parsers/fragment/base-fragment-parser";
+import BaseTokenParser from "./parsers/token/base-token-parser";
 import BaseFunctionEvaluator from "./evaluators/function/base-function-evaluator";
 import BasePathEvaluator from "./evaluators/path/base-path-evaluator";
 import ComparisonOperator from "./operators/comparison-operator";
@@ -9,14 +9,15 @@ import ConditionEvaluator from "./evaluators/condition/condition-evaluator";
 import createContext from "./context/create-context";
 import evaluate from "./evaluate";
 import ExpressionContext from "./context/expression-context";
-import ExpressionDelimiter from "./parsers/fragment/expression-delimiter";
+import DelimiterToken from "./parsers/token/delimiter-token";
 import ExpressionError from "./errors/expression-error";
 import ExpressionEvaluator from "./evaluators/expression/expression-evaluator";
 import ExpressionFunction from "./functions/expression-function";
+import ExpressionNode from "./parsers/expression/expression-node";
 import ExpressionParser from "./parsers/expression/expression-parser";
-import ExpressionToken from "./parsers/fragment/expression-token";
-import FragmentParser from "./parsers/fragment/fragment-parser";
-import {FragmentParserOptions} from "./parsers/fragment/fragment-parser";
+import SymbolToken from "./parsers/token/symbol-token";
+import TokenParser from "./parsers/token/token-parser";
+import {TokenParserOptions} from "./parsers/token/token-parser";
 import functions from "./functions/functions";
 import FunctionContext from "./context/function-context";
 import FunctionEvaluator from "./evaluators/function/function-evaluator";
@@ -29,7 +30,7 @@ export {
     BaseConditionEvaluator,
     BaseExpressionEvaluator,
     BaseExpressionParser,
-    BaseFragmentParser,
+    BaseTokenParser,
     BaseFunctionEvaluator,
     BasePathEvaluator,
     ComparisonOperator,
@@ -37,14 +38,15 @@ export {
     createContext,
     evaluate,
     ExpressionContext,
-    ExpressionDelimiter,
+    DelimiterToken,
     ExpressionError,
     ExpressionEvaluator,
     ExpressionFunction,
+    ExpressionNode,
     ExpressionParser,
-    ExpressionToken,
-    FragmentParser,
-    FragmentParserOptions,
+    SymbolToken,
+    TokenParser,
+    TokenParserOptions,
     functions,
     FunctionContext,
     FunctionEvaluator,

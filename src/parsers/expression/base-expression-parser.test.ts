@@ -4,7 +4,7 @@ import ExpressionContext from "../../context/expression-context";
 import operators from "../../operators/operators";
 import functions from "../../functions/functions";
 import createContext from "../../context/create-context";
-import ExpressionNode from "../../evaluators/expression/expression-node";
+import ExpressionNode from "./expression-node";
 import SyntaxError from "../../errors/syntax-error";
 
 const parser = new BaseExpressionParser();

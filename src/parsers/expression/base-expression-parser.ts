@@ -1,14 +1,14 @@
 import ExpressionParser from "./expression-parser";
 import ExpressionContext from "../../context/expression-context";
-import ExpressionNode from "../../evaluators/expression/expression-node";
+import ExpressionNode from "./expression-node";
 import SyntaxError from "../../errors/syntax-error";
 
 class BaseExpressionParser implements ExpressionParser {
     parse<T>(context: ExpressionContext<T>): ExpressionNode {
         const expression = context.expression;
-        const tokens = context.fragmentParser.parse(
+        const tokens = context.tokenParser.parse(
             expression,
-            context.standardTokens,
+            context.standardSymbols,
             new Set([
                 { symbol: 'AND', whitespace: true, include: true },
                 { symbol: 'OR', whitespace: true, include: true },
@@ -19,7 +19,7 @@ class BaseExpressionParser implements ExpressionParser {
     }
 
     /**
-     * Transforms all parsed fragments into an Expression Chain using {@link ExpressionNode}.
+     * Transforms all parsed tokens into an Expression Chain using {@link ExpressionNode}.
      * @param tokens All tokens parsed from the expression.
      * @param context The {@link ExpressionContext}.
      * @private
