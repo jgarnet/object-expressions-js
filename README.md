@@ -153,7 +153,7 @@ Various comparison operators are provided by default, but it is possible to over
 For example, additional operators may be added to the `operators` map:
 
 ```javascript
-import { operators } from "obj-expressions-js";
+import { operators } from "object-expressions-js";
 import myOperator from "./my-operator";
 
 const customOperators = new Map(operators);
@@ -260,7 +260,7 @@ Various functions are provided by default, but it is possible to overwrite or ex
 For example, additional functions may be added to the `functions` map:
 
 ```javascript
-import { functions } from "obj-expressions-js";
+import { functions } from "object-expressions-js";
 import myFunc from "./my-func";
 
 const customFunctions = new Map(functions);
@@ -389,12 +389,12 @@ export default customFunctions;
 
 ### Precedence
 
-When evaluating an expression, the following tokens are parsed:
+When evaluating an expression, the following fragments are parsed:
 - Groups
 - Conditions
 - Logical Operators
 
-Each token is evaluated from left to right. If a token contains a group, all tokens within the group will be evaluated before moving to the next token.
+Each fragment is evaluated from left to right. If a fragment contains a group, all fragments within the group will be evaluated before moving to the next fragment.
 
 ## Fragment Parsing
 
