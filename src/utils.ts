@@ -1,4 +1,4 @@
-import ExpressionContext from "./context/expression-context";
+import ExpressionContext from "./expression/context/expression-context";
 import ExpressionError from "./errors/expression-error";
 import {DateTime} from "luxon";
 

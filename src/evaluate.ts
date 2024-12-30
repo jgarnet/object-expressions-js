@@ -1,5 +1,5 @@
-import ExpressionContext from "./context/expression-context";
-import createContext from "./context/create-context";
+import ExpressionContext from "./expression/context/expression-context";
+import createContext from "./expression/context/create-context";
 import ExpressionError from "./errors/expression-error";
 
 const evaluate = async <T> (context: Partial<ExpressionContext<T>>): Promise<boolean> => {

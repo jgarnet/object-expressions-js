@@ -4,7 +4,7 @@
 
 Evaluates if each condition (in relation to an object) contained in an expression is true, allowing business rules to be defined using expressions.
 
-The [evaluate](./src/evaluate.ts) function accepts an [ExpressionContext](src/context/expression-context.ts) and returns a Promise containing `true` if all conditions are met, or `false` otherwise.
+The [evaluate](./src/evaluate.ts) function accepts an [ExpressionContext](src/expression/context/expression-context.ts) and returns a Promise containing `true` if all conditions are met, or `false` otherwise.
 
 At a minimum, an `expression` and `object` are required for evaluation.
 
@@ -146,9 +146,9 @@ If an expression contains imbalanced or invalid conditions (invalid number of op
 
 #### Comparison Operators
 
-[Comparison Operators](src/operators/comparison-operator.ts) are used to evaluate conditions against an object during evaluation.
+[Comparison Operators](src/operator/comparison-operator.ts) are used to evaluate conditions against an object during evaluation.
 
-Various comparison operators are provided by default, but it is possible to overwrite or extend the provided [operators](./src/operators/operators.ts) via the [ExpressionContext](src/context/expression-context.ts).
+Various comparison operators are provided by default, but it is possible to overwrite or extend the provided [operators](src/operator/operators/index.ts) via the [ExpressionContext](src/expression/context/expression-context.ts).
 
 For example, additional operators may be added to the `operators` map:
 
@@ -249,13 +249,13 @@ evaluate({
 });
 ```
 
-[Functions](src/functions/expression-function.ts) can be applied to a field's value during evaluation.
+[Functions](src/function/expression-function.ts) can be applied to a field's value during evaluation.
 
 Functions can evaluate other functions as arguments.
 
 If an expression contains an unclosed function or invalid function argument, an `ExpressionError` will be thrown during evaluation.
 
-Various functions are provided by default, but it is possible to overwrite or extend the provided [functions](./src/functions/functions.ts) via the [ExpressionContext](src/context/expression-context.ts).
+Various functions are provided by default, but it is possible to overwrite or extend the provided [functions](src/function/functions/index.ts) via the [ExpressionContext](src/expression/context/expression-context.ts).
 
 For example, additional functions may be added to the `functions` map:
 
@@ -398,20 +398,20 @@ Each token is evaluated from left to right. If a token contains a group, all tok
 
 ## Token Parsing
 
-[TokenParser](src/parsers/token/token-parser.ts) is used to parse the expression string to identify all tokens (conditions, function calls, logical operators, comparison operators, etc.) before evaluation.
+[TokenParser](src/token/parser/token-parser.ts) is used to parse the expression string to identify all tokens (conditions, function calls, logical operators, comparison operators, etc.) before evaluation.
 
-[TokenParser](src/parsers/token/token-parser.ts) uses [SymbolToken](src/parsers/token/symbol-token.ts) to represent symbols and symbol groups (such as quotes, parentheses, brackets, etc.) and keep track of symbol counts when tokens are nested.
+[TokenParser](src/token/parser/token-parser.ts) uses [SymbolToken](src/token/symbol-token.ts) to represent symbols and symbol groups (such as quotes, parentheses, brackets, etc.) and keep track of symbol counts when tokens are nested.
 
-[TokenParser](src/parsers/token/token-parser.ts) uses [DelimiterToken](src/parsers/token/delimiter-token.ts) to represent delimiters which are responsible for splitting two tokens, such as logical operators (A `AND` B, A `OR` B, `NOT` A), comma separated values, etc.
+[TokenParser](src/token/parser/token-parser.ts) uses [DelimiterToken](src/token/delimiter-token.ts) to represent delimiters which are responsible for splitting two tokens, such as logical operators (A `AND` B, A `OR` B, `NOT` A), comma separated values, etc.
 
-By default, the [create-context](./src/context/create-context.ts) (which is internally called when using [evaluate](./src/evaluate.ts)) function specifies a default set of [SymbolToken](src/parsers/token/symbol-token.ts):
+By default, the [create-context](src/expression/context/create-context.ts) (which is internally called when using [evaluate](./src/evaluate.ts)) function specifies a default set of [SymbolToken](src/token/symbol-token.ts):
 
 - Groups (parentheses)
 - Strings (double quotes and single quotes)
 - Regular Expressions (forward slashes)
 - Field Paths (square brackets)
 
-Additionally, all [ComparisonOperator](./src/operators/comparison-operator.ts) definitions on the [ExpressionContext](./src/context/expression-context.ts) will be registered as [DelimiterToken](src/parsers/token/delimiter-token.ts) by default.
+Additionally, all [ComparisonOperator](src/operator/comparison-operator.ts) definitions on the [ExpressionContext](src/expression/context/expression-context.ts) will be registered as [DelimiterToken](src/token/delimiter-token.ts) by default.
 
 ## Error Handling
 
@@ -423,17 +423,17 @@ During evaluation, an `ExpressionError` will be thrown if errors occur. Errors w
 
 ## Custom Implementations
 
-The [ExpressionContext](src/context/expression-context.ts) can be configured to provide alternative implementations for the following classes:
-- [ConditionEvaluator](src/evaluators/condition/condition-evaluator.ts)
+The [ExpressionContext](src/expression/context/expression-context.ts) can be configured to provide alternative implementations for the following classes:
+- [ConditionEvaluator](src/condition/evaluator/condition-evaluator.ts)
   - Evaluates a condition (containing a comparison operation) against an object.
-- [ExpressionEvaluator](src/evaluators/expression/expression-evaluator.ts)
+- [ExpressionEvaluator](src/expression/evaluator/expression-evaluator.ts)
   - Evaluates an expression (containing conditions, logical operators, and child groups) against an object.
-- [ExpressionParser](src/parsers/expression/expression-parser.ts)
-  - Parses all tokens (conditions, logical operators, child groups) from an expression, and returns an [ExpressionNode](src/parsers/expression/expression-node.ts) chain.
-- [TokenParser](src/parsers/token/token-parser.ts)
+- [ExpressionParser](src/expression/parser/expression-parser.ts)
+  - Parses all tokens (conditions, logical operators, child groups) from an expression, and returns an [ExpressionNode](src/expression/expression-node.ts) chain.
+- [TokenParser](src/token/parser/token-parser.ts)
   - Parses all tokens from a string (supports delimiters, symbols, and symbol groups). 
   - Used when parsing expressions, evaluating conditions, and evaluating functions.
-- [FunctionEvaluator](src/evaluators/function/function-evaluator.ts)
+- [FunctionEvaluator](src/function/evaluator/function-evaluator.ts)
   - Evaluates a function within a condition.
-- [PathEvaluator](src/evaluators/path/path-evaluator.ts)
+- [PathEvaluator](src/path/evaluator/path-evaluator.ts)
   - Retrieves values from an object given a path.

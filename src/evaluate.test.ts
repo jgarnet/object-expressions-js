@@ -1,7 +1,7 @@
 import {describe, expect, it} from "@jest/globals";
 import evaluate from "./evaluate";
 import ExpressionError from "./errors/expression-error";
-import ExpressionContext from "./context/expression-context";
+import ExpressionContext from "./expression/context/expression-context";
 
 describe('evaluate tests', () => {
     it('should evaluate expressions', async () => {
